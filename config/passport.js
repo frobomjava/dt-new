@@ -30,6 +30,7 @@ function(userNameOrEmail, password, done) {
         message: 'Invalid Password'
       });
       var returnUser = {
+        userName: user.userName,
         email: user.email,
         createdAt: user.createdAt,
         id: user.id

@@ -32,9 +32,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': {
-    view: 'homepage'
-  },
+  '/': 'HomeController.welcome',
 
   'get /login': {
     view: 'login'
@@ -46,6 +44,26 @@ module.exports.routes = {
 
   'get /signup': {
     view: 'signup'
-  }
+  },
+
+  'get /projects': 'ProjectController.getAll',
+
+  'post /project/new': 'ProjectController.create',
+
+  'get /project/delete/:projectName': 'ProjectController.delete',
+
+  'post /project/update': 'ProjectController.update',
+
+  'get project/in/:projectName': 'ProjectController.enter',
+
+  'get /project/in/:projectName/files': 'DtFileController.getAll',
+
+  'post /project/in/:projectName/file/new':'DtFileController.create',
+
+  'get /project/in/:projectName/file/delete/:fileId':'DtFileController.delete',
+
+  'post /project/in/:projectName/file/save': 'DtFileController.save',
+
+  'get /project/in/:projectName/file/data/:fileId':'DtFileController.getData'
 
 };

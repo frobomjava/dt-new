@@ -20,10 +20,7 @@ module.exports = {
           console.log(err);
           return res.send(err);
         }
-        return res.send({
-          message: info.message,
-          user: user
-        });
+        return res.redirect('/');
       });
 
     })(req, res);

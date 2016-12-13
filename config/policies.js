@@ -25,6 +25,14 @@ module.exports.policies = {
     '*': 'isAuthenticated'
   },
 
+  'ProjectController': {
+    '*': 'isAuthenticated'
+  },
+
+  'DtFileController': {
+    '*': 'isAuthenticated'
+  }
+
   /***************************************************************************
   *                                                                          *
   * Default policy for all controllers and actions (`true` allows public     *
