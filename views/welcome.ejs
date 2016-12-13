@@ -10,6 +10,12 @@
 <body>
 
   <div id='projects'></div>
+
+  <form action="#" id="project-create">
+    <input type="text" id="projectName" name="projectName"/>
+    <input type="submit" value="create"/>
+  </form>
+
   <script src="/dependencies/sails.io.js"></script>
 
   <script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
@@ -32,17 +38,33 @@
   componentWillMount: function() {
     var self = this;
     $.getJSON('/projects', function (data) {
-        console.log('ok, got data');
-        console.log("data is");
-        self.setState({
-          projects: data.projects
-        });
+      console.log('ok, got data');
+      console.log("data is");
+      self.setState({
+        projects: data.projects
+      });
 
     });
-  },
 
-  render: function() {
-    return (<ul>
+    $('#project-create').submit(function(event) {
+      console.log("post handler");
+      event.preventDefault();
+      var url = '/project/new';
+      var posting = $.post(url, {projectName: $('#projectName').val()});
+      posting.done(function(data) {
+        console.log(data.name);
+        var projectsUpdated = self.state.projects.slice();
+        projectsUpdated.push(data);
+        self.setState({
+          projects: projectsUpdated
+        }
+      );
+    });
+  });
+},
+
+render: function() {
+  return (<ul>
     {this.state.projects.map(function(project){
       return <li>{project.name}</li>;
     })}

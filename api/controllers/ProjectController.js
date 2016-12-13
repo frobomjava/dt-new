@@ -8,7 +8,17 @@
 module.exports = {
 
   create: function(req, res) {
-
+    var projectName = req.param('projectName');
+    console.log(projectName);
+    Project.create({projectName: projectName, owner: req.user.id}).exec(function(err, data){
+      if (err) {
+        console.log(JSON.stringify((err)));
+        return res.json(err);
+      } else {
+        console.log(data.projectName);
+        return res.json({name: data.projectName});
+      }
+    });
   },
 
   getAll: function(req, res) {
