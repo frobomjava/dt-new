@@ -34,17 +34,13 @@ module.exports.routes = {
 
   '/': 'HomeController.welcome',
 
-  'get /login': {
-    view: 'login'
-  },
+  'get /login': 'HomeController.welcome',
 
   'post /login': 'AuthController.login',
 
   '/logout': 'AuthController.logout',
 
-  'get /signup': {
-    view: 'signup'
-  },
+  'get /signup': 'HomeController.signup',
 
   'get /projects': 'ProjectController.getAll',
 
