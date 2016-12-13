@@ -9,7 +9,7 @@ module.exports = {
 
   welcome: function(req, res) {
     if (req.isAuthenticated()) {
-      res.view('welcome');
+      res.view('welcome', {layout: null});
     } else {
       res.view('homepage');
     }

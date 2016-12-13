@@ -1,1 +1,56 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Welcome></title>
+</head>
 <h4>Welcome <%=req.user.userName %></h4>
+
+<body>
+
+  <div id='projects'></div>
+  <script src="/dependencies/sails.io.js"></script>
+
+  <script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
+  <script src="/dependencies/code.jquery.com-ui-1.12.0-jquery-ui.js"></script>
+  <script src="/dependencies/pubsub.js"></script>
+  <script src="/dependencies/react.min.js"></script>
+  <script src="/dependencies/react-dom.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+
+  <script type="text/babel">
+  var ProjectList = React.createClass({
+    getInitialState: function() {
+      return ({
+        projects: []
+      }
+    );
+  },
+
+  componentWillMount: function() {
+    var self = this;
+    $.getJSON('/projects', function (data) {
+        console.log('ok, got data');
+        console.log("data is");
+        self.setState({
+          projects: data.projects
+        });
+
+    });
+  },
+
+  render: function() {
+    return (<ul>
+    {this.state.projects.map(function(project){
+      return <li>{project.name}</li>;
+    })}
+    </ul>);
+  }
+
+});
+ReactDOM.render(<ProjectList/>, document.getElementById('projects'));
+</script>
+</body>
+</html>

@@ -12,7 +12,21 @@ module.exports = {
   },
 
   getAll: function(req, res) {
+    var data = {
+      projects: [
+        {
+          name: 'project1'
+        },
+        {
+          name: 'project2'
+        },
+        {
+          name: 'project3'
+        }
+      ]
+    };
 
+    return res.json(data);
   },
 
   delete: function(req, res) {
