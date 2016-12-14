@@ -16,27 +16,21 @@ module.exports = {
         return res.json(err);
       } else {
         console.log(data.projectName);
-        return res.json({name: data.projectName});
+        return res.json(data);
       }
     });
   },
 
   getAll: function(req, res) {
-    var data = {
-      projects: [
-        {
-          name: 'project1'
-        },
-        {
-          name: 'project2'
-        },
-        {
-          name: 'project3'
-        }
-      ]
-    };
-
-    return res.json(data);
+			Project.find({owner: req.user.id}).exec(function(err, data) {
+				if (err) {
+          console.log(JSON.stringify((err)));
+          return res.json(err);
+				} else {
+          console.log(JSON.stringify(data));
+					return res.json(data);
+				}
+			});
   },
 
   delete: function(req, res) {
