@@ -1,0 +1,37 @@
+
+<h2>WorkSpace</h2>
+<h4><%= projectName %>&nbsp;&nbsp;<input id="addBtn" type="button" value="+"></h4>
+<div id="file-list-container"></div>
+
+<p id="error"></p>
+
+<script src="/js/dependencies/sails.io.js"></script>
+<script src="/js/dependencies/ajax.googleapis.com-ajax-libs-jquery-1.12.4-jquery.min.js"></script>
+<script src="/js/dependencies/react.js"></script>
+<script src="/js/dependencies/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+
+<script>
+var projectName = <%- JSON.stringify(projectName) %>;
+$(document).ready(function(){
+
+	$("#addBtn").click(function(){
+		$("#file-list-container").append(
+
+			'<input id="txtFile" type="text" placeholder="File Name"/>'
+			+ '&nbsp;&nbsp;<input id="createFileBtn" type="button" value="Create File"/>'
+		);
+	});
+
+	$(document).on("click", "#createFileBtn" , function() {
+		//todo
+		var fileName = $(this).prev("#txtFile").val(); //$('#txtFile').value;
+		//alert('file name : ' + fileName);
+
+		$(this).parent().remove();
+		//console.log('... sendRequest to server to create file ...');
+
+	});
+});
+</script>
+<script type="text/babel" src="/js/filelist.js"></script>

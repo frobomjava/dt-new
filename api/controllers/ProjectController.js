@@ -21,42 +21,61 @@ module.exports = {
         return res.json({error: message});
       }
       else {
-        Project.create({projectName: projectName, owner: req.user.id}).exec(function(err, data){
-          if (err) {
-            console.log(JSON.stringify((err)));
-            return res.json(err);
-          } else {
-            console.log(data.projectName);
-            return res.json(data);
-          }
-        });
-      }
-    });
-  },
+        Project.create({projectName: projectName, owner: req.user.id}).exec(
+          function(err, data){
+            if (err) {
+              console.log(JSON.stringify((err)));
+              return res.json(err);
+            } else {
+              var projectdir = process.cwd()+'\\projects';
 
-  getAll: function(req, res) {
-    Project.find({owner: req.user.id}).exec(function(err, data) {
-      if (err) {
-        console.log(JSON.stringify((err)));
-        return res.json(err);
-      } else {
-        console.log(JSON.stringify(data));
-        return res.json(data);
-      }
-    });
-  },
+              var filessystem = require('fs');
+              if (!filessystem.existsSync(projectdir)) {
+                filessystem.mkdirSync(projectdir);
+              }
 
-  delete: function(req, res) {
+              projectdir += '\\' + req.user.userName;
+              if (!filessystem.existsSync(projectdir)) {
+                filessystem.mkdirSync(projectdir);
+              }
 
-  },
+              projectdir += '\\' + data.projectName;
+              if (!filessystem.existsSync(projectdir)) {
+                filessystem.mkdirSync(projectdir);
+              }
 
-  update: function(req, res) {
+              console.log(projectdir + " Directory created successfully!");
+              console.log(data.projectName);
+              return res.json(data);
+            }
+          });
+        }
+      });
+    },
 
-  },
+    getAll: function(req, res) {
+      Project.find({owner: req.user.id}).exec(function(err, data) {
+        if (err) {
+          console.log(JSON.stringify((err)));
+          return res.json(err);
+        } else {
+          console.log(JSON.stringify(data));
+          return res.json(data);
+        }
+      });
+    },
 
-  enter: function(req, res) {
+    delete: function(req, res) {
 
-  }
+    },
+
+    update: function(req, res) {
+
+    },
+
+    enter: function(req, res) {
+      res.view('workspace', {layout: null, projectName: req.param('projectName')});
+    }
 
 
-};
+  };

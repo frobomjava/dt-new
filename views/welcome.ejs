@@ -3,7 +3,7 @@
 <html>
 
 <head>
-  <title>Welcome></title>
+  <title>Welcome</title>
 </head>
 <h4>Welcome <%=req.user.userName %></h4>
 
@@ -72,9 +72,11 @@
 },
 
 render: function() {
+  var self = this;
   return (<ul>
     {this.state.projects.map(function(project){
-      return <li>{project.projectName}</li>;
+      var url = '/project/in/'+ project.projectName;
+      return <li><a href={url}>{project.projectName}</a></li>;
     })}
     </ul>);
   }

@@ -50,7 +50,7 @@ module.exports.routes = {
 
   'post /project/update': 'ProjectController.update',
 
-  'get project/in/:projectName': 'ProjectController.enter',
+  'get /project/in/:projectName': 'ProjectController.enter',
 
   'get /project/in/:projectName/files': 'DtFileController.getAll',
 
