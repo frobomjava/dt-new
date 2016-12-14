@@ -71,14 +71,35 @@
   });
 },
 
-render: function() {
-  return (<ul>
-    {this.state.projects.map(function(project){
-      return <li>{project.projectName}</li>;
-    })}
-    </ul>);
-  }
+deleteHandler: function(event){
+  console.log("delete handler");
+  event.preventDefault();
+  var self = this;
+  var projectName = event.target.getAttribute('name');
+  var index = event.target.getAttribute('id');
+  var url = '/project/delete/'+projectName;
+  var getting = $.get(url);
+  getting.done(function() {
+    var projectsUpdated = self.state.projects.slice();
+    projectsUpdated.splice(index, 1);
+    self.setState({projects: projectsUpdated});
+  });
+},
 
+render: function() {
+  var self = this;
+    var index = 0;
+    return (<ul>
+      {this.state.projects.map(function(project){
+        var url = "/project/delete/"+project.projectName;
+        return (
+          <li>{project.projectName} &nbsp;
+          (<a href="#" id={index++} name={project.projectName} onClick={self.deleteHandler}>Delete</a>)
+          </li>);
+        })}
+        </ul>
+      );
+    }
 });
 ReactDOM.render(<ProjectList/>, document.getElementById('projects'));
 </script>
