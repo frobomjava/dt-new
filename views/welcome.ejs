@@ -12,10 +12,10 @@
   <div id='projects'></div>
 
   <form action="#" id="project-create">
-    <input type="text" id="projectName" name="projectName"/>
+    <input type="text" id="projectName" name="projectName" required/>
     <input type="submit" value="create"/>
   </form>
-
+  <h4 id="error"></h4>
   <script src="/dependencies/sails.io.js"></script>
 
   <script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
@@ -52,13 +52,21 @@
       var url = '/project/new';
       var posting = $.post(url, {projectName: $('#projectName').val()});
       posting.done(function(data) {
-        console.log(data.name);
-        var projectsUpdated = self.state.projects.slice();
-        projectsUpdated.push(data);
-        self.setState({
-          projects: projectsUpdated
-        }
-      );
+        if (data.projectName) {
+          $('#projectName').val('');
+          $('#error').text('');
+          console.log(data.projectName);
+          var projectsUpdated = self.state.projects.slice();
+          projectsUpdated.push(data);
+          self.setState({
+            projects: projectsUpdated
+          }
+        );
+      }
+      else {
+        console.log(data.error);
+        $('#error').text(data.error);
+      }
     });
   });
 },

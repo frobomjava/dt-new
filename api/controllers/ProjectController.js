@@ -10,27 +10,40 @@ module.exports = {
   create: function(req, res) {
     var projectName = req.param('projectName');
     console.log(projectName);
-    Project.create({projectName: projectName, owner: req.user.id}).exec(function(err, data){
+
+    Project.findOne({projectName: projectName, owner: req.user.id}).exec(function(err, data){
       if (err) {
         console.log(JSON.stringify((err)));
         return res.json(err);
-      } else {
-        console.log(data.projectName);
-        return res.json(data);
+      } else if(data){
+        var message = data.projectName + ' is already exist..';
+        console.log(message);
+        return res.json({error: message});
+      }
+      else {
+        Project.create({projectName: projectName, owner: req.user.id}).exec(function(err, data){
+          if (err) {
+            console.log(JSON.stringify((err)));
+            return res.json(err);
+          } else {
+            console.log(data.projectName);
+            return res.json(data);
+          }
+        });
       }
     });
   },
 
   getAll: function(req, res) {
-			Project.find({owner: req.user.id}).exec(function(err, data) {
-				if (err) {
-          console.log(JSON.stringify((err)));
-          return res.json(err);
-				} else {
-          console.log(JSON.stringify(data));
-					return res.json(data);
-				}
-			});
+    Project.find({owner: req.user.id}).exec(function(err, data) {
+      if (err) {
+        console.log(JSON.stringify((err)));
+        return res.json(err);
+      } else {
+        console.log(JSON.stringify(data));
+        return res.json(data);
+      }
+    });
   },
 
   delete: function(req, res) {

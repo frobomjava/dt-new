@@ -1,0 +1,55 @@
+<head>
+
+</head>
+<h4 align="right"><a href="/signout">Signout</a></h4>
+<h2>Project List</h2>
+<i id="status">Loading projects..</i>
+<div id="project-list-container"></div>
+<br/>
+
+  <h5>Create New Project</h5>
+  <input id="txtProject" name="name" type="text" placeholder="Project Name"/>
+  &nbsp; &nbsp;
+  <input type="button" value="Create Project" onClick="sendRequest()"/>
+
+<script src="/dependencies/sails.io.js"></script>
+
+<script src="/dependencies/ajax.googleapis.com-ajax-libs-jquery-1.12.4-jquery.min.js"></script>
+<script src="/dependencies/react.js"></script>
+<script src="/dependencies/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+<script>
+
+  var prjList;
+
+  io.socket.get('/projects', function (resData, jwRes) {
+    if (jwRes.error) {
+      console.log(jwRes.statusCode); // => e.g. 403
+      return;
+    }
+    prjList = resData;
+    console.log('resData : '+ resData);
+  });
+  console.console.log(prjList.length);
+  if (!prjList.length) {
+    document.getElementById("status").innerHTML = "No Project...";
+  }
+  else {
+    document.getElementById("status").style.display = "none";
+  }
+
+  function sendRequest() {
+    var pname = document.getElementById("txtProject").value;
+    console.log('... sendRequest to server to create project ...');
+    io.socket.post('/project/new', { projectName: pname}, function (resData, jwRes) {
+      if (jwRes.error) {
+        console.log(jwRes.statusCode); // => e.g. 403
+        return;
+      }
+      console.log(jwRes.statusCode);
+      console.log('resData : '+resData);
+    });
+
+  }
+</script>
+<script type="text/babel" src="/js/projects.js"></script>
