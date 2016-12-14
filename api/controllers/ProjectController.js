@@ -47,6 +47,16 @@ module.exports = {
   },
 
   delete: function(req, res) {
+    var userId = req.user.id;
+   var projectName = req.param('projectName');
+   console.log("---delete project name--- " + projectName);
+   Project.destroy({owner: userId , projectName : projectName}).exec(function(err){
+     if (err) {
+       console.log(JSON.stringify(err));
+       return res.json(err);
+     }
+     res.ok();
+   });
 
   },
 
