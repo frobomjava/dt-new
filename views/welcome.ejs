@@ -3,7 +3,7 @@
 <html>
 
 <head>
-  <title>Welcome></title>
+  <title>Welcome</title>
 </head>
 <h4>Welcome <%=req.user.userName %></h4>
 
@@ -88,18 +88,20 @@ deleteHandler: function(event){
 
 render: function() {
   var self = this;
-    var index = 0;
-    return (<ul>
-      {this.state.projects.map(function(project){
-        var url = "/project/delete/"+project.projectName;
-        return (
-          <li>{project.projectName} &nbsp;
-          (<a href="#" id={index++} name={project.projectName} onClick={self.deleteHandler}>Delete</a>)
-          </li>);
-        })}
-        </ul>
+  var index = 0;
+
+  return (<ul>
+    {this.state.projects.map(function(project){
+      var url = '/project/in/'+ project.projectName;
+      return (
+        <li><a href={url}>{project.projectName}</a> &nbsp;
+        (<a href="#" id={index++} name={project.projectName} onClick={self.deleteHandler}>Delete</a>)
+        </li>
       );
-    }
+    })}
+    </ul>
+  );
+}
 });
 ReactDOM.render(<ProjectList/>, document.getElementById('projects'));
 </script>
