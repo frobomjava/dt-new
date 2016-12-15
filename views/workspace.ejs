@@ -1,47 +1,91 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
-  <title>Welcome></title>
+
+	<meta charset="utf-8">
+
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+	<link rel="stylesheet" href="/styles/main.css" />
+
+	<!-- for IE -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+
+	<!-- for chrome -->
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
+	<!-- for DtTable -->
+	<script src="/dependencies/sails.io.js"></script>
+	<script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
+	<script src="/dependencies/code.jquery.com-ui-1.12.0-jquery-ui.js"></script>
+	<script src="/dependencies/pubsub.js"></script>
+	<script src="/dependencies/react.min.js"></script>
+	<script src="/dependencies/react-dom.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+
+	<script>
+	var projectName = <%- JSON.stringify(projectName) %> ;
+	</script>
+	<script type="text/babel" src="/js/filelist.js"></script>
+
 </head>
 
 <body>
-<h2>WorkSpace</h2>
-<h4><%= projectName %>&nbsp;&nbsp;<input id="addBtn" type="button" value="+"></h4>
-<div id="file-list-container"></div>
 
-<p id="error"></p>
+	<div class="container">
 
-<script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
-<script src="/dependencies/code.jquery.com-ui-1.12.0-jquery-ui.js"></script>
-<script src="/dependencies/pubsub.js"></script>
-<script src="/dependencies/react.min.js"></script>
-<script src="/dependencies/react-dom.min.js"></script>
+		<div class="headerDiv"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
-<script>
-var projectName = <%- JSON.stringify(projectName) %>;
-$(document).ready(function(){
+		<div class="contentDiv">
 
-	$("#addBtn").click(function(){
-		$("#file-list-container").append(
+			<div class="left" id="leftID">
 
-			'<input id="txtFile" type="text" placeholder="File Name"/>'
-			+ '&nbsp;&nbsp;<input id="createFileBtn" type="button" value="Create File"/>'
-		);
-	});
+				<div class='titleMenu' id='titleMenuID'>
 
-	$(document).on("click", "#createFileBtn" , function() {
-		//todo
-		var fileName = $(this).prev("#txtFile").val(); //$('#txtFile').value;
-		//alert('file name : ' + fileName);
+					<span id='minusID'>- -</span>
 
-		$(this).parent().remove();
-		//console.log('... sendRequest to server to create file ...');
+					<span>Folder</span>
 
-	});
-});
-</script>
-<script type="text/babel" src="/js/filelist.js"></script>
+					<span><div class='createButton'>
+
+						<input type='button' value='+' id="file-create"/>
+
+					</div></span>
+
+				</div>
+
+				<div class='newProjectCreate' id='file-list-container'></div>
+
+			</div>
+
+			<div class="center" id="centerID"></div>
+
+			<div class="bottomOfCenter" id="bottomOfCenterID"></div>
+
+			<div class="right" id="rightID">
+
+				<div id="title_barID">
+
+					<div id="restoreButtonID">-</div>
+
+				</div>
+
+				<div id="boxID"></div>
+
+			</div>
+
+		</div>
+
+	</div>
+
 </body>
+
 </html>

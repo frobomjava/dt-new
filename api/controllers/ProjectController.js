@@ -58,7 +58,7 @@ module.exports = {
         console.log(JSON.stringify((err)));
         return res.json(err);
       } else {
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
         return res.json(data);
       }
     });
@@ -83,6 +83,7 @@ module.exports = {
   },
 
   enter: function(req, res) {
+    console.log("---enter workspace---");
     return res.view('workspace', {layout: null, projectName: req.param('projectName')});
   }
 
