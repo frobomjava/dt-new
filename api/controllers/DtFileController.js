@@ -67,7 +67,7 @@ module.exports = {
         });
       },
 
-      function checkProject(callback) {        
+      function checkProject(callback) {
         Project.findOne({owner: projectData.owner , projectName: projectData.projectName}).exec(function(err,projects){
           if (err) {
             callback(err);
@@ -126,7 +126,26 @@ module.exports = {
   },
 
   getData: function(req, res) {
+    console.log("---getData---");
+    var projectData = {
+      projectName: req.param('projectName')
+    };
 
+    var fileData = {
+      id: req.param('fileId')
+    };
+
+    DtFile.findOne({id: fileData.id}).exec(function(err,dtFiles){
+      if(err) {
+        return res.serverError(err);
+      } else {
+        var path = dtFiles.url;
+        console.log("---path--- " + path);
+        jsonFile.readFile(path, function(err, dtFileJSONData) {
+          console.log("J Data = " + JSON.stringify(dtFileJSONData));
+          return res.json(dtFileJSONData);
+        })
+      }
+    });
   }
-
 };
