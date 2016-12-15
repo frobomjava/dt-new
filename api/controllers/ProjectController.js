@@ -26,6 +26,24 @@ module.exports = {
             console.log(JSON.stringify((err)));
             return res.json(err);
           } else {
+            var projectdir = process.cwd()+'\\projects';
+
+            var filessystem = require('fs');
+            if (!filessystem.existsSync(projectdir)) {
+              filessystem.mkdirSync(projectdir);
+            }
+
+            projectdir += '\\' + req.user.userName;
+            if (!filessystem.existsSync(projectdir)) {
+              filessystem.mkdirSync(projectdir);
+            }
+
+            projectdir += '\\' + data.projectName;
+            if (!filessystem.existsSync(projectdir)) {
+              filessystem.mkdirSync(projectdir);
+            }
+
+            console.log(projectdir + " Directory created successfully!");
             console.log(data.projectName);
             return res.json(data);
           }
@@ -48,15 +66,15 @@ module.exports = {
 
   delete: function(req, res) {
     var userId = req.user.id;
-   var projectName = req.param('projectName');
-   console.log("---delete project name--- " + projectName);
-   Project.destroy({owner: userId , projectName : projectName}).exec(function(err){
-     if (err) {
-       console.log(JSON.stringify(err));
-       return res.json(err);
-     }
-     res.ok();
-   });
+    var projectName = req.param('projectName');
+    console.log("---delete project name--- " + projectName);
+    Project.destroy({owner: userId , projectName : projectName}).exec(function(err){
+      if (err) {
+        console.log(JSON.stringify(err));
+        return res.json(err);
+      }
+      res.ok();
+    });
 
   },
 
@@ -65,7 +83,7 @@ module.exports = {
   },
 
   enter: function(req, res) {
-
+    return res.view('workspace', {layout: null, projectName: req.param('projectName')});
   }
 
 
