@@ -39,7 +39,7 @@
     var self = this;
     $.getJSON('/projects', function (data) {
       console.log('ok, got data');
-      console.log("data is = " + JSON.stringify(data));
+      //console.log("data is = " + JSON.stringify(data));
       self.setState({
         projects: data
       });
