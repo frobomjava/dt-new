@@ -5,6 +5,7 @@
 * @help        :: See http://sailsjs.com/docs/concepts/controllers
 */
 var jsonFile = require('jsonfile');
+var fs = require('fs');
 
 module.exports = {
 
@@ -123,6 +124,26 @@ module.exports = {
 
   save: function(req, res) {
 
+    var fileUrl, fileName;
+
+    var fileData = {
+      fileId: req.param('fileId')
+    }
+    var dtFileJSONData = req.param('dtData');
+
+    DtFile.findOne({id: fileData.fileId}).exec(function(err,dtFile){
+      if (err) {
+        return res.serverError(err);
+      } else {
+        fileUrl = dtFile.url;
+        fileName = dtFile.fileName;
+
+        fs.writeFile(fileUrl,JSON.stringify(dtFileJSONData), function (err) {
+          if (err) return console.log("===Error=== " + err);
+        });
+        return res.ok();
+      }
+    });
   },
 
   getData: function(req, res) {
