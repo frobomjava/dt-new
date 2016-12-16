@@ -2,7 +2,19 @@ class DtTableComponent extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			dtData: [],
+			dtData:{
+				names:{
+					conditions : [""],
+					actions : [""]
+				},
+
+				rules:[
+					{
+						conditions : [""],
+						actions : [""]
+					},		       
+				]
+			},
 
 			currentIndex:{
 				cellType:"",
@@ -24,14 +36,10 @@ class DtTableComponent extends React.Component{
 		PubSub.subscribe( "contextMenuEvent", this.addSubscribe );
 	};
 
-	clickFileHandler(message,dtData){
-
-		var dtDataUpdated = this.state.dtData.slice();
-
-		dtDataUpdated.push(dtData);
-		console.log("---dtDataUpdated---- " + JSON.stringify(dtDataUpdated));
-		this.setState({dtData: dtDataUpdated});
-
+	clickFileHandler(msg, data){
+		console.log(JSON.stringify(data));
+		console.log(data.names);
+		this.setState({dtData: data});
 		console.log("this.state.dtData = " + JSON.stringify(this.state.dtData));
 	};
 

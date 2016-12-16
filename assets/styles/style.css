@@ -1,0 +1,91 @@
+
+
+table {
+  text-align: center;
+  margin-left: 10px;
+  margin-top: 20px;  
+}
+
+
+td, th {
+  width: 6rem;
+  height: 2rem;
+  border: 1px solid;
+  padding: 0px;  
+}
+
+th {
+  background: lightblue;
+  border-color: white;
+  text-align: center;
+  color: blue;
+}
+
+#condition {
+  border-bottom: 3px solid blue; 
+}
+
+input[type="text"] {
+  height: 40px;
+  padding: 3px;
+  border: solid 1px #dcdcdc;
+}
+
+input[type="text"]:focus,
+input[type="text"].focus {
+  border: solid 1px #707070;
+  box-shadow: 0 0 5px 1px blue;
+}
+
+
+/* tasks */
+
+.tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+.context-menu {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  padding: 12px 0;
+  width: 240px;
+  background-color: #fff;
+  border: solid 1px #dfdfdf;
+  box-shadow: 1px 1px 2px #cfcfcf;
+}
+
+.context-menu--active {
+  display: block;
+}
+
+.context-menu__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu__item {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.context-menu__item:last-child {
+  margin-bottom: 0;
+}
+
+.context-menu__link {
+  display: block;
+  padding: 4px 12px;
+  font-size: 15px;
+  color: #0066aa;
+  text-decoration: none;
+}
+
+.context-menu__link:hover {
+  color: #fff;
+  background-color: #0066aa;
+}
