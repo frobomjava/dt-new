@@ -4,15 +4,15 @@ class DtTableComponent extends React.Component{
 		this.state = {
 			dtData:{
 				names:{
-					conditions : [""],
-					actions : [""]
+					conditions : [],
+					actions : []
 				},
 
 				rules:[
 					{
-						conditions : [""],
-						actions : [""]
-					},		       
+						conditions : [],
+						actions : []
+					},
 				]
 			},
 
@@ -20,7 +20,10 @@ class DtTableComponent extends React.Component{
 				cellType:"",
 				rowIndex:"",
 				colIndex:""
-			}
+			},
+
+			projectName: projectName,
+			fileId: ""
 		}
 
 		this.clickFileHandler = this.clickFileHandler.bind(this);
@@ -37,10 +40,25 @@ class DtTableComponent extends React.Component{
 	};
 
 	clickFileHandler(msg, data){
-		console.log(JSON.stringify(data));
-		console.log(data.names);
-		this.setState({dtData: data});
+		console.log("==dtTable fileId=== " + data.fileId);
+		console.log("==dtTable data=== " +JSON.stringify(data.dtData));
+
+		this.setState({dtData: data.dtData});
+		this.setState({fileId: data.fileId});
 		console.log("this.state.dtData = " + JSON.stringify(this.state.dtData));
+	};
+
+	componentDidMount(){
+		var self = this;
+		$('#saveID').on('click',function(event){
+			event.preventDefault();
+			var url = '/project/in/'+self.state.projectName+'/file/save';
+			console.log("===url=== " + url);
+			var updatedDtData = self.state.dtData;
+			var fileId = self.state.fileId;		
+			var posting = $.post(url,{dtData: updatedDtData , fileId: fileId});
+		})
+
 	};
 
 	addSubscribe(msg,data){
@@ -98,10 +116,24 @@ class DtTableComponent extends React.Component{
 		}
 
 		if(data == "Add Column Right"){
+			console.log("===Add Column Right===");
+			console.log("====cellType===="+cellType);
+			if (cellType === 'condition' || cellType === 'action') {
+				alert('Cannot add column right here..');
+				return;
+			}
 			columnIndex++;
 			dtDatas.rules.splice(columnIndex, 0, newRule);
+
 		}else if(data == "Add Column Left"){
+			console.log("===Add Column Left===");
+			console.log("====cellType===="+cellType);
+			if (cellType === 'condition' || cellType === 'action') {
+				alert('Cannot add column right here..');
+				return;
+			}
 			dtDatas.rules.splice(columnIndex, 0, newRule);
+
 		}else if(data == "Delete Column" && columnLength != 1){
 			dtDatas.rules.splice(columnIndex, 1);
 		}else if(data == "Add Row Above" && (cellType == "condition" || cellType == "ruleCondition")){
@@ -151,6 +183,7 @@ class DtTableComponent extends React.Component{
 		}
 		this.setState({dtData:dtDatas});
 		console.log(JSON.stringify(this.state.dtData));
+
 	}
 
 	render(){
@@ -270,4 +303,4 @@ class Cell extends React.Component{
 	}
 }
 
-ReactDOM.render(<DtTableComponent />, document.getElementById('centerID'));
+ReactDOM.render(<DtTableComponent />, document.getElementById('dtTableID'));

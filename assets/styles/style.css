@@ -3,7 +3,7 @@
 table {
   text-align: center;
   margin-left: 10px;
-  margin-top: 20px;  
+  margin-top: 20px;
 }
 
 
@@ -11,7 +11,7 @@ td, th {
   width: 6rem;
   height: 2rem;
   border: 1px solid;
-  padding: 0px;  
+  padding: 0px;
 }
 
 th {
@@ -22,7 +22,7 @@ th {
 }
 
 #condition {
-  border-bottom: 3px solid blue; 
+  border-bottom: 3px solid blue;
 }
 
 input[type="text"] {
@@ -88,4 +88,28 @@ input[type="text"].focus {
 .context-menu__link:hover {
   color: #fff;
   background-color: #0066aa;
+}
+
+.menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #ADD8E6;
+}
+
+.menu ul li {
+    float: left;
+}
+
+.menu ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.menu ul li a:hover {
+    background-color: #111;
 }

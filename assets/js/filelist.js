@@ -52,17 +52,17 @@ handleClick: function(event) {
 	if(self.state.myMap.has(fileId)){
 		var dtData = self.state.myMap.get(fileId);
 		console.log("---map has key-value--- " + dtData);
-		PubSub.publish('ClickFileEvent',dtData);
+		PubSub.publish('ClickFileEvent',{fileId: fileId, dtData: dtData});
 		console.log(JSON.stringify(dtData));
 	} else {
 		console.log("---no key---");
 		$.getJSON(url, function (data) {
 			console.log('ok, got data');
 			console.log(JSON.stringify(data));
-			console.log("data printed");
+			console.log("===data printed===");
 			self.state.myMap.set(fileId,data);
 			var dtData = self.state.myMap.get(fileId);
-			PubSub.publish('ClickFileEvent',dtData);
+			PubSub.publish('ClickFileEvent',{fileId: fileId, dtData: dtData});
 		});
 	}
 },
