@@ -1,20 +1,20 @@
+
 var FileList = React.createClass({
 	getInitialState: function(){
 		return ({
 			files: [],
-			projectName: projectName
+			projectName: projectName,
+			myMap: myMap
 		});
 	},
 
 	componentWillMount: function() {
 		var self = this;
 		var prjName = this.state.projectName;
-		console.log("--prjName-- " +prjName);
 		var url = '/project/in/'+prjName+'/files'
-		console.log("---url--- " + url);
 		$.getJSON(url, function (data) {
 			console.log('ok, got data');
-			console.log("data is = " + JSON.stringify(data));
+			//console.log("data is = " + JSON.stringify(data));
 			self.setState({
 				files: data
 			});
@@ -25,7 +25,6 @@ var FileList = React.createClass({
 			event.preventDefault();
 			var fileName = prompt("Please enter file name", "");
 			var url = '/project/in/'+projectName+'/file/new';
-			console.log('file create url' + url);
 			var posting = $.post(url,{fileName: fileName});
 			posting.done(function(data) {
 				if (data.fileName) {
@@ -39,51 +38,46 @@ var FileList = React.createClass({
 			}
 		});
 	});
-
 },
 
-// updateFileList: function(file) {
-// 	console.log('new file\'s name : ' + file.fileName);
-// 	var updatedFiles = this.state.files.slice();
-// 	updatedFiles.push(file);
-// 	this.setState({
-// 		files: updatedFiles
-// 	});
-// },
 handleClick: function(event) {
-	event.preventDefault();
 	console.log("---handlerClick---");
-
+	event.preventDefault();
 	var self = this;
 	var fileName = event.target.getAttribute('name');
-	console.log("---fileName--- " + fileName);
-	var index = event.target.getAttribute('index');
-	console.log("---index--- " + index);
-	//var url = "/project/in/"+:projectName+"/file/data/"+:fileId;
-
-	// if (e.currentTarget.style.backgroundColor === 'blue') {
-	// 	console.log('if == blue');
-	// 	e.currentTarget.style.backgroundColor = 'white';
-	// }
-	// else {
-	// 	console.log('else ');
-	// 	e.currentTarget.style.backgroundColor = 'blue';
-	// }
-
+	var fileId = event.target.getAttribute('value');
+	var index = event.target.getAttribute('id');
+	var url = "/project/in/"+this.state.projectName+"/file/data/"+fileId;
+	console.log("---url--- " + url);
+	if(self.state.myMap.has(fileId)){
+		var dtData = self.state.myMap.get(fileId);
+		console.log("---map has key-value--- " + dtData);
+		PubSub.publish('ClickFileEvent',dtData);
+		console.log(JSON.stringify(dtData));
+	} else {
+		console.log("---no key---");
+		$.getJSON(url, function (data) {
+			console.log('ok, got data');
+			console.log(JSON.stringify(data));
+			console.log("data printed");
+			self.state.myMap.set(fileId,data);
+			var dtData = self.state.myMap.get(fileId);
+			PubSub.publish('ClickFileEvent',dtData);
+		});
+	}
 },
+
 render: function() {
 	var self = this;
-	var files = this.state.files.map(function (file, index) {
-		return(
-			<li onClick={self.handleClick} key={file.id} index={index} name={file.fileName}>
-			{file.fileName}
-			</li>
-		)
-	});
-
 	return (
 		<ul>
-		{files}
+		{this.state.files.map(function (file, index) {
+			return(
+				<li onClick={self.handleClick} id={index} value={file.id} name={file.fileName}>
+				{file.fileName}
+				</li>
+			)
+		})}
 		</ul>
 	);
 }
