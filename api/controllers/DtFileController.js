@@ -45,6 +45,8 @@ module.exports = {
   },
 
   create: function(req, res) {
+    console.log("===============");
+    console.log("===== file create ====");
 
     var projectData = {
       projectName: req.param('projectName')
@@ -54,22 +56,9 @@ module.exports = {
       fileName: req.param('fileName')
     };
 
-    var userId = req.user.id;
-
     async.series([
-      function checkUser(callback) {
-        User.findOne({id: userId}).exec(function(err,users){
-          if(err){
-            callback(err);
-          } else if (users) {
-            projectData.owner = users.id;
-            callback();
-          }
-        });
-      },
-
-      function checkProject(callback) {
-        Project.findOne({owner: projectData.owner , projectName: projectData.projectName}).exec(function(err,projects){
+      function findProject(callback) {
+        Project.findOne({owner: req.user.id, projectName: projectData.projectName}).exec(function(err,projects){
           if (err) {
             callback(err);
           } else if (projects) {
@@ -79,11 +68,26 @@ module.exports = {
         });
       },
 
+      function existDtFile(callback){
+        DtFile.findOne({fileName: fileData.fileName, project:fileData.project}).exec(function(err, data){
+          if (err) {
+            console.log(JSON.stringify((err)));
+            return res.json(err);
+          } else if(data){
+            var message = fileData.fileName + ' is already exist..';
+            console.log(message);
+            return res.json(err);
+          }
+          else {
+            callback();
+          }
+        });
+      },
+
       function createDtFile(callback){
         var fileDir = process.cwd()+'\\projects\\' + req.user.userName +'\\'+ projectData.projectName + '\\' + fileData.fileName + '.json' ;
         fileData.url = fileDir ;
-        console.log("---File Url--- = " + fileDir);
-        var obj = {
+        var dtFileJSONData = {
           names:{
             conditions : [""],
             actions : [""]
@@ -97,7 +101,7 @@ module.exports = {
           ]
         }
 
-        jsonFile.writeFile(fileDir, obj, function(err){
+        jsonFile.writeFile(fileDir, dtFileJSONData, function(err){
           if(err){
             callback(err);
           } else {
@@ -105,7 +109,7 @@ module.exports = {
               if(err){
                 callback(err);
               } else {
-                console.log('---newFile--- ' + JSON.stringify(newFile));
+                //console.log('---newFile--- ' + JSON.stringify(newFile));
                 return res.json(newFile);
               }
             });
@@ -114,7 +118,7 @@ module.exports = {
       }
     ],
     function(err) {
-      return res.serverError(err);
+      return res.json(err);
     })
   },
 
