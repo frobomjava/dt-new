@@ -11,7 +11,7 @@ module.exports = {
     if (req.isAuthenticated()) {
       res.view('welcome', {layout: null});
     } else {
-      res.view('login');
+      res.view('login', {layout: null, error: ''});
     }
   },
 
@@ -19,7 +19,7 @@ module.exports = {
     if (req.isAuthenticated()) {
       res.redirect('/');
     } else {
-      res.view('signup');
+      res.view('signup', {layout: null, error: ''});
     }
   }
 

@@ -1,6 +1,8 @@
 <h1>Login</h1>
+<h4 style="color:red;" id="error-message"><%=error %></h4>
+
   <form method="POST" action="/login">
-  <input type="text" name="userNameOrEmail">
-  <input type="password" name="password">
+  <input type="text" placeholder="User Name or Email" name="userNameOrEmail" required>
+  <input type="password" placeholder="Password" name="password" required>
   <input type="submit" value="submit">
 </form>

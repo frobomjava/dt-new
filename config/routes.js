@@ -42,6 +42,8 @@ module.exports.routes = {
 
   'get /signup': 'HomeController.signup',
 
+  'post /signup': 'UserController.create',
+
   'get /projects': 'ProjectController.getAll',
 
   'post /project/new': 'ProjectController.create',
