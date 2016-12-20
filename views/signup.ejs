@@ -3,9 +3,83 @@
 
 <head>
   <title>Sign Up</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="css/style.css" rel='stylesheet' type='text/css' />
 </head>
 <body>
-<h1>Signup</h1>
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Brand</a>
+    </div>
+
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">Link</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form id="signin" class="navbar-form navbar-right" role="form" method="POST" action="/login">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="email" type="text" class="form-control" name="userNameOrEmail" value="" placeholder="User Name Or Email" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input id="password" type="password" class="form-control" name="password" value="" placeholder="Password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <br>
+                        <h4 style="color:red;" id="error-message"><%=err %></h4>
+                   </form>
+
+    </div>
+  </div>
+</nav>
+
+<div class="wrapper">
+<form class="form-signin" method="POST" action="/signup">
+  <h2 class="form-signin-heading">Please Sign Up</h2>
+  <br/>
+  <h4 style="color:red;" id="signup-error-message"><%=error %></h4>
+  <input type="email" class="form-control input-lg" placeholder="Email" name="email" required>
+  <input type="text" class="form-control input-lg" placeholder="User Name" name="userName" required>
+  <input type="password" class="form-control input-lg" placeholder="******" name="password" pattern=".{6,}"
+    oninvalid="this.setCustomValidity('Password must be 6 characters at least')"
+    oninput="setCustomValidity('')" required>
+  <br/>
+  <!-- <label class="checkbox">
+    <input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe"> Remember me
+  </label> -->
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
+
+</form>
+
+</div>
+
+<!-- <h1>Signup</h1>
 <h4 style="color:red;" id="error-message"><%=error %></div>
 <form method="POST" action="/signup">
   <input type="email" placeholder="Email" name="email" required>
@@ -14,7 +88,7 @@
     oninvalid="this.setCustomValidity('Password must be 6 characters at least')"
     oninput="setCustomValidity('')" required>
   <input type="submit" value="submit">
-</form>
+</form> -->
 
 </body>
 </html>
