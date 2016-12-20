@@ -1,4 +1,4 @@
-
+var preDiv = null;
 var FileList = React.createClass({
 	getInitialState: function(){
 		return ({
@@ -21,9 +21,8 @@ var FileList = React.createClass({
 		});
 
 		function addDtFile() {
-			var valid = true;
 			var fileName = $('#fileID').val();
-			if (valid && fileName) {
+			if (fileName) {
 				console.log("---file create handler---");
 				var url = '/project/in/'+projectName+'/file/new';
 				var posting = $.post(url,{fileName: fileName});
@@ -39,7 +38,6 @@ var FileList = React.createClass({
 				}
 			});
 			dialog.dialog( "close" );
-			return valid;
 		} else {
 			dialog.dialog( "close" );
 		}
@@ -74,12 +72,20 @@ var FileList = React.createClass({
 handleClick: function(event) {
 	console.log("---handlerClick---");
 	event.preventDefault();
+
+	if(preDiv) {
+		preDiv.style.backgroundColor = "white";
+	}
+	event.target.style.backgroundColor = "#87CEEB";
+	preDiv = event.target;
+
 	var self = this;
 	var fileName = event.target.getAttribute('name');
 	var fileId = event.target.getAttribute('value');
 	var index = event.target.getAttribute('id');
 	var url = "/project/in/"+this.state.projectName+"/file/data/"+fileId;
 	console.log("---url--- " + url);
+
 	if(self.state.myMap.has(fileId)){
 		var dtData = self.state.myMap.get(fileId);
 		console.log("---map has key-value--- " + dtData);
