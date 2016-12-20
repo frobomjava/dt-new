@@ -12,7 +12,7 @@ module.exports = {
     }
     var message;
     async.series([
-      function findUserName(callback) {
+      function findUserEmail(callback) {
         User.findOne({email: req.param('email')}).exec(function(err, user) {
           if (err) {
             callback(err);
@@ -21,20 +21,21 @@ module.exports = {
             callback();
           }
           else {
+            message = '';
             callback();
           }
         });
       },
-      function findUserEmail(callback) {
+      function findUserName(callback) {
         User.findOne({userName: req.param('userName')}).exec(function(err, user) {
           if (err) {
             callback(err);
           } else if (user) {
-            message += '\n' + user.userName + ' already exist!';
+            message += '\t' + user.userName + ' already exist!';
             callback(message);
           }
           else {
-            callback();
+            callback(message);
           }
         });
       },
@@ -55,7 +56,7 @@ module.exports = {
     ],
     function(err) {
       console.log('err : ' + err);
-      return res.render("signup", {layout:null, error: message});
+      return res.render("signup", {layout:null, error: err, err:''});
     });
 
   }
