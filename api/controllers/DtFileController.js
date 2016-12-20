@@ -85,7 +85,7 @@ module.exports = {
       },
 
       function createDtFile(callback){
-        var fileDir = process.cwd()+'\\projects\\' + req.user.userName +'\\'+ projectData.projectName + '\\' + fileData.fileName + '.json' ;
+        var fileDir = process.cwd()+'/projects/' + req.user.userName +'/'+ projectData.projectName + '/' + fileData.fileName + '.json' ;
         fileData.url = fileDir ;
         var dtFileJSONData = {
           names:{
