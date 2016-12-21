@@ -21,24 +21,25 @@ module.exports = {
         return res.json({error: message});
       }
       else {
-        Project.create({projectName: projectName, owner: req.user.id}).exec(function(err, data){
+        var url = process.cwd()+'/projects'+'/' + req.user.userName+'/' + projectName;
+        Project.create({projectName: projectName, url: url, owner: req.user.id}).exec(function(err, data){
           if (err) {
             console.log(JSON.stringify((err)));
             return res.json(err);
           } else {
-            var projectdir = process.cwd()+'\\projects';
+            var projectdir = process.cwd()+'/projects';
 
             var filessystem = require('fs');
             if (!filessystem.existsSync(projectdir)) {
               filessystem.mkdirSync(projectdir);
             }
 
-            projectdir += '\\' + req.user.userName;
+            projectdir += '/' + req.user.userName;
             if (!filessystem.existsSync(projectdir)) {
               filessystem.mkdirSync(projectdir);
             }
 
-            projectdir += '\\' + data.projectName;
+            projectdir += '/' + data.projectName;
             if (!filessystem.existsSync(projectdir)) {
               filessystem.mkdirSync(projectdir);
             }
