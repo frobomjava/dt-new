@@ -10,18 +10,18 @@ module.exports = {
     if (req.param('password').length < 6) {
       return res.render("signup", {layout:null, error: 'Password must be at least 6 characters!'});
     }
-    var message;
+    var message = '';
     async.series([
       function findUserEmail(callback) {
         User.findOne({email: req.param('email')}).exec(function(err, user) {
           if (err) {
             callback(err);
           } else if (user) {
-            message = user.email + ' already exist!';
+            message = user.email;
             callback();
           }
           else {
-            message = '';
+            //message = '';
             callback();
           }
         });
@@ -31,7 +31,12 @@ module.exports = {
           if (err) {
             callback(err);
           } else if (user) {
-            message += '\t' + user.userName + ' already exist!';
+            if (message != '') {
+              message += ' and ' + user.userName;
+            }
+            else {
+              message = user.userName;
+            }
             callback(message);
           }
           else {
@@ -56,6 +61,7 @@ module.exports = {
     ],
     function(err) {
       console.log('err : ' + err);
+      err += ' already exist!';
       return res.render("signup", {layout:null, error: err, err:''});
     });
 
