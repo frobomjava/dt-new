@@ -11,7 +11,7 @@ module.exports = {
     if (req.isAuthenticated()) {
       res.view('welcome', {layout: null});
     } else {
-      res.view('signup', {layout: null,err:'', error: ''});
+      res.view('signup', {layout: null, err:'', error: ''});
     }
   },
 

@@ -6,6 +6,10 @@
   <title>Welcome</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link href="css/style.css" rel='stylesheet' type='text/css' />
 </head>
 
@@ -42,20 +46,31 @@
           </li>
         </ul>
         <div class="navbar-form navbar-right">
-          <strong><%=req.user.userName %>&nbsp;<a href="/logout">Log out</a></strong>
+          <strong><%=req.user.userName %>&nbsp;&nbsp;&nbsp;<a href="/logout">Log out</a></strong>
         </div>
 
       </div>
     </div>
   </nav>
 
-  <div id='projects' class="list-group"></div>
+  <div class="container">
+    <div class="project-create">
+      <div class="alert alert-error" id="alert-error">
+        <button class="close" data-dismiss="alert" type=
+        "button">×</button> <strong id="error"></strong>
+      </div>
+      <h3 class="project-title">Project List</h3>
+      <form id="project-create-form" class="form-inline">
 
-  <form action="#" id="project-create">
-    <input type="text" id="projectName" name="projectName" required/>
-    <input type="submit" value="create"/>
-  </form>
-  <h4 id="error"></h4>
+        <div class="form-group">
+          <input type="text" class="form-control" id="projectName" name="projectName" placeholder="Type Project Name..." required>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+      <div id='projects'></div>
+    </div>
+  </div>
+
   <script src="/dependencies/sails.io.js"></script>
 
   <script src="/dependencies/code.jquery.com-jquery-latest.min.js"></script>
@@ -86,7 +101,7 @@
 
     });
 
-    $('#project-create').submit(function(event) {
+    $('#project-create-form').submit(function(event) {
       console.log("post handler");
       event.preventDefault();
       var url = '/project/new';
@@ -94,7 +109,8 @@
       posting.done(function(data) {
         if (data.projectName) {
           $('#projectName').val('');
-          $('#error').text('');
+          $('#error').text(data.projectName + ' is created..');
+          $(".alert").css({"background-color": "#80CBC4", "opacity": 1});
           console.log(data.projectName);
           var projectsUpdated = self.state.projects.slice();
           projectsUpdated.push(data);
@@ -106,6 +122,7 @@
       else {
         console.log(data.error);
         $('#error').text(data.error);
+        $(".alert").css({"background-color": "#FA5858", "opacity": 1});
       }
     });
   });
@@ -130,17 +147,17 @@ render: function() {
   var self = this;
   var index = 0;
 
-  return (<ul>
-    {this.state.projects.map(function(project){
-      var url = '/project/in/'+ project.projectName;
-      return (
-        <li><a href={url} className="list-group-item">{project.projectName}</a> &nbsp;
-        (<a href="#" id={index++} name={project.projectName} onClick={self.deleteHandler}>Delete</a>)
-        </li>
-      );
-    })}
-    </ul>
-  );
+  return (<ul className="content-list">
+  {this.state.projects.map(function(project){
+    var url = '/project/in/'+ project.projectName;
+    return (
+      <li><strong><a href={url}>{project.projectName}</a></strong> &nbsp;
+      <span className="control"><a href="#" id={index++} name={project.projectName} onClick={self.deleteHandler}>Delete</a></span>
+      </li>
+    );
+  })}
+  </ul>
+);
 }
 });
 ReactDOM.render(<ProjectList/>, document.getElementById('projects'));
