@@ -86,7 +86,7 @@ module.exports = {
 
       function createDtFile(callback){
         var fileDir = process.cwd()+'\\projects\\' + req.user.userName +'\\'+ projectData.projectName + '\\' + fileData.fileName + '.json' ;
-        fileData.url = fileDir ;
+        fileData.url = fileDir;
         var dtFileJSONData = {
           names:{
             conditions : [""],
@@ -123,6 +123,43 @@ module.exports = {
   },
 
   delete: function(req, res) {
+    console.log("========================");
+    console.log("===server file delete===");
+
+    var fileData = {
+      fileId: req.param('fileId')
+    }
+
+    async.series([
+      function findDtFile(callback){
+        DtFile.findOne({id: fileData.fileId}).exec(function(err,dtFile){
+          if (err) {
+            callback(err);
+          } else {
+            fileData.url = dtFile.url;
+            fs.unlink(fileData.url, function(err) {
+              if (err) callback(err);
+              console.log("===file deleted successfully from directory===");
+            });
+            callback();
+          }
+        })
+      },
+
+      function deleteDtFile(callback){
+        DtFile.destroy({id: fileData.fileId}).exec(function(err){
+          if (err) {
+            callback(err);
+          } else {
+            console.log("===file delete ok from model===");
+            res.ok();
+          }
+        });
+      }
+    ],
+    function(err) {
+      return res.json(err);
+    })
 
   },
 
@@ -152,9 +189,6 @@ module.exports = {
 
   getData: function(req, res) {
     console.log("---getData---");
-    var projectData = {
-      projectName: req.param('projectName')
-    };
 
     var fileData = {
       id: req.param('fileId')
@@ -167,7 +201,7 @@ module.exports = {
         var path = dtFiles.url;
         console.log("---path--- " + path);
         jsonFile.readFile(path, function(err, dtFileJSONData) {
-          console.log("J Data = " + JSON.stringify(dtFileJSONData));
+
           return res.json(dtFileJSONData);
         })
       }
