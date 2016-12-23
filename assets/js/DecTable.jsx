@@ -196,13 +196,20 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     }
 
     render(){
-      return(
+      if (this.state.dtData.names.conditions.length == 0) {
+        return(
+          <div/>
+        );
+      } else {
+        return(
         <table>
         <Theader myRuleIndex={this.state.dtData.rules}/>
         <Condition myCondition={this.state.dtData.names.conditions} myConRule={this.state.dtData.rules} callbackParent={this.handler}/>
         <Action myAction={this.state.dtData.names.actions} myActionRule={this.state.dtData.rules} callbackParent={this.handler}/>
         </table>
       );
+      }
+     
     }
   }
 
