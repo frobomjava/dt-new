@@ -18,16 +18,16 @@ requirejs.config({
 
 });
 
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'app/DTFileList', 'app/DecTable'],
-  function ($, React, ReactDOM, PubSub, contextmenu, DTFileList, DecTable) {
+require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'app/DtFileList', 'app/DecisionTable'],
+  function ($, React, ReactDOM, PubSub, contextmenu, DtFileList, DecisionTable) {
 
     function render() {
       ReactDOM.render( <
-        DTFileList / >,
+        DtFileList / >,
         document.getElementById('file-list-container')
       );
       ReactDOM.render( <
-        DecTable / >,
+        DecisionTable / >,
         document.getElementById('decTableID')
       );
     }
