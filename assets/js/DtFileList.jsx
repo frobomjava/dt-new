@@ -1,7 +1,6 @@
-var preDiv = null;
-var fileName, fileId, index, url, projName, filesUpdated;
-
 define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React, $) {
+  var preDiv = null;
+  var fileName, fileId, index, url, projName, filesUpdated;
   var DTFileList = React.createClass({
     getInitialState: function(){
       return ({
@@ -10,7 +9,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
         myMap: myMap
       });
     },
-
+    
     componentWillMount: function() {
       var self = this;
       var projectName = this.state.projectName;

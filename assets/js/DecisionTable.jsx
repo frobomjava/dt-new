@@ -1,5 +1,5 @@
 define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
-    class Theader extends React.Component{
+  class Theader extends React.Component{
     render(){
       return(
         <thead>
@@ -128,7 +128,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       });
     }
   }
-  
+
   var DecTable = class DtTableComponent extends React.Component{
     constructor(props){
       super(props);
@@ -332,14 +332,14 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         );
       } else {
         return(
-        <table>
-        <Theader myRuleIndex={this.state.dtData.rules}/>
-        <Condition myCondition={this.state.dtData.names.conditions} myConRule={this.state.dtData.rules} callbackParent={this.handler}/>
-        <Action myAction={this.state.dtData.names.actions} myActionRule={this.state.dtData.rules} callbackParent={this.handler}/>
-        </table>
-      );
+          <table>
+          <Theader myRuleIndex={this.state.dtData.rules}/>
+          <Condition myCondition={this.state.dtData.names.conditions} myConRule={this.state.dtData.rules} callbackParent={this.handler}/>
+          <Action myAction={this.state.dtData.names.actions} myActionRule={this.state.dtData.rules} callbackParent={this.handler}/>
+          </table>
+        );
       }
-     
+
     }
   }
 
