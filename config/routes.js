@@ -44,9 +44,13 @@ module.exports.routes = {
 
   'post /signup': 'UserController.create',
 
+  'get /users/:userName': 'UserController.findUser',
+
   'get /projects': 'ProjectController.getAll',
 
   'post /project/new': 'ProjectController.create',
+
+  'get /project/setting/:projectName': 'ProjectController.setting',
 
   'get /project/delete/:projectName': 'ProjectController.delete',
 

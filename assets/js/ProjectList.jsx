@@ -5,8 +5,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         projects: []
       }
       );
-    }, 
-    
+    },
+
     componentWillMount: function() {
       var self=this;
       $.getJSON('/projects', function (data) {
@@ -54,8 +54,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         );
       }
       );
-    }, 
-    
+    },
+
     deleteHandler: function(event) {
       console.log("delete handler");
       event.preventDefault();
@@ -73,31 +73,49 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         );
       }
       );
-    }, 
-    
+    },
+
+    settingHandler: function(event) {
+      console.log("setting handler");
+      event.preventDefault();
+      var self=this;
+      var projectName=event.target.getAttribute('name');
+      var index=event.target.getAttribute('id');
+      var url='/project/setting/'+projectName;
+      var getting=$.get(url);
+      getting.done(function() {
+        var projectsUpdated=self.state.projects.slice();
+        projectsUpdated.splice(index, 1);
+        self.setState( {
+          projects: projectsUpdated
+        }
+        );
+      }
+      );
+    },
+
     render: function() {
       var self=this;
       var index=0;
       return (<ul className="content-list"> {
         this.state.projects.map(function(project) {
           var url='/project/in/'+ project.projectName;
-          return ( <li><strong><a href= {
+          var settingurl='/project/setting/' + project.projectName;
+          return ( <li key={project.id}><strong><a href= {
             url
           }
           > {
             project.projectName
           }
           </a></strong> &nbsp;
-          <span className="control"><a href="#" id= {
+          <span className="control"><a href={settingurl} id= {
             index++
           }
           name= {
             project.projectName
           }
-          onClick= {
-            self.deleteHandler
-          }
-          >Delete</a></span> </li>);
+
+          >Setting</a></span> </li>);
         }
         )
       }

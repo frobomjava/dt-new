@@ -86,6 +86,11 @@ module.exports = {
   enter: function(req, res) {
     console.log("---enter workspace---");
     return res.view('workspace', {layout: null, projectName: req.param('projectName')});
+  },
+
+  setting: function(req, res) {
+    console.log("---enter setting---");
+    return res.view('setting', {layout: null, projectName: req.param('projectName')});
   }
 
 
