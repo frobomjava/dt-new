@@ -1,14 +1,14 @@
 body {
   padding-top: 30px;
   overflow-x: hidden;
-	overflow-y: hidden;
+  overflow-y: hidden;
 }
 
- .navbar .navbar-brand{ padding: 0 12px;font-size: 16px;line-height: 30px;height: 30px; margin: 0;}
- .navbar .navbar-nav > li > a {  padding-top: 0px; padding-bottom: 0px; line-height: 30px; }
- .navbar .navbar-toggle {  margin-top: 3px; margin-bottom: 0px; padding: 8px 9px; }
- .navbar .navbar-form { margin-top: 2px; margin-bottom: 0px }
- .navbar .navbar-collapse {border-color: #A40303;}
+.navbar .navbar-brand{ padding: 0 12px;font-size: 16px;line-height: 30px;height: 30px; margin: 0;}
+.navbar .navbar-nav > li > a {  padding-top: 0px; padding-bottom: 0px; line-height: 30px; }
+.navbar .navbar-toggle {  margin-top: 3px; margin-bottom: 0px; padding: 8px 9px; }
+.navbar .navbar-form { margin-top: 2px; margin-bottom: 0px }
+.navbar .navbar-collapse {border-color: #A40303;}
 
 .navbar {
   min-height:30px;
@@ -17,24 +17,51 @@ body {
 
 .left-div {
   height: 570px;
-  background-color:  #f1f1f1;
   margin: 0;
   padding: 0;
-	border-right: 1px solid gray;
-	overflow:auto;
+  background-color:  #f1f1f1;
+  border-right: 1px solid gray;
+  overflow:auto;
+}
+
+#minusID {
+  text-align: center;
+  padding: 5px;
+  height: 30px;
+  cursor:pointer;
+}
+
+.fileListDiv {
+  padding: 0;
+  /*margin-left:10px;*/
+}
+
+#treeID li:hover {
+	background-color: #DCDCDC;
 }
 
 .center-div {
   height: 570px;
   margin: 0;
   padding: 0;
+  background-color:  #f1f1f1;
   overflow: auto;
-  /*background-color:  #f1f1f1;*/
+  overflow-x: hidden;
+}
+
+.nav li:hover {
+  background-color: #DCDCDC;
+}
+
+.dtTable {
+  padding-bottom: 10px;
+  overflow: auto;
 }
 
 .right-div {
   height: 570px;
-  margin: auto;
+  margin: 0;
+  padding: 0;
   background-color: #f1f1f1;
   border-left: 1px solid gray;
 }
@@ -45,30 +72,58 @@ body {
 }
 
 .titleMenu{
-	height: 30px;
+  height: 30px;
   padding-left: 0;
-	background-color: #f1f1f1;
+  background-color: #f1f1f1;
   border-bottom: 1px solid gray;
 }
 
-/*.fileListDiv{
-	overflow: auto;
-}
-*/
 .row {
   padding: 0;
   margin: 0;
 }
 
 ul {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 li {
   padding: 3px;
   font-size: 16px;
+  cursor:pointer;
+}
+
+.logDiv {
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid gray;
+}
+
+.logTitle {
+  padding: 0;
+  /*background:	#ADD8E6;*/
+  height:30px;
+}
+
+.restoreIcon {
+  text-align: center;
+  padding: 5px;
+  height: 30px;
+  /*background:	#ADA8E6;*/
+  cursor:pointer;
+}
+
+.restoreIcon:hover {
+	background-color: #DCDCDC;
+}
+
+.logContent{
+  padding: 0;
+  overflow: auto;
+  height: 539px;
+  /*background-color: blue;*/
 }
 
 label, input { display:block; }

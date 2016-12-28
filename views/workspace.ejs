@@ -60,7 +60,7 @@
 
 	<div class="left-div col-sm-2">
 		<div class='titleMenu col-sm-12' id='titleMenuID'>
-			<span class='col-sm-3' id='minusID'>- -</span>
+			<span class='col-sm-3 glyphicon' id='minusID'>&#x2212;</span>
 			<span class='col-sm-5'><%= projectName %></span>
 			<span class='col-sm-4'>
 				<div class='createButton col-sm-1'>
@@ -86,11 +86,13 @@
 	</div>
 
 	<div class="right-div col-sm-2">
+		<div class="logDiv col-sm-12">
+			<span class="col-sm-9 logTitle"></span>
+			<span class="col-sm-3 restoreIcon glyphicon">&#x2212;</span>
+		</div>
+		<div class="logContent col-sm-12">
+		</div>
 	</div>
-
-	<footer class="footer-div col-sm-12">
-		<p>Footer Text</p>
-	</footer>
 
 	<div id="dialog-form" title="Create New File">
 		<form>
@@ -100,6 +102,10 @@
 			</fieldset>
 		</form>
 	</div>
+
+	<footer class="footer-div col-sm-12">
+		<p align="center">@CopyRight ...... </p>
+	</footer>
 
 	<script src="/dependencies/sails.io.js"></script>
 	<script src="/bower_components/requirejs/require.js"></script>
