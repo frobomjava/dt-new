@@ -1,0 +1,80 @@
+body {
+  padding-top: 30px;
+  overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+ .navbar .navbar-brand{ padding: 0 12px;font-size: 16px;line-height: 30px;height: 30px; margin: 0;}
+ .navbar .navbar-nav > li > a {  padding-top: 0px; padding-bottom: 0px; line-height: 30px; }
+ .navbar .navbar-toggle {  margin-top: 3px; margin-bottom: 0px; padding: 8px 9px; }
+ .navbar .navbar-form { margin-top: 2px; margin-bottom: 0px }
+ .navbar .navbar-collapse {border-color: #A40303;}
+
+.navbar {
+  min-height:30px;
+  margin: 0;
+}
+
+.left-div {
+  height: 570px;
+  background-color:  #f1f1f1;
+  margin: 0;
+  padding: 0;
+	border-right: 1px solid gray;
+	overflow:auto;
+}
+
+.center-div {
+  height: 570px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  /*background-color:  #f1f1f1;*/
+}
+
+.right-div {
+  height: 570px;
+  margin: auto;
+  background-color: #f1f1f1;
+  border-left: 1px solid gray;
+}
+
+.footer-div {
+  color: white;
+  background-color: #555;
+}
+
+.titleMenu{
+	height: 30px;
+  padding-left: 0;
+	background-color: #f1f1f1;
+  border-bottom: 1px solid gray;
+}
+
+/*.fileListDiv{
+	overflow: auto;
+}
+*/
+.row {
+  padding: 0;
+  margin: 0;
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+li {
+  padding: 3px;
+  font-size: 16px;
+}
+
+label, input { display:block; }
+
+input.text { margin-bottom:12px; width:95%; padding: .4em; }
+
+fieldset { padding:0; border:0; margin-top:25px; }
+
+h1 { font-size: 1.2em; margin: .6em 0; }
