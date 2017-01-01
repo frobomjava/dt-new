@@ -2,10 +2,13 @@
 <html>
 <head>
 	<title>Decision Table WorkSpace </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link href="https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="/styles/importer.css">
-	<link rel="stylesheet" href="/styles/main.css">
+	<link rel="stylesheet" href="/css/workspace.css">
 	<link rel="stylesheet" href="/styles/style.css">
 	<!-- for file input entry dialog -->
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -14,84 +17,103 @@
 
 <body>
 
-	<div class="container">
-
-		<div class="headerDiv"></div>
-
-		<div class="contentDiv">
-
-			<div class="left" id="leftID">
-
-				<div class='titleMenu' id='titleMenuID'>
-
-					<span id='minusID'>- -</span>
-
-					<span>Folder</span>
-
-					<span><div class='createButton'>
-
-						<input type='button' value='+' id="file-create"/>
-
-					</div></span>
-
-				</div>
-
-				<div class='newProjectCreate' id='file-list-container'></div>
-
-			</div>
-
-			<div class="center" id="centerID">
-				<div class="menu" id="menuID">
-					<ul>
-						<li><a class="save" id="saveID" href="#">Save</a></li>
-						<li><a class="reload" id="reloadID" href="#">ReLoad</a></li>
-					</ul>
-				</div>
-				<div class="dtTable" id="decTableID"></div>
-			</div>
-
-			<div class="bottomOfCenter" id="bottomOfCenterID"></div>
-
-			<div class="right" id="rightID">
-
-				<div id="title_barID">
-
-					<div id="restoreButtonID">-</div>
-
-				</div>
-
-				<div id="boxID"></div>
-
-			</div>
-
+	<div class="navbar navbar-default navbar-fixed-top">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Brand</a>
 		</div>
 
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="#">File <span class="sr-only">(current)</span></a></li>
+				<li><a href="#">Edit</a></li>
+				<li><a href="#">View</a></li>
+				<li><a href="#">Selection</a></li>
+				<li><a href="#">Find</a></li>
+			</ul>
+			<div class="navbar-form navbar-right">
+				<a href="/logout" class="btn btn-info btn-md">
+					<%=req.user.userName %> &nbsp; &nbsp;	<span class="glyphicon glyphicon-user"></span>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="navbar navbar-inverse navbar-static-top">
+		<div class="navbar-header">
+			<ul class="nav navbar-nav">
+				<li><a href="#">Link</a></li>
+				<li><a href="#">Link</a></li>
+				<li><a href="#">Link</a></li>
+				<li><a href="#">Link</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="left-div col-sm-2">
+		<div class='titleMenu col-sm-12' id='titleMenuID'>
+			<span class='col-sm-3 glyphicon' id='minusID'>&#x2212;</span>
+			<span class='col-sm-5'><%= projectName %></span>
+			<span class='col-sm-4'>
+				<div class='createButton col-sm-1'>
+					<input type='button' value='+' id="file-create"/>
+				</div>
+			</span>
+		</div>
+		<div class='fileListDiv col-sm-12' id='file-list-container'></div>
+	</div>
+
+	<div class="center-div col-sm-8">
+		<div class="row navbar navbar-default navbar-static-top col-sm-12">
+			<ul class="nav navbar-nav">
+				<li><a href="#" class="save" id="saveID">Save</a></li>
+				<li><a href="#">Reload</a></li>
+				<li><a href="#">Undo</a></li>
+				<li><a href="#">Redo</a></li>
+			</ul>
+		</div>
+		<div class="row col-sm-12">
+			<div class="dtTable" id="decTableID"></div>
+		</div>
+	</div>
+
+	<div class="right-div col-sm-2">
+		<div class="logDiv col-sm-12">
+			<span class="col-sm-9 logTitle"></span>
+			<span class="col-sm-3 restoreIcon glyphicon">&#x2212;</span>
+		</div>
+		<div class="logContent col-sm-12">
+		</div>
 	</div>
 
 	<div id="dialog-form" title="Create New File">
-
 		<form>
-
 			<fieldset>
-
 				<input type="text" name="name" id="fileID" class="text ui-widget-content ui-corner-all" placeholder="Enter File Name" />
-
 				<input type="submit" tabindex="-1" style="position:absolute; top:-1000px" />
-
 			</fieldset>
-
 		</form>
-
 	</div>
 
+	<footer class="footer-div col-sm-12">
+		<p align="center">@CopyRight ...... </p>
+	</footer>
+
 	<script src="/dependencies/sails.io.js"></script>
-  <script src="/bower_components/requirejs/require.js"></script>
-  <script src="/js/workspace.js"></script>
+	<script src="/bower_components/requirejs/require.js"></script>
+	<script src="/js/workspace.js"></script>
 	<script>
 	var projectName = <%- JSON.stringify(projectName) %> ;
 	var myMap = new Map();
 	</script>
 
 </body>
-
 </html>

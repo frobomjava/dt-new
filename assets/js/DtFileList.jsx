@@ -9,7 +9,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
         myMap: myMap
       });
     },
-    
+
     componentWillMount: function() {
       var self = this;
       var projectName = this.state.projectName;
@@ -76,9 +76,9 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
       index = event.target.getAttribute('id');
 
       if(preDiv) {
-        preDiv.style.backgroundColor = "white";
+        preDiv.style.backgroundColor = "#f1f1f1";
       }
-      event.target.style.backgroundColor = "#87CEEB";
+      event.target.style.backgroundColor = "#D1D0CE";
       preDiv = event.target;
 
       if(self.state.myMap.has(fileId)){
@@ -123,7 +123,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
     render: function() {
       var self = this;
       return (
-        <ul>
+        <ul id="treeID">
         {this.state.files.map(function (file, index) {
           return(
             <li key={index} className="file-context-menu-one" onClick={self.handleClick} id={index} value={file.id} name={file.fileName}>
