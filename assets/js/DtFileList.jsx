@@ -9,7 +9,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
         myMap: myMap
       });
     },
-    
+
     componentWillMount: function() {
       var self = this;
       var projectName = this.state.projectName;
@@ -62,6 +62,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (React,
       });
 
       $( "#file-create" ).button().on( "click", function() {
+        alert("+ button is clicked...");
         dialog.dialog( "open" );
       });
     },

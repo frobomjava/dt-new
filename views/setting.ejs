@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <meta charset="utf-8">
     <title>Project Setting</title>
     <!-- Bootstrap core CSS OPTIONAL -->
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
       .tt-input, /* UPDATE: newer versions use tt-input instead of tt-query */
       .tt-hint {
         width: 300px;
-        height: 50px;
+        height: 40px;
         padding: 8px 12px;
-        font-size: 24px;
+        font-size: 20px;
         line-height: 30px;
         border: 2px solid #ccc;
         border-radius: 8px;
@@ -28,6 +31,7 @@
 
       .tt-highlight {
         color: red;
+        font-size: 18px;
       }
 
       .tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
@@ -40,12 +44,17 @@
         box-shadow: 0 5px 10px rgba(0,0,0,.2);
       }
 
-      .tt-suggestion {
+      .tt-suggestion, .noitems {
+        position: relative;
         padding: 20px;
         font-size: 18px;
         line-height: 24px;
         border-bottom: 1px solid #ccc;
         margin: 0px;
+      }
+
+      .tt-highlight:first-child:before {
+        content: '\f000' + '&nbsp;';
       }
 
       .tt-suggestion:hover { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
@@ -57,16 +66,48 @@
       .tt-suggestion p {
         margin: 0;
       }
+
+      .btn-danger {
+        font-size: 24px;
+      }
+
+      .btn-primary {
+        height: 40px;
+        padding-top: 7px;
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      a.list-group-item:hover {
+      	color: blue;
+      }
+
+      a.list-group-item {
+        font-size: 16px;
+        font-weight: bold;
+      }
+
   </style>
   </head>
   <body>
-    <h3><%= projectName %> Setting</h3>
+    <div class="container">
+      <h3><%= projectName %> Setting</h3>
 
-    <div id="remote">
-      <input class="typeahead" type="text" placeholder="Search users...">
-    </div>
-    <div id="members">
-      <ul id="memberList"></ul>
+      <div id="remote">
+        <input class="typeahead" type="text" placeholder="Search users..." />
+        <a class="btn btn-primary btn-lg" href="#"><i class="fa fa-plus-square"></i>  Add</a>
+      </div>
+      <br/>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Member of <strong><%= projectName %></strong></div>
+        <div class="panel-body">
+          <div class="list-group member-list">
+          </div>
+        </div>
+      </div>
+
+      <a class="btn btn-danger btn-lg" href="#"><i class="fa fa-trash-o"></i> Delete</a>
     </div>
 
     <!-- <script src="/bower_components/jquery/dist/jquery.js"></script> -->
@@ -105,6 +146,8 @@
 
     $(document).ready(function() {
 
+      var memberName;
+
       $('input').on([
                     'typeahead:initialized',
                     'typeahead:initialized:err',
@@ -115,17 +158,9 @@
                     'typeahead:closed'
                 ].join(' '), function(x) {
                     console.log(this.value);
-                    $( "#memberList" ).append( "<li>"+ this.value +"</li>" );
-
+                    memberName = this.value;
+                    $( ".member-list" ).append( '<a class="list-group-item" href="#"><i class="fa fa-user fa-2x" aria-hidden="true"></i>&nbsp; '+ this.value +'</a>' );
                 });
-
-      // $(document).on("click",".tt-suggestion",function() {
-      //   console.log($('.typeahead').val());
-      //   var memberName = $('.typeahead').val();
-      //     $( "#memberList" ).append( "<li>"+ memberName +"</li>" );
-      //     $('.typeahead').val('');
-      // });
-
     });
     </script>
   </body>

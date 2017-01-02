@@ -343,7 +343,6 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     }
   }
 
-
   return DecTable;
 }
 );
