@@ -22,6 +22,14 @@ module.exports = {
       model: 'user'
     },
 
+    members: {
+      collection: 'user'
+    },
+
+    resources: {
+      collection: 'resource'
+    },
+
     createdAt: {
       type: 'number',
       autoCreatedAt: true
