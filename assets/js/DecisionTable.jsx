@@ -27,20 +27,35 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         <tbody>
         {
           this.props.myCondition.map((conData, conIndex) => {
-            return (
-              <tr key={conIndex}>
-              <th>{conIndex+1}</th>
-
-              <Cell cellType="condition" index={conIndex} value={conData} callbackChild={this.conditionHandler}/>
-              {
-                this.props.myConRule.map((ruleConData, ruleIndex) => {
-                  return(
-                    <Cell cellType="ruleCondition" index={conIndex} ruleIndex={ruleIndex} value={ruleConData.conditions[conIndex]} callbackChild={this.conditionHandler}/>
-                  );
-                })
-              }
-              </tr>
-            );
+            if(this.props.myCondition.length != (conIndex+1)) {
+              return(
+                <tr key={conIndex}>
+                <th>{conIndex+1}</th>
+                <Cell cellType="condition" index={conIndex} value={conData} callbackChild={this.conditionHandler}/>
+                {
+                  this.props.myConRule.map((ruleConData, ruleIndex) => {
+                    return(
+                      <Cell cellType="ruleCondition" index={conIndex} ruleIndex={ruleIndex} value={ruleConData.conditions[conIndex]} callbackChild={this.conditionHandler}/>
+                    );
+                  })
+                }
+                </tr>
+              );
+            } else {
+              return (
+                <tr key={conIndex} style={{borderBottom: '2px solid blue'}}>
+                <th>{conIndex+1}</th>
+                <Cell cellType="condition" index={conIndex} value={conData} callbackChild={this.conditionHandler}/>
+                {
+                  this.props.myConRule.map((ruleConData, ruleIndex) => {
+                    return(
+                      <Cell cellType="ruleCondition" index={conIndex} ruleIndex={ruleIndex} value={ruleConData.conditions[conIndex]} callbackChild={this.conditionHandler}/>
+                    );
+                  })
+                }
+                </tr>
+              );
+            }
           })
         }
         </tbody>
