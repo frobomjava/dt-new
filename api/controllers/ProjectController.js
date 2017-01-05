@@ -91,7 +91,37 @@ module.exports = {
   setting: function(req, res) {
     console.log("---enter setting---");
     return res.view('setting', {layout: null, projectName: req.param('projectName')});
-  }
+  },
 
+  addMember: function(req, res) {
+    console.log('---add member---');
+    Project.findOne({projectName: req.param('projectName')}).populate('members').exec(function (err, project){
+      if (err) { return res.serverError(err); }
+      if (!project) { return res.notFound('Could not find a project! '); }
+
+      User.findOne({userName: req.param('userName')}).exec(function (err, user){
+        if (err) { return res.serverError(err); }
+        if (!user) { return res.notFound('Could not find a user!'); }
+
+        project.members.add(user.id);
+        project.save(function(err){
+          if (err) { return res.serverError(err); }
+          return res.json(user);
+        });//</save()>
+      });//</User.findOne()>
+    });//</Project.findOne()>
+  },
+
+  getMember: function(req, res) {
+    console.log('---getMember---');
+    Project.findOne({projectName: req.param('projectName')})
+    .populate('members', { sort: 'userName ASC' })
+    .exec(function(err, user) {
+      if(err) { return res.json(err); }
+
+      console.log(user);
+      return res.json(user.members);
+    });
+  }
 
 };

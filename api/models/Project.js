@@ -22,6 +22,10 @@ module.exports = {
       model: 'user'
     },
 
+    members:{
+      collection: 'user'
+    },
+
     createdAt: {
       type: 'number',
       autoCreatedAt: true

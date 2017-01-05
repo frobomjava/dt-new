@@ -1,167 +1,189 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset="utf-8">
-    <title>Project Setting</title>
-    <!-- Bootstrap core CSS OPTIONAL -->
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel='stylesheet' type='text/css' />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-      .tt-input, /* UPDATE: newer versions use tt-input instead of tt-query */
-      .tt-hint {
-        width: 300px;
-        height: 40px;
-        padding: 8px 12px;
-        font-size: 20px;
-        line-height: 30px;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        outline: none;
-      }
+<head>
+  <meta charset="utf-8">
+  <title>Project Setting</title>
+  <!-- Bootstrap core CSS OPTIONAL -->
+  <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/style.css" rel='stylesheet' type='text/css' />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+  .tt-input, /* UPDATE: newer versions use tt-input instead of tt-query */
+  .tt-hint {
+    width: 300px;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 18px;
+    line-height: 30px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+  }
 
-      .tt-input { /* UPDATE: newer versions use tt-input instead of tt-query */
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      }
+  .tt-input { /* UPDATE: newer versions use tt-input instead of tt-query */
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  }
 
-      .tt-hint {
-        color: #999;
-      }
+  .tt-hint {
+    color: #999;
+  }
 
-      .tt-highlight {
-        color: red;
-        font-size: 18px;
-      }
+  .tt-highlight {
+    color: red;
+    font-size: 18px;
+  }
 
-      .tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
-        width: 422px;
-        margin-top: 12px;
-        padding: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        box-shadow: 0 5px 10px rgba(0,0,0,.2);
-      }
+  .tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
+    width: 422px;
+    margin-top: 12px;
+    padding: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  }
 
-      .tt-suggestion, .noitems {
-        position: relative;
-        padding: 20px;
-        font-size: 18px;
-        line-height: 24px;
-        border-bottom: 1px solid #ccc;
-        margin: 0px;
-      }
+  .tt-suggestion, .noitems {
+    position: relative;
+    padding: 20px;
+    font-size: 18px;
+    line-height: 24px;
+    border-bottom: 1px solid #ccc;
+    margin: 0px;
+  }
 
-      .tt-highlight:first-child:before {
-        content: '\f000' + '&nbsp;';
-      }
+  .tt-highlight:first-child:before {
+    content: '\f000' + '&nbsp;';
+  }
 
-      .tt-suggestion:hover { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
-        color: #fff;
-        background-color: #0097cf;
+  .tt-suggestion:hover { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
+    color: #fff;
+    background-color: #0097cf;
 
-      }
+  }
 
-      .tt-suggestion p {
-        margin: 0;
-      }
+  .tt-suggestion p {
+    margin: 0;
+  }
 
-      .btn-danger {
-        font-size: 24px;
-      }
+  .btn-danger {
+    font-size: 20px;
+  }
 
-      .btn-primary {
-        height: 40px;
-        padding-top: 7px;
-        margin-top: 15px;
-        text-align: center;
-      }
+  .btn-primary {
+    height: 40px;
+    padding-top: 7px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
 
-      a.list-group-item:hover {
-      	color: blue;
-      }
+  div.list-group-item:hover {
+    color: white;
+    background-color: lightblue;
+  }
 
-      a.list-group-item {
-        font-size: 16px;
-        font-weight: bold;
-      }
+  div.list-group-item {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  div.member-delete {
+    float: right;
+    color: white;
+  }
 
   </style>
-  </head>
-  <body>
-    <div class="container">
-      <h3><%= projectName %> Setting</h3>
+</head>
+<body>
+  <div class="container">
+    <h3>Setting</h3>
+    <br/><br/>
 
-      <div id="remote">
-        <input class="typeahead" type="text" placeholder="Search users..." />
-        <a class="btn btn-primary btn-lg" href="#"><i class="fa fa-plus-square"></i>  Add</a>
+    <div id="remote">
+      <input class="typeahead" type="text" placeholder="Search users..." required/>
+      <a id="btnAdd" class="btn btn-primary btn-lg" href="#"><i class="fa fa-plus-square"></i>&nbsp;Add</a>
+    </div>
+    <br/>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Member of <strong><%= projectName %></strong></div>
+      <div id="memberlist" class="panel-body">
+
       </div>
-      <br/>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">Member of <strong><%= projectName %></strong></div>
-        <div class="panel-body">
-          <div class="list-group member-list">
-          </div>
-        </div>
-      </div>
-
-      <a class="btn btn-danger btn-lg" href="#"><i class="fa fa-trash-o"></i> Delete</a>
     </div>
 
-    <!-- <script src="/bower_components/jquery/dist/jquery.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <script src="/bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
-    <script src="/bower_components/typeahead.js/dist/bloodhound.js"></script>
-    <script>
-      var users = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('userName'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      prefetch: '../../users',
-      remote: {
+    <a class="btn btn-danger btn-lg" href="#"><i class="fa fa-trash-o"></i> Delete</a>
+  </div>
+
+  <script src="/bower_components/jquery/dist/jquery.js"></script>
+  <script src="/bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
+  <script src="/bower_components/typeahead.js/dist/bloodhound.js"></script>
+
+  <script src="/dependencies/sails.io.js"></script>
+  <script src="/bower_components/requirejs/require.js"></script>
+  <script src="/js/MemberList.js"></script>
+  <script>
+  var projectName = <%- JSON.stringify(projectName) %>;
+  var memberName;
+  var users = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('userName'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: '../../users',
+    remote: {
       url: '../../users/%QUERY',
       wildcard: '%QUERY'
-      }
-      });
+    }
+  });
 
-      $('#remote .typeahead').typeahead({
-          hint: true,
-          highlight: true,
-          minLength: 1
-      },
-     {
-      name: 'userName',
-      display: 'userName',
-      source: users,
-      templates: {
-        empty: [
-            '<div class="noitems">',
-            'No Users Found',
-            '</div>'
-        ].join('\n')
-      }
+  $('#remote .typeahead').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+  },
+  {
+    name: 'userName',
+    display: 'userName',
+    source: users,
+    templates: {
+      empty: [
+        '<div class="noitems">',
+        'No Users Found',
+        '</div>'
+      ].join('\n')
+    }
+  });
+
+  $(document).ready(function() {
+
+    console.log('projectName : ' + projectName);
+
+    $('input').on([
+      'typeahead:initialized',
+      'typeahead:initialized:err',
+      'typeahead:selected',
+      'typeahead:autocompleted',
+      'typeahead:cursorchanged',
+      'typeahead:opened',
+      'typeahead:closed'
+    ].join(' '), function(x) {
+      memberName = this.value;
+      console.log("memberName : " + memberName);
     });
 
-    $(document).ready(function() {
+    $(document).on('mouseenter', 'div.list-group-item', function(){
+      $(this).append(
+        '<div class="member-delete"><a href="#">' +
+        '<i class="fa fa-close fa-lg"></i></a></div>');
+      });
 
-      var memberName;
+      $(document).on('mouseleave', 'div.list-group-item', function(){
+        $('div.member-delete').hide();
+      });
 
-      $('input').on([
-                    'typeahead:initialized',
-                    'typeahead:initialized:err',
-                    'typeahead:selected',
-                    'typeahead:autocompleted',
-                    'typeahead:cursorchanged',
-                    'typeahead:opened',
-                    'typeahead:closed'
-                ].join(' '), function(x) {
-                    console.log(this.value);
-                    memberName = this.value;
-                    $( ".member-list" ).append( '<a class="list-group-item" href="#"><i class="fa fa-user fa-2x" aria-hidden="true"></i>&nbsp; '+ this.value +'</a>' );
-                });
     });
     </script>
   </body>
-</html>
+  </html>

@@ -58,6 +58,10 @@ module.exports.routes = {
 
   'get /project/in/:projectName': 'ProjectController.enter',
 
+  'post /project/setting/:projectName/user/add/:userName': 'ProjectController.addMember',
+
+  'get /project/setting/:projectName/users': 'ProjectController.getMember',
+
   'get /project/in/:projectName/files': 'DtFileController.getAll',
 
   'post /project/in/:projectName/file/new':'DtFileController.create',
