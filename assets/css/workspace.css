@@ -24,22 +24,6 @@ body {
   overflow:auto;
 }
 
-#minusID {
-  text-align: center;
-  padding: 5px;
-  height: 30px;
-  cursor:pointer;
-}
-
-.fileListDiv {
-  padding: 0;
-  /*margin-left:10px;*/
-}
-
-#treeID li:hover {
-	background-color: #DCDCDC;
-}
-
 .center-div {
   height: 570px;
   margin: 0;
@@ -83,18 +67,6 @@ body {
   margin: 0;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
-  padding: 3px;
-  font-size: 16px;
-  cursor:pointer;
-}
-
 .logDiv {
   padding: 0;
   margin: 0;
@@ -103,7 +75,6 @@ li {
 
 .logTitle {
   padding: 0;
-  /*background:	#ADD8E6;*/
   height:30px;
 }
 
@@ -111,19 +82,17 @@ li {
   text-align: center;
   padding: 5px;
   height: 30px;
-  /*background:	#ADA8E6;*/
   cursor:pointer;
 }
 
 .restoreIcon:hover {
-	background-color: #DCDCDC;
+  background-color: #DCDCDC;
 }
 
 .logContent{
   padding: 0;
   overflow: auto;
   height: 539px;
-  /*background-color: blue;*/
 }
 
 label, input { display:block; }
@@ -133,3 +102,47 @@ input.text { margin-bottom:12px; width:95%; padding: .4em; }
 fieldset { padding:0; border:0; margin-top:25px; }
 
 h1 { font-size: 1.2em; margin: .6em 0; }
+
+.category-tree {
+  margin: 0;
+  padding: 0;
+}
+.category-tree ul {
+  margin: 0;
+  padding: 0 0 0 14px;
+}
+.category-tree li {
+  list-style-type: none;
+  font-size: 16px;
+}
+.category-tree a {
+  cursor: pointer;
+}
+.category-tree li.selected > a {
+  padding: 2px 10px 2px 3px;
+  background-color: #D1D0CE;
+  color: #000;
+}
+.category-tree li:before {
+  content: "";
+  display: inline-block;
+  font-size: 13px;
+  height: 11px;
+  line-height: 7px;
+  margin: 3px 7px 0 0;
+  text-align: center;
+  /*vertical-align: top;*/
+  width: 11px;
+}
+.category-tree .has-children:before {
+  content: "▶";
+  cursor: pointer;
+}
+.category-tree .has-children.open:before {
+  content: "▼";
+  cursor: pointer;
+}
+.category-tree .has-children.always-open:before {
+  content: "";
+  cursor: default;
+}

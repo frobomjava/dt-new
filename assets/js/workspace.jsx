@@ -18,20 +18,19 @@ requirejs.config({
 
 });
 
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'app/DtFileList', 'app/DecisionTable'],
-  function ($, React, ReactDOM, PubSub, contextmenu, DtFileList, DecisionTable) {
+require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/projectExplorer', 'app/DecisionTable'],
+function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable) {
 
-    function render() {
-      ReactDOM.render( <
-        DtFileList / >,
-        document.getElementById('file-list-container')
-      );
-      ReactDOM.render( <
-        DecisionTable / >,
-        document.getElementById('decTableID')
-      );
-    }
-    render();
-    console.log("updated workspace.js");
+  function render() {
+    ReactDOM.render( <ProjectExplorer />,
+      document.getElementById('file-list-container')
+    );
+    ReactDOM.render( <
+      DecisionTable / >,
+      document.getElementById('decTableID')
+    );
+  }
+  render();
+  console.log("updated workspace.js");
 
-  }); //require
+}); //require
