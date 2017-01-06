@@ -51,7 +51,6 @@ ul.member-list>li {
 ul.content-list>li {
     padding: 15px;
 		font-size: medium;
-		border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     margin: 0;
 }

@@ -54,15 +54,62 @@ module.exports = {
   },
 
   getAll: function(req, res) {
-    Project.find({owner: req.user.id}).exec(function(err, data) {
-      if (err) {
-        console.log(JSON.stringify((err)));
-        return res.json(err);
-      } else {
-        //console.log(JSON.stringify(data));
-        return res.json(data);
-      }
-    });
+    var data = {
+      projects : [],
+      memberProjects : [],
+      userName : ""
+    };
+    async.series(
+  	[
+  		function getOwnProjects(callback){
+        Project.find({owner: req.user.id}).exec(function(err, projects) {
+          if (err) {
+            console.log(JSON.stringify((err)));
+            callback(err);
+          } else {
+            console.log();
+            console.log('---own projects---');
+            console.log(JSON.stringify(projects));
+            data.projects = projects;
+            callback();
+          }
+        });
+  		},
+  		function getMemberProjects(callback){
+        Project.find().populate('members').exec(function(err, projects) {
+          if (err) {
+            console.log(JSON.stringify(err));
+            callback(err);
+          } else {
+            var memberProjects = projects.filter(function(project){
+              var result = project.members.filter(function(member){
+                return member.id == req.user.id;
+              });
+              return result.length > 0;
+            });
+            console.log();
+            console.log('---memberProjects---');
+            memberProjects.forEach(function(mp) {
+              console.log(mp);
+            });
+
+            // return res.json(memberProjects);
+            data.memberProjects = memberProjects;
+            data.userName = req.user.userName;
+            console.log();
+            console.log('---data---');
+            console.log(JSON.stringify(data));
+
+            return res.json(data);
+          }
+        });
+  		}
+  	],
+  	function(err) {
+      return res.json(err);
+  	}
+  );
+
   },
 
   delete: function(req, res) {

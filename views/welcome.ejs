@@ -5,7 +5,7 @@
 <head>
   <title>Welcome</title>
   <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link href="css/style.css" rel='stylesheet' type='text/css' />
 </head>
 
@@ -57,18 +57,20 @@
       </div>
       <h3 class="project-title">Project List</h3>
       <form id="project-create-form" class="form-inline">
-
         <div class="form-group">
           <input type="text" class="form-control" id="projectName" name="projectName" placeholder="Type Project Name..." required>
-          <button type="submit" class="btn btn-primary">Create</button>
+          <button type="submit" class="btn btn-success">Create</button>
         </div>
       </form>
-      <div id='projects'></div>
+
+      <div id="projects"></div>
+
+
     </div>
   </div>
 
   <script src="/dependencies/sails.io.js"></script>
-  <script src="/bower_components/requirejs/require.js"></script>
+  <script src="/bower_components/requirejs/require.js"></script>  
   <script src="/js/welcome.js"></script>
 </body>
 </html>
