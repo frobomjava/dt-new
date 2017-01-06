@@ -14,7 +14,7 @@
     width: 300px;
     height: 40px;
     padding: 8px 12px;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 30px;
     border: 2px solid #ccc;
     border-radius: 8px;
@@ -30,13 +30,13 @@
   }
 
   .tt-highlight {
-    color: red;
-    font-size: 18px;
+    color: red; 
+    font-size: 16px;
   }
 
   .tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
-    width: 422px;
-    margin-top: 12px;
+    min-width: 300px;
+    margin-top: 5px;
     padding: 0;
     background-color: #fff;
     border: 1px solid #ccc;
@@ -46,8 +46,8 @@
 
   .tt-suggestion, .noitems {
     position: relative;
-    padding: 20px;
-    font-size: 18px;
+    padding: 15px;
+    font-size: 16px;
     line-height: 24px;
     border-bottom: 1px solid #ccc;
     margin: 0px;
@@ -59,7 +59,7 @@
 
   .tt-suggestion:hover { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
     color: #fff;
-    background-color: #0097cf;
+    background-color: lightblue;
 
   }
 
@@ -92,7 +92,19 @@
 
   div.member-delete {
     float: right;
-    color: white;
+    display: none;
+  }
+
+  div.member-delete a {
+    color: black;
+  }
+
+  div.member-delete a:hover {
+    color: red;
+  }
+
+  strong {
+    color: blue;
   }
 
   </style>
@@ -173,15 +185,13 @@
       console.log("memberName : " + memberName);
     });
 
-    $(document).on('mouseenter', 'div.list-group-item', function(){
-      $(this).append(
-        '<div class="member-delete"><a href="#">' +
-        '<i class="fa fa-close fa-lg"></i></a></div>');
-      });
+    $(document).on('mouseenter', 'div.list-group-item', function(event){
+       $(event.target).children(".member-delete").show();
+    });
 
-      $(document).on('mouseleave', 'div.list-group-item', function(){
-        $('div.member-delete').hide();
-      });
+    $(document).on('mouseleave', 'div.list-group-item', function(){
+      $('div.member-delete').hide();
+    });
 
     });
     </script>

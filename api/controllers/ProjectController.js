@@ -116,12 +116,55 @@ module.exports = {
     console.log('---getMember---');
     Project.findOne({projectName: req.param('projectName')})
     .populate('members', { sort: 'userName ASC' })
-    .exec(function(err, user) {
+    .exec(function(err, project) {
       if(err) { return res.json(err); }
 
-      console.log(user);
-      return res.json(user.members);
+      return res.json(project.members);
     });
-  }
+  },
+
+  removeMember: function(req, res){
+    console.log();
+    console.log('---removeMember---');
+    console.log('userId ' + req.param('userId'));
+    console.log();
+
+  async.series(
+  	[
+  		function remove(callback){
+        Project.findOne({projectName: req.param('projectName')})
+        .populate('members')
+        .exec(function(err, project){
+          if(err) { callback(err); }
+
+          console.log('1. before remove' + JSON.stringify(project.members));
+
+          project.members.remove(req.param('userId'));
+          console.log('2. after remove' + JSON.stringify(project.members));
+          project.save(function(err){
+            if (err) { callback(err); }
+            console.log('in save');
+            console.log();
+          });
+          callback();
+        });
+  		},
+  		function sendUpdatedMembers(callback){
+        Project.findOne({projectName: req.param('projectName')})
+        .populate('members', { sort: 'userName ASC' })
+        .exec(function(err, project) {
+          if(err) { callback(err); }
+
+          console.log('3. before send json ' + JSON.stringify(project.members));
+          return res.json(project.members);
+        });
+  		}
+  	],
+  	function(err) {
+      console.log('err : ' + err);
+      return res.json(err);
+  	}
+  );
+}
 
 };

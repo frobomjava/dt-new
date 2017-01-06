@@ -36,7 +36,6 @@ module.exports = {
             callback();
           }
           else {
-            //message = '';
             callback();
           }
         });

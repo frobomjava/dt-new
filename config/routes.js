@@ -60,6 +60,8 @@ module.exports.routes = {
 
   'post /project/setting/:projectName/user/add/:userName': 'ProjectController.addMember',
 
+  'get /project/setting/:projectName/user/remove/:userId': 'ProjectController.removeMember',
+
   'get /project/setting/:projectName/users': 'ProjectController.getMember',
 
   'get /project/in/:projectName/files': 'DtFileController.getAll',

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Project Setting</title>
+  <link href="css/style.css" rel='stylesheet' type='text/css' >
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+
+  ul.dropdown-menu {
+    min-width: 200px;
+    padding: 0px;
+  }
+
+  ul.dropdown-menu>li {
+    position: absolute;
+    color: #263238;
+    background-color: white;
+    min-width: inherit;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 10px 0px 10px 40px;
+    font-size: medium;
+
+  }
+
+  ul.dropdown-menu>li:hover {
+    background-color: #D1F2EB;
+  }
+  </style>
+
+</head>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Brand</a>
+      </div>
+
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">Link</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">One more separated link</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="navbar-form navbar-right">
+          <strong><%=req.user.userName %>&nbsp;&nbsp;&nbsp;<a href="/logout">Log out</a></strong>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h3>Members</h3>
+    <br/>
+    <form class="form-inline">
+      <div class="dropdown">
+        <input type="text" id="txtUser" class="dropdown-toggle form-control"
+        data-toggle="dropdown" placeholder="Search for a user.." />
+        <ul id="dropdown-menu" class="dropdown-menu"></ul>
+      </div>
+
+    </form>
+    <br/>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Member to <strong><%=projectName %></strong>
+      </div>
+
+      <ul class="content-list"></ul>
+      <br/>
+    </div>
+    <br/><br/>
+    <button type="submit" class="btn btn-danger btn-lg">Delete</button>
+
+  </div>
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+
+  $(document).ready(function(){
+    $("#txtUser").click(function(e){
+        e.preventDefault();
+        $("#txtUser").attr("aria-expanded","false");
+    });
+
+    $('#txtUser').on('input', function(e) {
+      e.preventDefault();
+      var input = $(this).val() // get the current value of the input field.
+      console.log("input : " + input);
+
+      $("#txtUser").attr("aria-expanded","false");
+
+        $.getJSON('/users', {keyword : input},function (data) {
+          console.log('ok, got user data');
+          console.log("data is = " + JSON.stringify(data));
+
+          data.forEach(function(user){
+            $("ul.dropdown-menu").append("<li class='userName'>" + user.userName + "</li>");
+          });
+
+          $("#txtUser").attr("aria-expanded","true");
+
+        });
+
+    });
+
+
+    $(document).delegate('.userName', 'click', function(event){
+        event.stopPropagation(); //<-- has no effect to the described behavior
+        console.log(event.target.tagName);
+        console.log($(event.target).text());
+        $("ul.content-list").append("<li class='memberName'>" + $(event.target).text() + "</li>");
+    });
+
+  });
+
+  </script>
+</body>
+</html>
