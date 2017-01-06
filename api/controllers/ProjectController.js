@@ -136,31 +136,33 @@ module.exports = {
         .populate('members')
         .exec(function(err, project){
           if(err) { callback(err); }
-
-          console.log('1. before remove' + JSON.stringify(project.members));
-
           project.members.remove(req.param('userId'));
-          console.log('2. after remove' + JSON.stringify(project.members));
+
           project.save(function(err){
             if (err) { callback(err); }
-            console.log('in save');
-            console.log();
+
+            callback();
           });
-          callback();
+
         });
   		},
+
   		function sendUpdatedMembers(callback){
+        console.log();
+        console.log('----sendUpdatedMembers-----');
+
         Project.findOne({projectName: req.param('projectName')})
         .populate('members', { sort: 'userName ASC' })
         .exec(function(err, project) {
           if(err) { callback(err); }
-
-          console.log('3. before send json ' + JSON.stringify(project.members));
+          console.log();
+          console.log('3. before send JSON ' + JSON.stringify(project.members));
           return res.json(project.members);
         });
   		}
   	],
   	function(err) {
+      console.log();
       console.log('err : ' + err);
       return res.json(err);
   	}
