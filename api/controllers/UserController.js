@@ -6,6 +6,29 @@
 */
 
 module.exports = {
+  getAll: function(req, res) {
+    User.find(function(err, users) {
+        if (err) {return res.serverError(err);}
+        console.log(JSON.stringify((users)));
+        return res.json(users);
+    });
+  },
+
+  findUser: function(req, res) {
+    console.log(' inside findUser in UserController...');
+    User.find({
+      userName: { startsWith: req.param('userName') }, sort: 'userName'
+    }).exec(function (err, users){
+      if (err) {
+        console.log(JSON.stringify((err)));
+        return res.json(err);
+      } else {
+        console.log('users : ' + JSON.stringify(users));
+        return res.json(users);
+      }
+    });
+  },
+
   create: function(req, res) {
     if (req.param('password').length < 6) {
       return res.render("signup", {layout:null, error: 'Password must be at least 6 characters!'});

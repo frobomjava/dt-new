@@ -44,15 +44,27 @@ module.exports.routes = {
 
   'post /signup': 'UserController.create',
 
+  'get /users': 'UserController.getAll',
+
+  'get /users/:userName': 'UserController.findUser',
+
   'get /projects': 'ProjectController.getAll',
 
   'post /project/new': 'ProjectController.create',
+
+  'get /project/setting/:projectName': 'ProjectController.setting',
 
   'get /project/delete/:projectName': 'ProjectController.delete',
 
   'post /project/update': 'ProjectController.update',
 
   'get /project/in/:projectName': 'ProjectController.enter',
+
+  'post /project/setting/:projectName/user/add/:userName': 'ProjectController.addMember',
+
+  'get /project/setting/:projectName/user/remove/:userId': 'ProjectController.removeMember',
+
+  'get /project/setting/:projectName/users': 'ProjectController.getMember',
 
   'get /project/in/:projectName/files': 'DtFileController.getAll',
 
