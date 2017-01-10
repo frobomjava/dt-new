@@ -132,7 +132,7 @@ module.exports = {
 
   enter: function(req, res) {
     console.log("---enter workspace---");
-    return res.view('workspace', {layout: null, projectName: req.param('projectName')});
+    return res.view('workspace', {layout: null, projectName: req.param('projectName'), ownerOrmember: req.param('ownerOrmember')});
   },
 
   setting: function(req, res) {

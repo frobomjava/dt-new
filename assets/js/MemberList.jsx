@@ -63,7 +63,7 @@ function ($, React, ReactDOM, PubSub, contextmenu) {
     removeMember: function(event) {
       event.preventDefault();
       console.log(event.target);
-      
+
       var self = this;
       var userId = event.target.getAttribute('value');
       console.log('userId : ' + userId);
