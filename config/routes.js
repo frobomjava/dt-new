@@ -58,6 +58,8 @@ module.exports.routes = {
 
   'post /project/in/:projectName/file/new':'DtFileController.create',
 
+  'post /project/in/:projectName/resource/new':'ResourceController.create',
+
   'get /project/in/:projectName/file/delete/:fileId':'DtFileController.delete',
 
   'post /project/in/:projectName/file/save': 'DtFileController.save',
