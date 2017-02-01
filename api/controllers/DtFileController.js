@@ -17,13 +17,30 @@ module.exports = {
 
     async.series([
       function findProject(callback) {
-        Project.findOne({owner: req.user.id, projectName: projectData.projectName}).exec(function(err, projects) {
+        Project.find({projectName: projectData.projectName}).populate('members').exec(function(err, projects) {
           if (err) {
             callback(err);
           } else {
-            DtFile.project = projects.id;
-            projectData.id = projects.id;
-            callback();
+            projects.forEach(function(project) {
+              if (project.owner == req.user.id) {
+                projectData.id = project.id;
+                callback();
+              }
+              else {
+                console.log();
+                console.log('members ' + JSON.stringify(project.members));
+
+                var memberProject = project.members.filter(function(member){
+                  return member.id == req.user.id;
+                });
+                if (memberProject.length > 0) {
+                  projectData.id = project.id;
+                  callback();
+                }
+              }
+            });
+
+
           }
         });
       },
@@ -58,17 +75,44 @@ module.exports = {
 
     async.series([
       function findProject(callback) {
-        Project.findOne({owner: req.user.id, projectName: projectData.projectName}).exec(function(err,projects){
+        Project.find({projectName: projectData.projectName}).populate('members').exec(function(err, projects) {
           if (err) {
             callback(err);
-          } else if (projects) {
-            fileData.project = projects.id;
+          } else {
+            for (var i = 0; i < projects.length; i++) {
+              if (projects[i].owner == req.user.id) {
+                fileData.project = projects[i].id;
+                projectData.owner = projects[i].owner;
+                break;
+              }
+              else {
+                console.log();
+                console.log('members ' + JSON.stringify(projects[i].members));
+
+                var memberProject = projects[i].members.filter(function(member){
+                  console.log('member.id :' + member.id);
+                  console.log('user.id : ' + req.user.id);
+                  return member.id == req.user.id;
+                });
+                console.log(memberProject.length);
+                if (memberProject.length > 0) {
+                  fileData.project = projects[i].id;
+                  console.log('projects[i].owner : ' + JSON.stringify(projects[i].owner));
+                  projectData.owner = projects[i].owner;
+                  console.log('project.id : ' + projects[i].id);
+                  console.log('fileData.project : ' + fileData.project);
+
+                  break;
+                }
+              }
+            }
             callback();
           }
         });
       },
 
       function existDtFile(callback){
+        console.log('===existDtFile===');
         DtFile.findOne({fileName: fileData.fileName, project:fileData.project}).exec(function(err, data){
           if (err) {
             console.log(JSON.stringify((err)));
@@ -85,41 +129,66 @@ module.exports = {
       },
 
       function createDtFile(callback){
-        var fileDir = process.cwd()+'/projects/' + req.user.userName +'/'+ projectData.projectName + '/' + fileData.fileName + '.json' ;
-        fileData.url = fileDir;
-        var dtFileJSONData = {
-          names:{
-            conditions : [""],
-            actions : [""]
-          },
+        console.log('===createDtFile===');
 
-          rules:[
-            {
-              conditions : [""],
-              actions : [""]
-            },
-          ]
-        }
+        async.series(
+      	[
+      		function getProjectOwner(callback){
+            Project.findOne(fileData.project).populate('owner')
+            .exec(function(err, project) {
 
-        jsonFile.writeFile(fileDir, dtFileJSONData, function(err){
-          if(err){
-            callback(err);
-          } else {
-            DtFile.create(fileData).exec(function(err,newFile){
+              if (err) {callback(err);}
+              console.log(project.owner.userName);
+              fileData.ownerName = project.owner.userName;
+              callback();
+            });
+      		},
+
+      		function createFile(callback){
+            var fileDir = process.cwd()+'/projects/' + fileData.ownerName +'/'
+                + projectData.projectName + '/' + fileData.fileName + '.json' ;
+            fileData.url = fileDir;
+            console.log('fileData.url : ' + fileData.url);
+            var dtFileJSONData = {
+              names:{
+                conditions : [""],
+                actions : [""]
+              },
+
+              rules:[
+                {
+                  conditions : [""],
+                  actions : [""]
+                },
+              ]
+            }
+
+            jsonFile.writeFile(fileDir, dtFileJSONData, function(err){
               if(err){
                 callback(err);
               } else {
-                //console.log('---newFile--- ' + JSON.stringify(newFile));
-                return res.json(newFile);
+                DtFile.create(fileData).exec(function(err,newFile){
+                  if(err){
+                    callback(err);
+                  } else {
+                    console.log('---newFile--- ' + JSON.stringify(newFile));
+                    return res.json(newFile);
+                  }
+                });
               }
             });
-          }
+      		}
+      	],
+        function(err) {
+          console.log('err : ' + err);
+          return res.json(err);
         });
       }
     ],
     function(err) {
+      console.log('err : ' + err);
       return res.json(err);
-    })
+    });
   },
 
   delete: function(req, res) {
