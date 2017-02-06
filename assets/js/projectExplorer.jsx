@@ -70,7 +70,7 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
 
       function add() {
         var resourceName = $('#resourceID').val();
-        console.log("resourceName = " + resourceName);
+
         if (resourceName) {
           var resourceType = self.state.resourceType;
           var nodeID = self.state.nodeID;
@@ -79,12 +79,22 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
           var posting = $.post(url,{resourceName: resourceName, resourceType: resourceType, nodeID: nodeID});
           posting.done(function(data) {
             if (data.parent) {
+              var newChildData = [{
+                id: data.id,
+                name: data.name,
+                resourceType: data.resourceType
+              }];
               //Not yet finished this code
               console.log("ParentID is = " + data.parent.id);
+
               self.state.data.resourceData.map(function(resData,index){
                 if(data.parent.id == resData.id){
-                  var parentData = resData ;
-                  console.log("parent data = " + JSON.stringify(parentData));
+                  self.state.data.resourceData.splice(++index, 0, newChildData);
+                  console.log("resourceData is = " + self.state.data.resourceData);
+
+                  // var parentData = resData ;
+                  // console.log("parent data = " + JSON.stringify(parentData));
+                  // console.log("*** index *** " + index);
                 }
               });
             } else {
