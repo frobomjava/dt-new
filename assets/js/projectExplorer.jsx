@@ -1,20 +1,105 @@
 define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], function (classnames,React, $) {
   var ProjectExplorer = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return ({
         data: {
           name: projectName,
           resourceType: 'project',
-          resourceData:[]
-        },
-        resourceType: "",
-        trigger: "",
-        nodeID: ""
+          level: 0,
+          resourceData: [
+            {
+              id: 1,
+              name: 'folder1',
+              resourceType: 'folder',
+              level: 1,
+              resourceData: [
+                {
+                  id: 1,
+                  name: 'file11',
+                  resourceType: 'file',
+                  level: 2
+                },
+
+                {
+                  id: 2,
+                  name: 'file12',
+                  resourceType: 'file',
+                  level: 2
+                }
+              ]
+            },
+            {
+              id: 2,
+              name: 'folder2',
+              resourceType: 'folder',
+              level: 1,
+              resourceData: [
+                {
+                  id: 3,
+                  name: 'file21',
+                  resourceType: 'file',
+                  level: 2
+                },
+                {
+                  id: 4,
+                  name: 'file22',
+                  resourceType: 'file',
+                  level: 2
+                }
+              ]
+            },
+
+            {
+              id: 3,
+              name: 'folder3',
+              resourceType: 'folder',
+              level: 1,
+              resourceData: [
+                {
+                  id: 4,
+                  name: 'subFolder4',
+                  resourceType: 'folder',
+                  level: 2,
+                  resourceData: [
+                    {
+                      id: 7,
+                      name: 'subFile41',
+                      resourceType: 'file',
+                      level: 4
+                    }
+                  ]
+                },
+
+                {
+                  id: 5,
+                  name: 'file31',
+                  resourceType: 'file',
+                  level: 2
+                },
+
+                {
+                  id: 6,
+                  name: 'file32',
+                  resourceType: 'file',
+                  level: 2
+                }
+              ]
+            }
+          ]
+        }
       });
     },
 
     componentWillMount: function() {
       this.setState({data: this.state.data});
+
+      var self = this;
+      var url = '/project/in/'+projectName+'/resource/tree';
+
+      $.getJSON(url, function (data) {
+        console.log("Resource Tree");
+        console.log(JSON.stringify(data));
+      });
     },
 
     onSelect: function (node,trigger,nodeID) {

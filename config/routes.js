@@ -76,6 +76,7 @@ module.exports.routes = {
 
   'post /project/in/:projectName/file/save': 'DtFileController.save',
 
-  'get /project/in/:projectName/file/data/:fileId':'DtFileController.getData'
+  'get /project/in/:projectName/file/data/:fileId':'DtFileController.getData',
 
+  'get /project/in/:projectName/resource/tree': 'ProjectController.resourceTree'
 };

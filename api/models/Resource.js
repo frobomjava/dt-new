@@ -40,7 +40,7 @@ module.exports = {
     },
     
     extension: {
-      type: 'string'
+        type: 'string'
     },
 
     createdAt: {
@@ -53,6 +53,21 @@ module.exports = {
       autoUpdatedAt: true
     }
 
+  },
+
+  fillChildResourcesRecursively: function(resource) {
+    Resource.find({parent: resource.id}).exec(function(err, resources) {
+      if (err) {
+        console.log("Error occured");
+      } else if(resources) {
+        resource.children = resources;
+        resources.forEach(function(childResource) {
+          console.log("In forEach loop in recursive function");
+          console.log("Child:" + childResource.name + " Parent:" + resource.name);
+          Resource.fillChildResourcesRecursively(childResource);
+        });
+      }
+    });
   }
 };
 
