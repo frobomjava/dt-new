@@ -79,30 +79,37 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
           var posting = $.post(url,{resourceName: resourceName, resourceType: resourceType, nodeID: nodeID});
           posting.done(function(data) {
             if (data.parent) {
-              var newChildData = [{
+              var newChildData = {
                 id: data.id,
                 name: data.name,
-                resourceType: data.resourceType
-              }];
+                resourceType: data.resourceType,
+                resourceData: []
+              };
               //Not yet finished this code
-              console.log("ParentID is = " + data.parent.id);
-
               self.state.data.resourceData.map(function(resData,index){
-                if(data.parent.id == resData.id){
-                  self.state.data.resourceData.splice(++index, 0, newChildData);
-                  console.log("resourceData is = " + self.state.data.resourceData);
-
-                  // var parentData = resData ;
-                  // console.log("parent data = " + JSON.stringify(parentData));
-                  // console.log("*** index *** " + index);
+                if(data.parent == resData.id){
+                  console.log("ParentID is = " + data.parent + " & res id = " + resData.id);
+                  var datasUpdated = self.state.data;
+                  datasUpdated.resourceData[index].resourceData.push(newChildData);
+                  self.setState({data: datasUpdated});
+                  console.log("new resData is = " + JSON.stringify(self.state.data));
                 }
               });
             } else {
-              console.log("Parent is not exist.");
-              var datasUpdated = self.state.data;
-              datasUpdated.resourceData.push({'id': data.id,'name': data.name,'resourceType': data.resourceType,});
-              self.setState({data: datasUpdated});
-              console.log("==finished data=== " + JSON.stringify(self.state.data));
+              if(data.resourceType == 'file'){
+                console.log("Parent is not exist. file create");
+                var datasUpdated = self.state.data;
+                datasUpdated.resourceData.push({'id': data.id,'name': data.name,'resourceType': data.resourceType});
+                self.setState({data: datasUpdated});
+                console.log("==updated data=== " + JSON.stringify(self.state.data));
+              } else {
+                console.log("Parent is not exist.");
+                var datasUpdated = self.state.data;
+                datasUpdated.resourceData.push({'id': data.id,'name': data.name,'resourceType': data.resourceType,'resourceData':[]});
+                self.setState({data: datasUpdated});
+                console.log("==updated data=== " + JSON.stringify(self.state.data));
+              }
+
             }
           });
           dialog.dialog( "close" );
