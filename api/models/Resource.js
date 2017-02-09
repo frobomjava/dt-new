@@ -57,7 +57,6 @@ module.exports = {
     var resource = this.toObject();
     if (this.children && this.children.length > 0) {
       var newChildren = this.children.map(function (child) {
-        delete child.url;
         delete child.createdAt;
         delete child.createdBy;
         delete child.updatedAt;
@@ -65,7 +64,6 @@ module.exports = {
       });
       resource.children = newChildren;
     }
-    delete resource.url;
     delete resource.createdAt;
     delete resource.createdBy;
     delete resource.updatedAt;

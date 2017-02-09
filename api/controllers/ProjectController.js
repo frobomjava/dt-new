@@ -258,7 +258,7 @@ module.exports = {
           console.log("Printing json data *********************");
           delete data.project.updatedAt;
           delete data.project.createdAt;
-          delete data.project.url;
+          delete data.project.id;
           delete data.project.createdBy;
           data.project.name = data.project.projectName;
           data.project.resourceType = 'project';

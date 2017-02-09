@@ -98,11 +98,22 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log(JSON.stringify(project));
         //var projectData = JSON.parse(project);
         project.children = project.resources;
-        self.setState({data : project });
+        self.setState({data : project, resourceType : "", trigger : "", nodeID : ""});
         //console.log(JSON.stringify(projectData));
         console.log("state has been set");
       });
       console.log("new componet will mount");
+    },
+
+    findParentResource: function(parentId, resources, callback) {
+      var self = this;
+      resources.forEach(function(resource) {
+        if (resource.id == parentId) {
+          return callback(resource);
+        } else if (resource.children && resource.children.length > 0) {
+          return self.findParentResource(parentId, resource.children, callback);
+        }
+      });
     },
 
     onSelect: function (node, trigger, nodeID) {
@@ -176,16 +187,17 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
                 resourceType: data.resourceType,
                 children: []
               };
-              //Not yet finished this code
-              self.state.data.children.map(function (resData, index) {
-                if (data.parent == resData.id) {
-                  console.log("ParentID is = " + data.parent + " & res id = " + resData.id);
-                  var datasUpdated = self.state.data;
-                  datasUpdated.children[index].children.push(newChildData);
-                  self.setState({ data: datasUpdated });
-                  console.log("new resData is = " + JSON.stringify(self.state.data));
-                }
+              // recursively tracing tree nodes to find the parent node
+              // if found the parent node, push to the received data to is children,
+              // update react component state
+              var updatedData = self.state.data;
+              self.findParentResource(data.parent, updatedData.children, function(resource) {
+                resource.children.push(newChildData);
+                self.setState({data: updatedData});
+                console.log("data updated 222*****");
+                self.forceUpdate();
               });
+
             } else {
               if (data.resourceType == 'file') {
                 console.log("Parent is not exist. file create");
