@@ -230,22 +230,38 @@ module.exports = {
             }
             data.project = project;
             if (project) {
-              project.resources.forEach(function(resource) {
+              //project.resources.forEach(function(resource) {
                 console.log("Printing each resource");
-                console.log(resource.name);
-                Resource.fillChildResourcesRecursively(resource);
-              });
+                //console.log(resource.name);
+                Resource.fillChildResourcesRecursively2(project.resources.length, project.resources, function() {
+                  console.log("Now callback");
+                  callback();
+                });
+              //});
               console.log(JSON.stringify(project));
             }
-
-            callback();
           });
         },
 
         function success(callback) {
           console.log("Printing data ***********");
-          console.log(JSON.stringify(data));
-           res.json(data);
+          data.project.resources.forEach(function(resource) {
+            console.log("Printing each resource");
+            console.log(JSON.stringify(resource,['name','children']));
+            console.log("Now will print children");
+            console.log(JSON.stringify(resource.children));
+            resource.children.forEach(function(child) {
+              console.log(child.name);
+            });
+          });
+
+          console.log("Printing json data *********************");
+          delete data.project.updatedAt;
+          delete data.project.createdAt;
+          delete data.project.url;
+          delete data.project.createdBy;
+          console.log(JSON.stringify(data.project));
+          res.json(data);
         },
 
         function(err) {
