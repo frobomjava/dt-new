@@ -46,6 +46,8 @@ module.exports = {
       delete project.createdAt;
       delete project.updatedAt;
       delete project.owner;
+      project.children = project.resources;
+      delete project.children;
       return project;
     }
 

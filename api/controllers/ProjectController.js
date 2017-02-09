@@ -260,8 +260,10 @@ module.exports = {
           delete data.project.createdAt;
           delete data.project.url;
           delete data.project.createdBy;
+          data.project.name = data.project.projectName;
+          data.project.resourceType = 'project';
           console.log(JSON.stringify(data.project));
-          res.json(data);
+          res.json(data.project);
         },
 
         function(err) {
