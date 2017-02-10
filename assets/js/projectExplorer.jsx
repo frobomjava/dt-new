@@ -14,6 +14,13 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
     },
 
     componentWillMount: function() {
+      var self = this;
+      var projectName = this.state.data.name;
+      $.getJSON('/project/in/'+projectName+'/resources', function(data){
+        console.log("ok, get resource data");
+        console.log("resourece data is = " + JSON.stringify(data));
+        //self.setState()
+      });
       this.setState({data: this.state.data});
     },
 
@@ -22,7 +29,9 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
       var projectName = this.state.data.name;
       $.contextMenu( 'destroy', '.file-context-menu-one' );
 
-      this.setState({trigger: trigger});
+      console.log("trigger = " + trigger);
+
+    //  this.setState({trigger: trigger});
       this.setState({nodeID: nodeID});
 
       if (this.state.selected && this.state.selected.isMounted()) {
@@ -31,8 +40,9 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
       this.setState({selected: node});
       node.setState({selected: true});
 
+      //console.log("state.trigger = " + this.state.trigger);
 
-      if (this.state.trigger == "file"){
+      if (trigger == "file"){
         console.log("===file clicked=== ");
         $(function($){
           $.contextMenu({
@@ -136,6 +146,7 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
 
       var form = dialog.find( "form" ).on( "submit", function( event ) {
         event.preventDefault();
+        event.stopPropagation();
         add();
       });
 
@@ -182,7 +193,7 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
 
     render: function () {
       var self = this;
-      var fileIcon;
+      var resourceIcon;
       if (!this.state.resourceData) this.state.resourceData = [];
       var classes = classnames({
         'has-children': (this.props.data.resourceData ? true : false),
@@ -192,13 +203,13 @@ define(['classnames','react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub' ], fu
       });
 
       if(this.props.data.resourceType == "file"){
-        fileIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
+        resourceIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
       } else if (this.props.data.resourceType == "folder") {
-        fileIcon = <i className="fa fa-folder-o" aria-hidden="true"></i>;
+        resourceIcon = <i className="fa fa-folder-o" aria-hidden="true"></i>;
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-        {fileIcon}&nbsp;
+        {resourceIcon}&nbsp;
         <a onClick={this.onCategorySelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one">{this.props.data.name}</a>
         <ul>
         {this.state.resourceData.map(function(child,index){

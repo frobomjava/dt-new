@@ -20,8 +20,7 @@ require(['jquery', 'react', 'reactdom', 'app/ProjectList'],
   function ($, React, ReactDOM, ProjectList) {
 
     function render() {
-      ReactDOM.render( <
-        ProjectList / > ,
+      ReactDOM.render( <ProjectList / > ,
         document.getElementById('projects')
       );
     }

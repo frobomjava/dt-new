@@ -5,9 +5,9 @@
   <meta charset="utf-8">
   <title>Project Setting</title>
   <!-- Bootstrap core CSS OPTIONAL -->
-  <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="/css/style.css" rel='stylesheet' type='text/css' />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.min.css">
   <style>
   .tt-input, /* UPDATE: newer versions use tt-input instead of tt-query */
   .tt-hint {
@@ -30,7 +30,7 @@
   }
 
   .tt-highlight {
-    color: red; 
+    color: red;
     font-size: 16px;
   }
 
@@ -115,7 +115,7 @@
     <br/><br/>
 
     <div id="remote">
-      <input class="typeahead" type="text" placeholder="Search users..." required/>
+      <input id="txtMember" class="typeahead" type="text" placeholder="Search users..." required/>
       <a id="btnAdd" class="btn btn-primary btn-lg" href="#"><i class="fa fa-plus-square"></i>&nbsp;Add</a>
     </div>
     <br/>
@@ -130,70 +130,11 @@
     <a class="btn btn-danger btn-lg" href="#"><i class="fa fa-trash-o"></i> Delete</a>
   </div>
 
-  <script src="/bower_components/jquery/dist/jquery.js"></script>
-  <script src="/bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
-  <script src="/bower_components/typeahead.js/dist/bloodhound.js"></script>
-
   <script src="/dependencies/sails.io.js"></script>
   <script src="/bower_components/requirejs/require.js"></script>
-  <script src="/js/MemberList.js"></script>
+  <script src="/js/setting.js"></script>
   <script>
-  var projectName = <%- JSON.stringify(projectName) %>;
-  var memberName;
-  var users = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('userName'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: '../../users',
-    remote: {
-      url: '../../users/%QUERY',
-      wildcard: '%QUERY'
-    }
-  });
-
-  $('#remote .typeahead').typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1
-  },
-  {
-    name: 'userName',
-    display: 'userName',
-    source: users,
-    templates: {
-      empty: [
-        '<div class="noitems">',
-        'No Users Found',
-        '</div>'
-      ].join('\n')
-    }
-  });
-
-  $(document).ready(function() {
-
-    console.log('projectName : ' + projectName);
-
-    $('input').on([
-      'typeahead:initialized',
-      'typeahead:initialized:err',
-      'typeahead:selected',
-      'typeahead:autocompleted',
-      'typeahead:cursorchanged',
-      'typeahead:opened',
-      'typeahead:closed'
-    ].join(' '), function(x) {
-      memberName = this.value;
-      console.log("memberName : " + memberName);
-    });
-
-    $(document).on('mouseenter', 'div.list-group-item', function(event){
-       $(event.target).children(".member-delete").show();
-    });
-
-    $(document).on('mouseleave', 'div.list-group-item', function(){
-      $('div.member-delete').hide();
-    });
-
-    });
-    </script>
+    var projectName = <%- JSON.stringify(projectName) %>;
+  </script>
   </body>
   </html>

@@ -77,7 +77,8 @@ module.exports = {
             callback(err);
           }
           else {
-            res.redirect('/login');
+            // res.redirect('/login');
+            return res.render("signup", {layout:null, error: '', err: '', userName: user.userName});
           }
         });
       }
@@ -85,7 +86,7 @@ module.exports = {
     function(err) {
       console.log('err : ' + err);
       err += ' already exist!';
-      return res.render("signup", {layout:null, error: err, err:''});
+      return res.render("signup", {layout:null, error: err, err:'', userName: ''});
     });
 
   }

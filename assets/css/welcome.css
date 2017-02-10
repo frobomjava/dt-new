@@ -1,0 +1,76 @@
+body {
+	background: white;
+}
+
+div {
+    display: block;
+}
+
+div.container {
+	width: 70%;
+	margin: auto;
+	margin-top: 10px;
+}
+
+strong {
+	font-size: medium;
+}
+
+h3.project-title {
+	margin-right: 200px;
+}
+
+div.alert-error {
+	color: white;
+	background-color: #FA5858;
+	width: 100%;
+	display: none;
+}
+
+ul.content-list, .member-list {
+	list-style: none;
+	padding: 5px;
+	display: block;
+}
+
+ul.content-list>li {
+    padding: 15px;
+		font-size: medium;
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+}
+
+ul.content-list>li .control {
+    float: right;
+}
+
+
+.navbar-right {
+	width: auto;
+	margin-right: -5px;
+}
+
+.form-group {
+	margin-left: 60%;
+	margin-top: 10px;
+}
+
+span.project-create-label {
+	font-size: 17px;
+}
+
+div#projects {
+	margin-top: 20px;
+}
+
+.form-control {
+  position: relative;
+  font-size: 16px;
+  height: 35px;;
+  padding: 10px;
+  @include box-sizing(border-box);
+
+  &:focus {
+    z-index: 2;
+  }
+}

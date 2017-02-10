@@ -134,5 +134,28 @@ module.exports = {
             }
           );
         }
+      },
+
+      getAll: function(req,res) {
+        var projectName = req.param('projectName');
+        var pID;
+        // asyn.series(
+        //   [
+          //  function getProjectID(callback){
+              Project.find({projectName: projectName, owner: req.user.id}).populateAll().exec(function(err, projects){
+                if (err) {
+                  return res.json(err);
+                } else {
+                  console.log();
+                  console.log("*** all resources *** " + JSON.stringify(projects));
+                  return res.json(projects);
+                }
+              });
+        //     }
+        //   ],
+        //   function(err) {
+        //     return res.json(err);
+        // 	}
+        // );
       }
 };

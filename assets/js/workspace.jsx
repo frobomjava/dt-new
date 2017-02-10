@@ -25,8 +25,7 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
     ReactDOM.render( <ProjectExplorer />,
       document.getElementById('file-list-container')
     );
-    ReactDOM.render( <
-      DecisionTable / >,
+    ReactDOM.render( <DecisionTable / >,
       document.getElementById('decTableID')
     );
   }

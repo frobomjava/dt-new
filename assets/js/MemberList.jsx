@@ -1,24 +1,4 @@
-requirejs.config({
-  paths: {
-    'react': '/bower_components/react/react-with-addons',
-    'reactdom': '/bower_components/react/react-dom',
-    'jquery': '/bower_components/jquery/dist/jquery',
-    'jquery.ui': '/bower_components/jquery-ui/jquery-ui',
-    'bootstrap': '/bower_components/bootstrap/dist/js/bootstrap',
-    'PubSub': '/bower_components/PubSubJS/src/pubsub',
-    'jquery-contextMenu': '/bower_components/jQuery-contextMenu/src/jquery.contextMenu',
-    'app': '/js'
-  },
-
-  shim: {
-    'jquery.ui': ["jquery"],
-    'bootstrap': ["jquery"],
-  }
-
-});
-
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu'],
-function ($, React, ReactDOM, PubSub, contextmenu) {
+define(['react', 'jquery'], function (React, $) {
 
   var MemberList = React.createClass({
     getInitialState: function(){
@@ -43,16 +23,16 @@ function ($, React, ReactDOM, PubSub, contextmenu) {
       $('#btnAdd').click(function() {
         console.log('btnAdd click : ');
         var updateMember = self.state.members;
+        var memberName = $('#txtMember').val();
+
+        var url = "/project/setting/" + projectName + "/user/add/" + memberName;
+        console.log("url : " + url);
 
         if (!self.checkMemberExist(updateMember, memberName)) {
-          console.log('if');
-          $.ajax({
-            method: "POST",
-            url: "/project/setting/" + projectName + "/user/add/" + memberName
-          })
-          .done(function( user ) {
-            console.log( "Data Saved: " + user );
-            updateMember.push(user);
+          $.post(url, function(data) {
+            console.log('ok, got data');
+            console.log('data : ' + JSON.stringify(data));
+            updateMember.push(data);
             self.setState({members: updateMember});
             $('.typeahead').val('');
           });
@@ -98,11 +78,6 @@ function ($, React, ReactDOM, PubSub, contextmenu) {
     }
   });
 
-  ReactDOM.render( <
-    MemberList / >,
-    document.getElementById('memberlist')
-  );
+  return MemberList;
 
-  console.log("updated memberlist.js");
-
-}); //require
+}); //define

@@ -20,12 +20,6 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
        } );
     });
 
-    // $.getJSON('/projects/in', function (data) {
-    //   console.log('ok, got data');
-    //   //console.log("data is = " + JSON.stringify(data));
-    //   self.setState( { projects: data } );
-    // });
-
   $('#project-create-form').submit(function(event) {
     console.log("post handler");
     event.preventDefault();
@@ -39,7 +33,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       $('#projectName').val('');
       $('#error').text(data.projectName + ' is created..');
       $(".alert").css( {
-        "background-color": "#80CBC4", "opacity": 1
+        "background-color": "#80CBC4", "display": "block"
       }
     );
     console.log(data.projectName);
@@ -51,10 +45,10 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
   );
 }
 else {
-  console.log(data.error);
+  console.log("data.error " + data.error);
   $('#error').text(data.error);
   $(".alert").css( {
-    "background-color": "#FA5858", "opacity": 1
+    "background-color": "#FA5858", "display": "block"
   }
 );
 }
@@ -106,7 +100,7 @@ render: function() {
   var self=this;
   var index=0;
   var userName = userName;
-  console.log('userName '+userName);
+  console.log('userName '+ userName);
   return (
     <div>
     <div className="panel panel-primary">
