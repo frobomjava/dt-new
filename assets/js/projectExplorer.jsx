@@ -114,6 +114,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           return self.findParentResource(parentId, resource.children, callback);
         }
       });
+
     },
 
     onSelect: function (node, trigger, nodeID) {
@@ -126,6 +127,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       //  this.setState({trigger: trigger});
       this.setState({ nodeID: nodeID });
 
+
       if (this.state.selected && this.state.selected.isMounted()) {
         this.state.selected.setState({ selected: false });
       }
@@ -135,6 +137,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       //console.log("state.trigger = " + this.state.trigger);
 
       if (trigger == "file") {
+
         console.log("===file clicked=== ");
         $(function ($) {
           $.contextMenu({
@@ -288,6 +291,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       var self = this;
       var resourceIcon;
       if (!this.state.children) this.state.children = [];
+
       var classes = classnames({
         'has-children': (this.props.data.children ? true : false),
         'open': (this.state.children.length ? true : false),
@@ -296,6 +300,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       if (this.props.data.resourceType == "file") {
+
         resourceIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
       } else if (this.props.data.resourceType == "folder") {
         resourceIcon = <i className="fa fa-folder-o" aria-hidden="true"></i>;
@@ -303,6 +308,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
           {resourceIcon}&nbsp;
+
         <a onClick={this.onCategorySelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one">{this.props.data.name}</a>
           <ul>
             {this.state.children.map(function (child, index) {

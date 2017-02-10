@@ -10,22 +10,25 @@ div.container {
 	width: 70%;
 	margin: auto;
 }
-
-div.alert-error{
-	color: white;
+div.alert-success {
+	width: 90%;
+	margin: auto;
 	opacity: 0;
+}
+
+div.alert-error {
+	color: white;
+	background-color: #FA5858;
+	width: 100%;
+	display: none;
 }
 
 strong {
 	font-size: medium;
 }
 
-h3.project-title {
-	margin-right: 200px;
-}
-
 .wrapper {
-	margin-top: 80px;
+	margin-top: 10px;
   margin-bottom: 80px;
 }
 
@@ -59,14 +62,15 @@ ul.content-list>li .control {
     float: right;
 }
 
-form.form-inline {
-	margin-left: 50%;
-	margin-bottom:20px;
+
+.navbar-right {
+	width: auto;
+	margin-right: -75px;
 }
 
 .form-group {
-	margin-left: 100px;
-	margin-top: 20px;
+	margin-left: 10px;
+	margin-top: 10px;
 }
 
 span.project-create-label {
@@ -111,4 +115,5 @@ span.project-create-label {
 	  border-top-left-radius: 0;
 	  border-top-right-radius: 0;
 	}
+
 }
