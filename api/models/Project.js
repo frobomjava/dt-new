@@ -42,7 +42,6 @@ module.exports = {
 
     toJSON: function() {
       var project = this.toObject();
-      delete project.url;
       delete project.createdAt;
       delete project.updatedAt;
       delete project.owner;

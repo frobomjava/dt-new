@@ -1,93 +1,75 @@
 /**
-* UserController
-*
-* @description :: Server-side actions for handling incoming requests.
-* @help        :: See http://sailsjs.com/docs/concepts/controllers
-*/
-
+ * UserController
+ *
+ * @description :: Server-side actions for handling incoming requests.
+ * @help        :: See http://sailsjs.com/docs/concepts/controllers
+ */
+var UserUtil = require('../utils/UserUtil.js');
 module.exports = {
-  getAll: function(req, res) {
-    User.find(function(err, users) {
-        if (err) {return res.serverError(err);}
-        console.log(JSON.stringify((users)));
-        return res.json(users);
-    });
-  },
-
-  findUser: function(req, res) {
-    console.log(' inside findUser in UserController...');
-    User.find({
-      userName: { startsWith: req.param('userName') }, sort: 'userName'
-    }).exec(function (err, users){
+  getAll: function (req, res) {
+    UserUtil.retrieveAllUsers(function (err, users) {
       if (err) {
-        console.log(JSON.stringify((err)));
-        return res.json(err);
-      } else {
-        console.log('users : ' + JSON.stringify(users));
-        return res.json(users);
+        return res.serverError(err);
       }
+      return res.json(users);
     });
   },
 
-  create: function(req, res) {
-    if (req.param('password').length < 6) {
-      return res.render("signup", {layout:null, error: 'Password must be at least 6 characters!'});
-    }
-    var message = '';
+  findUser: function (req, res) {
+    UserUtil.retrieveUsersByNameStartedWith(req.param('userName'),
+      function (err, users) {
+        if (err) {
+          return res.json(err);
+        }
+        return res.json(users);
+      });
+  },
+
+  create: function (req, res) {
+    var userData = {
+      email: req.param('email'),
+      userName: req.param('userName'),
+      password: req.param('password')
+    };
+
     async.series([
-      function findUserEmail(callback) {
-        User.findOne({email: req.param('email')}).exec(function(err, user) {
-          if (err) {
-            callback(err);
-          } else if (user) {
-            message = user.email;
-            callback();
-          }
-          else {
-            //message = '';
-            callback();
-          }
-        });
-      },
-      function findUserName(callback) {
-        User.findOne({userName: req.param('userName')}).exec(function(err, user) {
-          if (err) {
-            callback(err);
-          } else if (user) {
-            if (message != '') {
-              message += ' and ' + user.userName;
+        function validate(callback) {
+          UserUtil.validateUserCreation(userData, function (err, canCreate) {
+            if (err) {
+              return callback(err);
             }
-            else {
-              message = user.userName;
+            if (canCreate) {
+              return callback();
             }
-            callback(message);
-          }
-          else {
-            callback(message);
-          }
+          });
+        },
+
+        function create(callback) {
+          UserUtil.createUser(userData, function (err, createdUser) {
+            if (err) {
+              return callback(err);
+            }
+            callback();
+          });
+        }
+      ],
+      function done(err) {
+        if (err) {
+          return res.render("signup", {
+            layout: null,
+            error: 'Error occured',
+            err: '',
+            userName: ''
+          });
+        }
+
+        return res.render("signup", {
+          layout: null,
+          error: '',
+          err: '',
+          userName: userData.userName
         });
-      },
-      function createUser(callback) {
-        User.create({
-          email: req.param('email'),
-          userName: req.param('userName'),
-          password: req.param('password')
-        }).exec(function(err, user) {
-          if (err) {
-            callback(err);
-          }
-          else {
-            // res.redirect('/login');
-            return res.render("signup", {layout:null, error: '', err: '', userName: user.userName});
-          }
-        });
-      }
-    ],
-    function(err) {
-      console.log('err : ' + err);
-      err += ' already exist!';
-      return res.render("signup", {layout:null, error: err, err:'', userName: ''});
-    });
+      });
 
   }
 };

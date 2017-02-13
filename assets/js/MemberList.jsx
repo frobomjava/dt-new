@@ -12,7 +12,7 @@ define(['react', 'jquery'], function (React, $) {
 
     componentWillMount: function() {
       var self = this;
-      var url = "/project/setting/" + projectName + "/users";
+      var url = "/project/setting/" + projectId + "/users";
 
       $.getJSON(url, function(data) {
         console.log('ok, got data');
@@ -25,7 +25,7 @@ define(['react', 'jquery'], function (React, $) {
         var updateMember = self.state.members;
         var memberName = $('#txtMember').val();
 
-        var url = "/project/setting/" + projectName + "/user/add/" + memberName;
+        var url = "/project/setting/" + projectId + "/user/add/" + memberName;
         console.log("url : " + url);
 
         if (!self.checkMemberExist(updateMember, memberName)) {
@@ -47,7 +47,7 @@ define(['react', 'jquery'], function (React, $) {
       var self = this;
       var userId = event.target.getAttribute('value');
       console.log('userId : ' + userId);
-      var url = '/project/setting/' + projectName + '/user/remove/' + userId;
+      var url = '/project/setting/' + projectId + '/user/remove/' + userId;
       $.getJSON(url, function (data) {
         console.log('ok, got data after remove');
         console.log('data : ' + JSON.stringify(data));

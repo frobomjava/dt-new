@@ -1,7 +1,9 @@
 define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (classnames, React, $) {
+  var preDiv = null;
   var ProjectExplorer = React.createClass({
     getInitialState: function () {
       return ({
+        myMap: myMap,
         data: {
           name: projectName,
           resourceType: 'project',
@@ -89,25 +91,79 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
     },
 
+    handleClick: function (event) {
+      event.preventDefault();
+      var self = this;
+      projName = this.state.projectName;
+      filesUpdated = this.state.files.slice();
+      fileName = event.target.getAttribute('name');
+      fileId = event.target.getAttribute('value');
+      index = event.target.getAttribute('id');
+
+      if (preDiv) {
+        preDiv.style.backgroundColor = "#f1f1f1";
+      }
+      event.target.style.backgroundColor = "#D1D0CE";
+      preDiv = event.target;
+
+      if (self.state.myMap.has(fileId)) {
+        var dtData = self.state.myMap.get(fileId);
+        console.log("---map has key-value--- " + JSON.stringify(dtData));
+        PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData });
+      } else {
+        console.log("---no key---");
+        url = "/project/in/" + projName + "/file/data/" + fileId;
+        $.getJSON(url, function (data) {
+          console.log('ok, got data');
+          self.state.myMap.set(fileId, data);
+          var dtData = self.state.myMap.get(fileId);
+          PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData });
+        });
+      }
+
+      $(function ($) {
+        $.contextMenu({
+          selector: '.file-context-menu-one',
+          callback: function (key, options) {
+            deleteHandler();
+          },
+          items: {
+            "Delete": { name: "delete", icon: "delete" }
+          }
+        });
+
+        function deleteHandler() {
+          var url = '/project/in/' + projName + '/file/delete/' + fileId;
+          console.log('===delete url=== ' + url);
+          var getting = $.get(url);
+          getting.done(function () {
+            filesUpdated.splice(index, 1);
+            self.setState({ files: filesUpdated });
+            PubSub.publish('DeleteFileEvent');
+          });
+        }
+      });
+    },
+
     componentWillMount: function () {
       var self = this;
-      var url = '/project/in/' + projectName + '/resource/tree';
+      var url = '/project/in/' + projectId + '/resource/tree';
 
       $.getJSON(url, function (project) {
         console.log("Resource Tree");
         console.log(JSON.stringify(project));
         //var projectData = JSON.parse(project);
         project.children = project.resources;
-        self.setState({data : project, resourceType : "", trigger : "", nodeID : ""});
+        self.setState({ data: project, resourceType: "", trigger: "", nodeID: "" });
         //console.log(JSON.stringify(projectData));
         console.log("state has been set");
       });
       console.log("new componet will mount");
     },
 
-    findParentResource: function(parentId, resources, callback) {
+    findParentResource: function (parentId, resources, callback) {
       var self = this;
-      resources.forEach(function(resource) {
+      resources.forEach(function (resource) {
         if (resource.id == parentId) {
           return callback(resource);
         } else if (resource.children && resource.children.length > 0) {
@@ -117,7 +173,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
     },
 
-    onSelect: function (node, trigger, nodeID) {
+    onSelect: function (event, node, trigger, nodeID) {
       var self = this;
       var projectName = this.state.data.name;
       $.contextMenu('destroy', '.file-context-menu-one');
@@ -137,6 +193,26 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       //console.log("state.trigger = " + this.state.trigger);
 
       if (trigger == "file") {
+        if (preDiv) {
+          preDiv.style.backgroundColor = "#f1f1f1";
+        }
+        event.target.style.backgroundColor = "#D1D0CE";
+        preDiv = event.target;
+
+        if (self.state.myMap.has(nodeID)) {
+          var dtData = self.state.myMap.get(nodeID);
+          console.log("---map has key-value--- " + JSON.stringify(dtData));
+          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData });
+        } else {
+          console.log("---no key---");
+          url = "/project/in/" + projectName + "/resource/data/" + nodeID;
+          $.getJSON(url, function (data) {
+            console.log('ok, got data');
+            self.state.myMap.set(nodeID, data);
+            var dtData = self.state.myMap.get(nodeID);
+            PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData });
+          });
+        }
 
         console.log("===file clicked=== ");
         $(function ($) {
@@ -180,7 +256,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var resourceType = self.state.resourceType;
           var nodeID = self.state.nodeID;
 
-          var url = '/project/in/' + projectName + '/resource/new';
+          var url = '/project/in/' + projectId + '/resource/new';
           var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
           posting.done(function (data) {
             if (data.parent) {
@@ -194,9 +270,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
               // if found the parent node, push to the received data to is children,
               // update react component state
               var updatedData = self.state.data;
-              self.findParentResource(data.parent, updatedData.children, function(resource) {
+              self.findParentResource(data.parent, updatedData.children, function (resource) {
                 resource.children.push(newChildData);
-                self.setState({data: updatedData});
+                self.setState({ data: updatedData });
                 console.log("data updated 222*****");
                 self.forceUpdate();
               });
@@ -269,7 +345,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       if (this.props.onCategorySelect) {
         trigger = event.target.getAttribute('value');
         nodeID = event.target.getAttribute('id');
-        this.props.onCategorySelect(this, trigger, nodeID);
+        this.props.onCategorySelect(event, this, trigger, nodeID);
       }
       event.preventDefault();
       event.stopPropagation();

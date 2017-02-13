@@ -1,20 +1,23 @@
 /**
-* ResourceController
-*
-* @description :: Server-side actions for handling incoming requests.
-* @help        :: See http://sailsjs.com/docs/concepts/controllers
-*/
-
+ * ResourceController
+ *
+ * @description :: Server-side actions for handling incoming requests.
+ * @help        :: See http://sailsjs.com/docs/concepts/controllers
+ */
+var ProjectUtil = require('../utils/ProjectUtil.js');
+var ResourceUtil = require('../utils/ResourceUtil');
 module.exports = {
   create: function (req, res) {
     console.log("===resource create===");
 
     var projectData = {
-      projectName: req.param('projectName')
-    }
+      id: req.param('projectId')
+    };
+    var projectId = req.param('projectId');
     var parentID = req.param('nodeID');
     var childID = null;
     console.log("== parentID == " + parentID);
+    console.log(req.param('resourceType'));
     var resourceData = {
       name: req.param('resourceName'),
       url: "",
@@ -23,106 +26,90 @@ module.exports = {
     }
     if (!parentID) {
       console.log("Parent id does not exist");
-      async.series(
-        [
-          function findProject(callback) {
-            Project.findOne({ projectName: projectData.projectName }).exec(function (err, project) {
+      async.waterfall([
+          function findParentProject(callback) {
+            ProjectUtil.findProjectByPopulatingResources(projectId, function (err, project) {
               if (err) {
-                callback(err);
-              } else {
-                resourceData.url = project.url + '/' + req.param('resourceName');
-                callback();
+                return callback(err);
               }
+              return callback(null, project);
             });
           },
-          function createResource(callback) {
-            Resource.create(resourceData).exec(function (err, data) {
+          function (project, callback) {
+            resourceData.url = project.url + '/' + req.param('resourceName');
+            ResourceUtil.createAndAddToProject(resourceData, project, function (err, resource) {
               if (err) {
-                callback(err);
-              } else {
-                childID = data.id;
-                var resourceDir = data.url;
-                var filessystem = require('fs');
-                if (!filessystem.existsSync(resourceDir)) {
-                  filessystem.mkdirSync(resourceDir);
-                  callback();
-                }
-                return res.json(data);
+                return callback(err);
               }
-            });
-          },
-          function setResource(callback) {
-            Project.findOne({ projectName: projectData.projectName }).populate('resources').exec(function (err, project) {
-              if (err) { return res.serverError(err); }
-              if (!project) { return res.notFound('Could not find a project.'); }
-              project.resources.add(childID);
-              project.save(function (err) {
-                if (err) { return res.serverError(err); }
-                // return res.json(data);
-              });
+              return callback(null, resource);
             });
           }
         ],
-        function (err) {
-          return res.json(err);
-        }
-      );
+        function (err, resource) {
+          if (err) {
+            return res.serverError(err);
+          }
+          return res.json(resource);
+        });
     } else {
       console.log();
-      console.log("Parent is exist.");
-      async.series(
-        [
-          function findResource(callback) {
-            Resource.findOne({ id: parentID }).exec(function (err, parentResource) {
+      console.log("Parent is exist.<new>");
+      async.waterfall([
+          function findParentResource(callback) {
+            ResourceUtil.findResourceByIdByPopulatingChildren(parentID, function (err, parentResource) {
               if (err) {
-                callback(err);
-              } else {
-                resourceData.url = parentResource.url + '/' + req.param('resourceName');
-                resourceData.parent = parentResource.id;
-                callback();
+                return callback(err);
               }
+              return callback(null, parentResource);
             });
           },
-          function createResource(callback) {
-            Resource.create(resourceData).exec(function (err, resource) {
+          function (parentResource, callback) {
+            resourceData.url = parentResource.url + '/' + req.param('resourceName');
+            resourceData.parent = parentResource.id;
+            ResourceUtil.createAndAddToParentResource(resourceData, parentResource, function (err, resource) {
               if (err) {
-                callback(err);
-              } else {
-                childID = resource.id;
-                var resourceDir = resource.url;
-                var filessystem = require('fs');
-                if (!filessystem.existsSync(resourceDir)) {
-                  filessystem.mkdirSync(resourceDir);
-                  callback();
-                }
-                console.log("+++ create resource +++ " + JSON.stringify(resource));
-                return res.json(resource);
+                return callback(err);
               }
-            });
-          },
-          function setChildren(callback) {
-            Resource.findOne({ id: parentID }).populate('children').exec(function (err, parentResource) {
-              if (err) {
-                return res.json(err);
-              } else {
-                console.log();
-                console.log("*** childID *** " + childID);
-                parentResource.children.add(childID);
-                parentResource.save(function (err) {
-                  if (err) { return res.serverError(err); }
-                  //return res.json(parentResource);
-                });
-              }
-              console.log();
-              console.log("*** parentResource *** " + JSON.stringify(parentResource));
+              return callback(null, resource);
             });
           }
         ],
-        function (err) {
-          return res.json(err);
-        }
-      );
+        function (err, resource) {
+          if (err) {
+            return res.serverError(err);
+          }
+          return res.json(resource);
+        });
     }
+  },
+
+  getData: function (req, res) {
+    var resourceId = req.param('resourceId');
+    var jsonFile = require('jsonfile');
+    async.waterfall([
+        function findResource(callback) {
+          ResourceUtil.findResourceById(resourceId, function (err, resource) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, resource);
+          });
+        },
+        function readData(resource, callback) {
+          jsonFile.readFile(resource.url, function (err, jsonData) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, jsonData);
+          });
+        }
+      ],
+      function (err, jsonData) {
+        if (err) {
+          return res.serverError(err);
+        }
+        return res.json(jsonData);
+      });
   }
 
 };

@@ -108,8 +108,8 @@ render: function() {
       <div className="panel-body">
         <ul className="content-list"> {
             this.state.projects.map(function(project) {
-              var url='/project/in/'+ project.projectName;
-              var settingurl='/project/setting/' + project.projectName;
+              var url='/project/in/'+ project.id;
+              var settingurl='/project/setting/' + project.id;
               return ( <li key={project.id}><strong><a href= {
                 url
               }
@@ -136,7 +136,7 @@ render: function() {
       <div className="panel-body">
         <ul className="content-list"> {
             this.state.memberProjects.map(function(project) {
-              var url='/project/in/'+ project.projectName;
+              var url='/project/in/'+ project.id;
               return (
                 <li key={project.id}>
                   <strong><a href={url}> {project.projectName} </a></strong>

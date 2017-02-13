@@ -52,33 +52,35 @@ module.exports.routes = {
 
   'post /project/new': 'ProjectController.create',
 
-  'get /project/setting/:projectName': 'ProjectController.setting',
+  'get /project/setting/:projectId': 'ProjectController.setting',
 
-  'get /project/delete/:projectName': 'ProjectController.delete',
+  'get /project/delete/:projectId': 'ProjectController.delete',
 
   'post /project/update': 'ProjectController.update',
 
-  'get /project/in/:projectName': 'ProjectController.enter',
+  'get /project/in/:projectId': 'ProjectController.enter',
 
-  'post /project/setting/:projectName/user/add/:userName': 'ProjectController.addMember',
+  'post /project/setting/:projectId/user/add/:userName': 'ProjectController.addMember',
 
-  'get /project/setting/:projectName/user/remove/:userId': 'ProjectController.removeMember',
+  'get /project/setting/:projectId/user/remove/:userId': 'ProjectController.removeMember',
 
-  'get /project/setting/:projectName/users': 'ProjectController.getMember',
+  'get /project/setting/:projectId/users': 'ProjectController.getMembers',
 
-  'get /project/in/:projectName/files': 'DtFileController.getAll',
+  'get /project/in/:projectId/files': 'DtFileController.getAll',
 
- 'post /project/in/:projectName/file/new':'DtFileController.create',
+ 'post /project/in/:projectId/file/new':'DtFileController.create',
 
-  'post /project/in/:projectName/resource/new':'ResourceController.create',
+  'post /project/in/:projectId/resource/new':'ResourceController.create',
 
-  'get /project/in/:projectName/resources':'ResourceController.getAll',
+  'get /project/in/:projectId/resources':'ResourceController.getAll',
 
-  'get /project/in/:projectName/file/delete/:fileId':'DtFileController.delete',
+  'get /project/in/:projectId/file/delete/:fileId':'DtFileController.delete',
 
-  'post /project/in/:projectName/file/save': 'DtFileController.save',
+  'post /project/in/:projectId/file/save': 'DtFileController.save',
 
-  'get /project/in/:projectName/file/data/:fileId':'DtFileController.getData',
+  'get /project/in/:projectId/file/data/:fileId':'DtFileController.getData',
 
-  'get /project/in/:projectName/resource/tree': 'ProjectController.resourceTree'
+  'get /project/in/:projectId/resource/tree': 'ProjectController.resourceTree',
+
+  'get /project/in/:projectId/resource/data/:resourceId':'ResourceController.getData'
 };

@@ -129,12 +129,13 @@
 
     <a class="btn btn-danger btn-lg" href="#"><i class="fa fa-trash-o"></i> Delete</a>
   </div>
-
+  <script>
+    var projectName = "To fix";
+    var projectId = <%- projectId %>;
+  </script>
   <script src="/dependencies/sails.io.js"></script>
   <script src="/bower_components/requirejs/require.js"></script>
   <script src="/js/setting.js"></script>
-  <script>
-    var projectName = <%- JSON.stringify(projectName) %>;
-  </script>
+  
   </body>
   </html>

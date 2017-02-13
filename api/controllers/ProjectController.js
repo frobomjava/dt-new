@@ -1,122 +1,105 @@
 /**
-* ProjectController
-*
-* @description :: Server-side actions for handling incoming requests.
-* @help        :: See http://sailsjs.com/docs/concepts/controllers
-*/
-
+ * ProjectController
+ *
+ * @description :: Server-side actions for handling incoming requests.
+ * @help        :: See http://sailsjs.com/docs/concepts/controllers
+ */
+var ProjectUtil = require('../utils/ProjectUtil.js');
 module.exports = {
 
   create: function (req, res) {
     var projectName = req.param('projectName');
     console.log(projectName);
+    var projectData = {
+      projectName: req.param('projectName'),
+      owner: req.user.id,
+      url: process.cwd() + '/projects' + '/' + req.user.userName + '/' + projectName
+    };
 
-    Project.findOne({ projectName: projectName, owner: req.user.id }).exec(function (err, data) {
-      if (err) {
-        console.log(JSON.stringify((err)));
-        return res.json(err);
-      } else if (data) {
-        var message = data.projectName + ' is already exist..';
-        console.log(message);
-        return res.json({ error: message });
-      }
-      else {
-        var url = process.cwd() + '/projects' + '/' + req.user.userName + '/' + projectName;
-        Project.create({ projectName: projectName, url: url, owner: req.user.id }).exec(function (err, data) {
-          if (err) {
-            console.log(JSON.stringify((err)));
-            return res.json(err);
-          } else {
-            var projectdir = process.cwd() + '/projects';
+    var createdProject = null;
 
-            var filessystem = require('fs');
-            if (!filessystem.existsSync(projectdir)) {
-              filessystem.mkdirSync(projectdir);
+    async.series([
+        function validate(callback) {
+          ProjectUtil.validateProjectCreation(projectData, function (err) {
+            if (err) {
+              return callback(err);
             }
-
-            projectdir += '/' + req.user.userName;
-            if (!filessystem.existsSync(projectdir)) {
-              filessystem.mkdirSync(projectdir);
+            console.log("Validation passed!");
+            return callback();
+          });
+        },
+        function createProject(callback) {
+          ProjectUtil.createProject(projectData, function (err, project) {
+            if (err) {
+              return callback(err);
             }
-
-            projectdir += '/' + data.projectName;
-            if (!filessystem.existsSync(projectdir)) {
-              filessystem.mkdirSync(projectdir);
+            createdProject = project;
+            return callback();
+          });
+        },
+        function createProjectDirectory(callback) {
+          ProjectUtil.createProjectDirectory(projectData.url, function (err) {
+            if (err) {
+              return callback(err);
             }
-
-            console.log(projectdir + " Directory created successfully!");
-            console.log(data.projectName);
-            return res.json(data);
-          }
-        });
-      }
-    });
+            return callback();
+          });
+        }
+      ],
+      function done(err) {
+        if (err) {
+          return res.json(err);
+        }
+        return res.json(createdProject);
+      });
   },
 
   getAll: function (req, res) {
     var data = {
       projects: [],
       memberProjects: [],
-      userName: ""
+      userName: req.user.userName
     };
     async.series(
       [
         function getOwnProjects(callback) {
-          Project.find({ owner: req.user.id }).exec(function (err, projects) {
+          var options = {
+            owner: req.user.id
+          };
+          ProjectUtil.findProjectsByOwnerUser(options, function (err, projects) {
             if (err) {
-              console.log(JSON.stringify((err)));
-              callback(err);
-            } else {
-              console.log();
-              console.log('---own projects---');
-              console.log(JSON.stringify(projects));
-              data.projects = projects;
-              callback();
+              return callback(err);
             }
+            data.projects = projects;
+            return callback();
           });
         },
         function getMemberProjects(callback) {
-          Project.find().populate('members').exec(function (err, projects) {
+          ProjectUtil.findProjectsByMemberUser(req.user.id, function (err, projects) {
             if (err) {
-              console.log(JSON.stringify(err));
-              callback(err);
-            } else {
-              var memberProjects = projects.filter(function (project) {
-                var result = project.members.filter(function (member) {
-                  return member.id == req.user.id;
-                });
-                return result.length > 0; //&& project.owner != req.user.id;
-              });
-              console.log();
-              console.log('---memberProjects---');
-              memberProjects.forEach(function (mp) {
-                console.log(mp);
-              });
-
-              // return res.json(memberProjects);
-              data.memberProjects = memberProjects;
-              data.userName = req.user.userName;
-              console.log();
-              console.log('---data---');
-              console.log(JSON.stringify(data));
-
-              return res.json(data);
+              return callback(err);
             }
+            data.memberProjects = projects;
+            return callback();
           });
         }
       ],
       function (err) {
-        return res.json(err);
+        if (err) {
+          return res.json(err);
+        }
+        return res.json(data);
       }
     );
 
   },
 
   delete: function (req, res) {
-    var userId = req.user.id;
-    var projectName = req.param('projectName');
+    var projectId = req.param('projectId');
     console.log("---delete project name--- " + projectName);
-    Project.destroy({ owner: userId, projectName: projectName }).exec(function (err) {
+    Project.destroy({
+      id: projectId
+    }).exec(function (err) {
       if (err) {
         console.log(JSON.stringify(err));
         return res.json(err);
@@ -132,111 +115,85 @@ module.exports = {
 
   enter: function (req, res) {
     console.log("---enter workspace---");
-    return res.view('workspace', { layout: null, projectName: req.param('projectName'), ownerOrmember: req.param('ownerOrmember') });
+    return res.view('workspace', {
+      layout: null,
+      projectId: req.param('projectId')
+    });
   },
 
   setting: function (req, res) {
     console.log("---enter setting---");
-    return res.view('setting', { layout: null, projectName: req.param('projectName') });
+    return res.view('setting', {
+      layout: null,
+      projectId: req.param('projectId'),
+      projectName: 'To do here'
+    });
   },
 
   addMember: function (req, res) {
-    console.log('---add member---');
-    Project.findOne({ projectName: req.param('projectName') }).populate('members').exec(function (err, project) {
-      if (err) { return res.serverError(err); }
-      if (!project) { return res.notFound('Could not find a project! '); }
-
-      User.findOne({ userName: req.param('userName') }).exec(function (err, user) {
-        if (err) { return res.serverError(err); }
-        if (!user) { return res.notFound('Could not find a user!'); }
-
-        project.members.add(user.id);
-        project.save(function (err) {
-          if (err) { return res.serverError(err); }
-          return res.json(user);
-        });//</save()>
-      });//</User.findOne()>
-    });//</Project.findOne()>
+    var userName = req.param('userName');
+    var projectId = req.param('projectId');
+    ProjectUtil.addMemberToProject(userName, projectId, function(err, addedUser) {
+      if (err) {
+        console.log("To log here == addMember function");
+        res.serverError(err);
+      }
+      console.log("New addMember function");
+      res.json(addedUser);
+    });
   },
 
-  getMember: function (req, res) {
-    console.log('---getMember---');
-    Project.findOne({ projectName: req.param('projectName') })
-      .populate('members', { sort: 'userName ASC' })
+  getMembers: function (req, res) {
+    console.log('---getMember New---');
+    Project.findOne({
+        id: req.param('projectId')
+      })
+      .populate('members', {
+        sort: 'userName ASC'
+      })
       .exec(function (err, project) {
-        if (err) { return res.json(err); }
-
+        if (err) {
+          return res.json(err);
+        }
         return res.json(project.members);
       });
   },
 
   removeMember: function (req, res) {
-    console.log();
-    console.log('---removeMember---');
-    console.log('userId ' + req.param('userId'));
-    console.log();
-
-    async.series(
-      [
-        function remove(callback) {
-          Project.findOne({ projectName: req.param('projectName') })
-            .populate('members')
-            .exec(function (err, project) {
-              if (err) { callback(err); }
-              project.members.remove(req.param('userId'));
-
-              project.save(function (err) {
-                if (err) { callback(err); }
-
-                callback();
-              });
-
-            });
-        },
-
-        function sendUpdatedMembers(callback) {
-          console.log();
-          console.log('----sendUpdatedMembers-----');
-
-          Project.findOne({ projectName: req.param('projectName') })
-            .populate('members', { sort: 'userName ASC' })
-            .exec(function (err, project) {
-              if (err) { callback(err); }
-              console.log();
-              console.log('3. before send JSON ' + JSON.stringify(project.members));
-              return res.json(project.members);
-            });
-        }
-      ],
-      function (err) {
-        console.log();
-        console.log('err : ' + err);
+    console.log("new removeMember function");
+    var userId = req.param('userId');
+    var projectId = req.param('projectId');
+    ProjectUtil.removeMemberFromProject(userId, projectId, function(err, updatedMembers) {
+      if (err) {
         return res.json(err);
       }
-    );
+      return res.json(updatedMembers);
+    });
   },
 
   resourceTree: function (req, res) {
-    var projectName = req.param('projectName');
+    var projectId = req.param('projectId');
     console.log("Resource Tree Action");
 
     var data = {};
     async.series(
       [
         function (callback) {
-          Project.findOne({ projectName: projectName }).populate('resources').exec(function (err, project) {
+          Project.findOne({
+            id: projectId
+          }).populate('resources').exec(function (err, project) {
             if (err) {
               return res.serverError(err);
             }
             data.project = project;
             if (project) {
               //project.resources.forEach(function(resource) {
-                console.log("Printing each resource");
-                //console.log(resource.name);
-                Resource.fillChildResourcesRecursively2(project.resources.length, project.resources, function() {
-                  console.log("Now callback");
-                  callback();
-                });
+              console.log("Printing each resource");
+              //console.log(resource.name);
+              Resource.fillChildResourcesRecursively2(project.resources.length, project.resources, function () {
+                console.log("Now callback");
+                callback();
+              });
               //});
               console.log(JSON.stringify(project));
             }
@@ -245,12 +202,12 @@ module.exports = {
 
         function success(callback) {
           console.log("Printing data ***********");
-          data.project.resources.forEach(function(resource) {
+          data.project.resources.forEach(function (resource) {
             console.log("Printing each resource");
-            console.log(JSON.stringify(resource,['name','children']));
+            console.log(JSON.stringify(resource, ['name', 'children']));
             console.log("Now will print children");
             console.log(JSON.stringify(resource.children));
-            resource.children.forEach(function(child) {
+            resource.children.forEach(function (child) {
               console.log(child.name);
             });
           });
@@ -266,12 +223,11 @@ module.exports = {
           res.json(data.project);
         },
 
-        function(err) {
+        function (err) {
           return res.json(err);
         }
       ]
     );
-
 
   }
 
