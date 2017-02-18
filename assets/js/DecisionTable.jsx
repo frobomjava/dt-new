@@ -8,17 +8,17 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
 
   class Theader extends React.Component {
     render() {
-      console.log('23 New DecisionTable');
+      var ruleHeaders = [];
+      for (var i = 0; i < this.props.numberOfRules; i++) {
+        ruleHeaders.push(<th key={i}>{i + 1}</th>);
+      }
+      console.log('17 New DecisionTable');
       return (
         <thead>
           <tr>
             <th></th>
             <th></th>
-            {this.props.myRuleIndex.map((rule, index) => {
-              return (
-                <th>{index + 1}</th>
-              );
-            })}
+            {ruleHeaders}
           </tr>
         </thead>
       );
@@ -38,13 +38,13 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
                 <tr key={conIndex}>
                   <th>{conIndex + 1}</th>
 
-                  <Cell cellInfo={new CellInfo("condition", conIndex)} 
-                   value={conData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                  <Cell cellInfo={new CellInfo("condition", conIndex)}
+                    value={conData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
                   {
                     this.props.rules.map((ruleConData, ruleIndex) => {
                       return (
-                        <Cell cellInfo={new CellInfo("ruleCondition", conIndex)} ruleIndex={ruleIndex} 
-                        value={ruleConData.conditions[conIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                        <Cell key={ruleIndex} cellInfo={new CellInfo("ruleCondition", conIndex)} ruleIndex={ruleIndex}
+                          value={ruleConData.conditions[conIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
                       );
                     })
                   }
@@ -69,14 +69,14 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
               return (
                 <tr key={actionIndex}>
                   <th>{actionIndex + 1}</th>
-                  <Cell cellType="action" cellInfo={new CellInfo("action", actionIndex)} index={actionIndex} 
-                  value={actionData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged}/>
+                  <Cell cellType="action" cellInfo={new CellInfo("action", actionIndex)} index={actionIndex}
+                    value={actionData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
 
                   {
                     this.props.rules.map((ruleActionData, ruleIndex) => {
                       return (
-                        <Cell cellInfo={new CellInfo("ruleAction", actionIndex)} ruleIndex={ruleIndex} 
-                        value={ruleActionData.actions[actionIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                        <Cell key={ruleIndex} cellInfo={new CellInfo("ruleAction", actionIndex)} ruleIndex={ruleIndex}
+                          value={ruleActionData.actions[actionIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
                       );
                     })
                   }
@@ -269,9 +269,9 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       this.setState({ dtData: dtDatas });
       console.log(JSON.stringify(this.state.dtData));
     };
-    
+
     createNewRule() {
-       var newRule = {
+      var newRule = {
         conditions: [],
         actions: []
       };
@@ -287,7 +287,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
 
     handleCellFocusChanged(cellInfo, ruleIndex) {
       this.setState({ activeCellInfo: cellInfo });
-      this.setState({activeRuleIndex: ruleIndex});
+      this.setState({ activeRuleIndex: ruleIndex });
     }
 
     handleCellValueChanged(cellValue) {
@@ -322,9 +322,9 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       } else {
         return (
           <table>
-            <Theader myRuleIndex={this.state.dtData.rules} />
-            <ConditionCells conditions={this.state.dtData.names.conditions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged}/>
-            <ActionCells actions={this.state.dtData.names.actions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged}/>
+            <Theader numberOfRules={this.state.dtData.rules.length} />
+            <ConditionCells conditions={this.state.dtData.names.conditions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged} />
+            <ActionCells actions={this.state.dtData.names.actions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged} />
           </table>
         );
       }
