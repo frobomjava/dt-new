@@ -110,6 +110,45 @@ module.exports = {
         }
         return res.json(jsonData);
       });
+  },
+
+  saveData: function (req, res) {
+    var id = req.param('resourceId');
+    var data = req.param('data');
+    async.waterfall([
+        function (callback) {
+          var criteria = {
+            id: id,
+            resourceType: 'file'
+          };
+          Resource.findOne(criteria).exec(function (err, resource) {
+            if (err) {
+              return callback(err);
+            }
+            if (!resource) {
+              return callback({
+                message: 'No resource'
+              });
+            }
+            return callback(null, resource);
+          })
+        },
+        function (resource, callback) {
+          var fs = require('fs');
+          fs.writeFile(resource.url, JSON.stringify(data), function (err) {
+            if (err) {
+              return callback(err);
+            }
+            return callback();
+          });
+        }
+      ],
+      function (err) {
+        if (err) {
+          return res.serverError(err);
+        }
+        res.ok();
+      });
   }
 
 };

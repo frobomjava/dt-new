@@ -82,5 +82,8 @@ module.exports.routes = {
 
   'get /project/in/:projectId/resource/tree': 'ProjectController.resourceTree',
 
-  'get /project/in/:projectId/resource/data/:resourceId':'ResourceController.getData'
+  'get /project/in/:projectId/resource/data/:resourceId':'ResourceController.getData',
+
+  'post /project/in/:projectId/resource/save/:resourceId':'ResourceController.saveData'
+
 };

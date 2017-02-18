@@ -151,6 +151,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
 
     handleFileClick(msg, data) {
       console.log("handleFileClick....");
+      console.log("file id is " + data.fileId);
       this.setState({ dtData: data.dtData });
       this.setState({ fileId: data.fileId });
       console.log("this.state.dtData = " + JSON.stringify(this.state.dtData));
@@ -178,11 +179,10 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       var self = this;
       $('#saveID').on('click', function (event) {
         event.preventDefault();
-        var url = '/project/in/' + self.state.projectName + '/file/save';
-        console.log("===url=== " + url);
         var updatedDtData = self.state.dtData;
         var fileId = self.state.fileId;
-        var posting = $.post(url, { dtData: updatedDtData, fileId: fileId });
+        var url = '/project/in/' + projectId + '/resource/save/' + fileId;
+        var posting = $.post(url, { data: updatedDtData });
       });
 
       $(function ($) {
