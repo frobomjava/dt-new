@@ -12,7 +12,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       for (var i = 0; i < this.props.numberOfRules; i++) {
         ruleHeaders.push(<th key={i}>{i + 1}</th>);
       }
-      console.log('17 New DecisionTable');
+      console.log('25 New DecisionTable');
       return (
         <thead>
           <tr>
@@ -39,12 +39,12 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
                   <th>{conIndex + 1}</th>
 
                   <Cell cellInfo={new CellInfo("condition", conIndex)}
-                    value={conData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                    value={conData} handleCellValueChange={this.props.handleCellValueChange} handleCellFocusChange={this.props.handleCellFocusChange} />
                   {
                     this.props.rules.map((ruleConData, ruleIndex) => {
                       return (
                         <Cell key={ruleIndex} cellInfo={new CellInfo("ruleCondition", conIndex)} ruleIndex={ruleIndex}
-                          value={ruleConData.conditions[conIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                          value={ruleConData.conditions[conIndex]} handleCellValueChange={this.props.handleCellValueChange} handleCellFocusChange={this.props.handleCellFocusChange} />
                       );
                     })
                   }
@@ -70,13 +70,13 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
                 <tr key={actionIndex}>
                   <th>{actionIndex + 1}</th>
                   <Cell cellType="action" cellInfo={new CellInfo("action", actionIndex)} index={actionIndex}
-                    value={actionData} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                    value={actionData} handleCellValueChange={this.props.handleCellValueChange} handleCellFocusChange={this.props.handleCellFocusChange} />
 
                   {
                     this.props.rules.map((ruleActionData, ruleIndex) => {
                       return (
                         <Cell key={ruleIndex} cellInfo={new CellInfo("ruleAction", actionIndex)} ruleIndex={ruleIndex}
-                          value={ruleActionData.actions[actionIndex]} handleCellValueChanged={this.props.handleCellValueChanged} handleCellFocusChanged={this.props.handleCellFocusChanged} />
+                          value={ruleActionData.actions[actionIndex]} handleCellValueChange={this.props.handleCellValueChange} handleCellFocusChange={this.props.handleCellFocusChange} />
                       );
                     })
                   }
@@ -102,11 +102,11 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     }
 
     handleValueChanged(event) {
-      this.props.handleCellValueChanged(event.target.value);
+      this.props.handleCellValueChange(event.target.value);
     }
 
     handleFocusChanged(event) {
-      this.props.handleCellFocusChanged(this.props.cellInfo, this.props.ruleIndex);
+      this.props.handleCellFocusChange(this.props.cellInfo, this.props.ruleIndex);
     }
 
   }
@@ -135,28 +135,28 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         fileId: ""
       }
 
-      this.handleFileClicked = this.handleFileClicked.bind(this);
-      this.handleFileDeleted = this.handleFileDeleted.bind(this);
+      this.handleFileClick = this.handleFileClick.bind(this);
+      this.handleFileDelete = this.handleFileDelete.bind(this);
       this.handleDtCommand = this.handleDtCommand.bind(this);
-      this.handleCellValueChanged = this.handleCellValueChanged.bind(this);
-      this.handleCellFocusChanged = this.handleCellFocusChanged.bind(this);
+      this.handleCellValueChange = this.handleCellValueChange.bind(this);
+      this.handleCellFocusChange = this.handleCellFocusChange.bind(this);
       this.createNewRule = this.createNewRule.bind(this);
     };
 
     componentWillMount() {
-      PubSub.subscribe("ClickFileEvent", this.handleFileClicked);
-      PubSub.subscribe("DeleteFileEvent", this.handleFileDeleted);
+      PubSub.subscribe("ClickFileEvent", this.handleFileClick);
+      PubSub.subscribe("DeleteFileEvent", this.handleFileDelete);
       PubSub.subscribe("dtCommand", this.handleDtCommand);
     };
 
-    handleFileClicked(msg, data) {
-      console.log("handleFileClicked....");
+    handleFileClick(msg, data) {
+      console.log("handleFileClick....");
       this.setState({ dtData: data.dtData });
       this.setState({ fileId: data.fileId });
       console.log("this.state.dtData = " + JSON.stringify(this.state.dtData));
     };
 
-    handleFileDeleted(msg, data) {
+    handleFileDelete(msg, data) {
       console.log("===delete file handler msg=== " + msg);
       var resetData = {
         names: {
@@ -194,13 +194,13 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
             PubSub.publish('dtCommand', key);
           },
           items: {
-            "Add Column Right": { name: "Add Column Right", icon: "add" },
-            "Add Column Left": { name: "Add Column Left", icon: "add" },
-            "Delete Column": { name: "Delete Column", icon: "delete" },
+            "add-column-right": { name: "Add Column Right", icon: "add" },
+            "add-column-left": { name: "Add Column Left", icon: "add" },
+            "delete-column": { name: "Delete Column", icon: "delete" },
             "sep1": "---------",
-            "Add Row Above": { name: "Add Row Above", icon: "add" },
-            "Add Row Below": { name: "Add Row Below", icon: "add" },
-            "Delete Row": { name: "Delete Row", icon: "delete" },
+            "add-row-above": { name: "Add Row Above", icon: "add" },
+            "add-row-below": { name: "Add Row Below", icon: "add" },
+            "delete-row": { name: "Delete Row", icon: "delete" },
             "sep2": "---------",
             "quit": {
               name: "Quit", icon: function () {
@@ -214,61 +214,100 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     };
 
     handleDtCommand(msg, command) {
-      var cellType = this.state.activeCellInfo.cellType;
-      var ruleIndex = this.state.activeRuleIndex;
-      var modelIndex = this.state.activeCellInfo.modelIndex;
-      var dtDatas = this.state.dtData;
-      var numberOfRules = this.state.dtData.rules.length;
-      var numberOfConditions = this.state.dtData.names.conditions.length;
-      var numberOfActions = this.state.dtData.names.actions.length;
+      switch (command) {
+        case "add-column-right": this.addColumnRightToActiveCell();
+          break;
+        case "add-column-left": this.addColumnLeftToActiveCell();
+          break;
+        case "delete-column": this.deleteColumn();
+          break;
+        case "add-row-above": this.addRowAboveActiveCell();
+          break;
+        case "add-row-below": this.addRowBelowActiveCell();
+          break;
+        case "delete-row": this.deleteRow();
+      }
+    };
 
-      if (command == "Add Column Right") {
-        ruleIndex++;
-        dtDatas.rules.splice(ruleIndex, 0, this.createNewRule());
-      } else if (command == "Add Column Left") {
-        if (cellType === 'condition' || cellType === 'action') {
-          alert('Cannot add column Left here..');
-          return;
-        }
-        dtDatas.rules.splice(ruleIndex, 0, this.createNewRule());
-      } else if (command == "Delete Column" && numberOfRules != 1) {
-        dtDatas.rules.splice(ruleIndex, 1);
-      } else if (command == "Add Row Above" && (cellType == "condition" || cellType == "ruleCondition")) {
-        dtDatas.names.conditions.splice(modelIndex, 0, "");
+    addColumnRightToActiveCell() {
+      var activeRuleIndex = this.state.activeRuleIndex;
+      var dtData = this.state.dtData;
+      dtData.rules.splice(++activeRuleIndex, 0, this.createNewRule());
+      this.setState({ dtData: dtData });
+    }
+
+    addColumnLeftToActiveCell() {
+      var activeCellType = this.state.activeCellInfo.cellType;
+      if (activeCellType === 'condition' || activeCellType === 'action') {
+        alert('Cannot add column Left here..');
+        return;
+      }
+      var dtData = this.state.dtData;
+      dtData.rules.splice(this.state.activeRuleIndex, 0, this.createNewRule());
+      this.setState({ dtData: dtData });
+    }
+
+    addRowAboveActiveCell() {
+      var index = this.state.activeCellInfo.modelIndex;
+      this.addRow(index);
+    }
+
+    addRowBelowActiveCell() {
+      var index = this.state.activeCellInfo.modelIndex;
+      index++;
+      this.addRow(index);
+    }
+
+    addRow(index) {
+      var dtData = this.state.dtData;
+      var numberOfRules = this.state.dtData.rules.length;
+      var activeCellType = this.state.activeCellInfo.cellType;
+      if (activeCellType === 'condition' || activeCellType === 'ruleCondition') {
+        dtData.names.conditions.splice(index, 0, "");
         for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].conditions.splice(modelIndex, 0, "");
-        }
-      } else if (command == "Add Row Below" && (cellType == "condition" || cellType == "ruleCondition")) {
-        modelIndex++;
-        dtDatas.names.conditions.splice(modelIndex, 0, "");
-        for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].conditions.splice(modelIndex, 0, "");
-        }
-      } else if (command == "Add Row Above" && (cellType == "action" || cellType == "ruleAction")) {
-        dtDatas.names.actions.splice(modelIndex, 0, "");
-        for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].actions.splice(modelIndex, 0, "");
-        }
-      } else if (command == "Add Row Below" && (cellType == "action" || cellType == "ruleAction")) {
-        modelIndex++;
-        dtDatas.names.actions.splice(modelIndex, 0, "");
-        for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].actions.splice(modelIndex, 0, "");
-        }
-      } else if (command == "Delete Row" && (cellType == "condition" || cellType == "ruleCondition") && numberOfConditions != 1) {
-        dtDatas.names.conditions.splice(modelIndex, 1);
-        for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].conditions.splice(modelIndex, 1);
-        }
-      } else if (command == "Delete Row" && (cellType == "action" || cellType == "ruleAction") && numberOfActions != 1) {
-        dtDatas.names.actions.splice(modelIndex, 1);
-        for (var i = 0; i < numberOfRules; i++) {
-          dtDatas.rules[i].actions.splice(modelIndex, 1);
+          dtData.rules[i].conditions.splice(index, 0, "");
         }
       }
-      this.setState({ dtData: dtDatas });
-      console.log(JSON.stringify(this.state.dtData));
-    };
+      else if (activeCellType === 'action' || activeCellType === 'ruleAction') {
+        dtData.names.actions.splice(index, 0, "");
+        for (var i = 0; i < numberOfRules; i++) {
+          dtData.rules[i].actions.splice(index, 0, "");
+        }
+      }
+      this.setState({ dtData: dtData });
+    }
+
+    deleteColumn() {
+      console.log("delete column");
+      var activeRuleIndex = this.state.activeRuleIndex;
+      var dtData = this.state.dtData;
+      var numberOfRules = this.state.dtData.rules.length;
+      if (numberOfRules > 1) {
+        dtData.rules.splice(activeRuleIndex, 1);
+      }
+      this.setState({ dtData: dtData });
+    }
+
+    deleteRow() {
+      var index = this.state.activeCellInfo.modelIndex;
+      var activeCellType = this.state.activeCellInfo.cellType;
+      var numberOfRules = this.state.dtData;
+      var dtData = this.state.dtData;
+      if (activeCellType === 'condition' || activeCellType === 'ruleCondition') {
+        dtData.names.conditions.splice(index, 1);
+        for (var i = 0; i < numberOfRules; i++) {
+          dtDatas.rules[i].conditions.splice(index, 1);
+        }
+      }
+      else if (activeCellType === 'action' || activeCellType === 'ruleAction') {
+        dtData.names.actions.splice(index, 1);
+        for (var i = 0; i < numberOfRules; i++) {
+          dtData.rules[i].actions.splice(index, 1);
+        }
+      }
+
+      this.setState({ dtData: dtData });
+    }
 
     createNewRule() {
       var newRule = {
@@ -285,12 +324,12 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       return newRule;
     }
 
-    handleCellFocusChanged(cellInfo, ruleIndex) {
+    handleCellFocusChange(cellInfo, ruleIndex) {
       this.setState({ activeCellInfo: cellInfo });
       this.setState({ activeRuleIndex: ruleIndex });
     }
 
-    handleCellValueChanged(cellValue) {
+    handleCellValueChange(cellValue) {
       var dtDatas = this.state.dtData;
       var index = this.state.activeCellInfo.modelIndex;
       var ruleIndex = this.state.activeRuleIndex;
@@ -323,8 +362,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         return (
           <table>
             <Theader numberOfRules={this.state.dtData.rules.length} />
-            <ConditionCells conditions={this.state.dtData.names.conditions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged} />
-            <ActionCells actions={this.state.dtData.names.actions} rules={this.state.dtData.rules} handleCellValueChanged={this.handleCellValueChanged} handleCellFocusChanged={this.handleCellFocusChanged} />
+            <ConditionCells conditions={this.state.dtData.names.conditions} rules={this.state.dtData.rules} handleCellValueChange={this.handleCellValueChange} handleCellFocusChange={this.handleCellFocusChange} />
+            <ActionCells actions={this.state.dtData.names.actions} rules={this.state.dtData.rules} handleCellValueChange={this.handleCellValueChange} handleCellFocusChange={this.handleCellFocusChange} />
           </table>
         );
       }
