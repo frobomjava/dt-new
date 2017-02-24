@@ -61,6 +61,21 @@ module.exports = {
     });
   },
 
+  findProjectByOwnerUser: function (data, callback) {
+    Project.findOne(data).exec(function (err, project) {
+      if (err) {
+        return callback(err);
+      }
+      if (project) {
+        return callback(null, project);
+      }
+      var error = {
+        appMessage: 'Project does not exist'
+      };
+      return callback(error);
+    });
+  },
+
   projectExists: function (data, callback) {
     Project.findOne(data).exec(function (err, project) {
       if (err) {
@@ -90,7 +105,7 @@ module.exports = {
               validationErrorMessages = validationErrorMessages || {};
               validationErrorMessages.projectExists = "Project already exists";
             }
-            callback();
+            return callback();
           });
         }
       ],
@@ -127,7 +142,7 @@ module.exports = {
         var result = project.members.filter(function (member) {
           return member.id == userId;
         });
-        return result.length > 0; //&& project.owner != req.user.id;
+        return result.length > 0; // project.owner != req.user.id;
       });
       return callback(null, memberProjects);
     });
@@ -141,7 +156,7 @@ module.exports = {
             if (err) {
               return callback(err);
             }
-            return callback(null, projet);
+            return callback(null, project);
           });
         },
         function findUser(project, callback) {

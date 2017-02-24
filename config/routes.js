@@ -66,19 +66,19 @@ module.exports.routes = {
 
   'get /project/setting/:projectId/users': 'ProjectController.getMembers',
 
-  'get /project/in/:projectId/files': 'DtFileController.getAll',
-
- 'post /project/in/:projectId/file/new':'DtFileController.create',
+ //  'get /project/in/:projectId/files': 'DtFileController.getAll',
+ //
+ // 'post /project/in/:projectId/file/new':'DtFileController.create',
 
   'post /project/in/:projectId/resource/new':'ResourceController.create',
 
   'get /project/in/:projectId/resources':'ResourceController.getAll',
 
-  'get /project/in/:projectId/file/delete/:fileId':'DtFileController.delete',
-
-  'post /project/in/:projectId/file/save': 'DtFileController.save',
-
-  'get /project/in/:projectId/file/data/:fileId':'DtFileController.getData',
+  // 'get /project/in/:projectId/file/delete/:fileId':'DtFileController.delete',
+  //
+  // 'post /project/in/:projectId/file/save': 'DtFileController.save',
+  //
+  // 'get /project/in/:projectId/file/data/:fileId':'DtFileController.getData',
 
   'get /project/in/:projectId/resource/tree': 'ProjectController.resourceTree',
 

@@ -9,7 +9,15 @@ module.exports = {
 
   welcome: function(req, res) {
     if (req.isAuthenticated()) {
-      res.view('welcome', {layout: null});
+      var redirectUrl = req.session.redirectTo ? req.session.redirectTo : '';
+      delete req.session.redirectTo;
+      if (redirectUrl != '') {
+          res.redirect(redirectUrl);
+      }
+      else {
+        res.view('welcome', {layout: null});
+      }
+
     } else {
       res.view('signup', {layout: null, err:'', error: '', userName: ''});
     }

@@ -8,12 +8,12 @@ var ProjectUtil = require('../utils/ProjectUtil.js');
 module.exports = {
 
   create: function (req, res) {
-    var projectName = req.param('projectName');
-    console.log(projectName);
+    console.log("projectName : " + req.param('projectName'));
+
     var projectData = {
       projectName: req.param('projectName'),
       owner: req.user.id,
-      url: process.cwd() + '/projects' + '/' + req.user.userName + '/' + projectName
+      url: process.cwd() + '/projects' + '/' + req.user.userName + '/' + req.param('projectName')
     };
 
     var createdProject = null;
@@ -96,7 +96,6 @@ module.exports = {
 
   delete: function (req, res) {
     var projectId = req.param('projectId');
-    console.log("---delete project name--- " + projectName);
     Project.destroy({
       id: projectId
     }).exec(function (err) {
