@@ -53,8 +53,8 @@
 			<ul class="nav navbar-nav">
 				<li><a href="#" class="save" id="saveID"><i class="fa fa-floppy-o"></i></a></li>
 				<li><a href="#"><i class="fa fa-refresh"></i></a></li>
-				<li><a href="#"><i class="fa fa-reply"></i></a></li>
-				<li><a href="#"><i class="fa fa-share"></i></a></li>
+				<li><a href="#" class="undo" id="undoID"><i class="fa fa-reply"></i></a></li>
+				<li><a href="#" class="redo" id="redoID"><i class="fa fa-share"></i></a></li>
 			</ul>
 		</div>
 	</div>
@@ -99,15 +99,19 @@
 		<p align="center"><i class="fa fa-copyright"></i> &nbsp;CopyRight ...... </p>
 	</footer>
 
-	<script src="/dependencies/sails.io.js"></script>
-	<script src="/bower_components/requirejs/require.js"></script>
-	<script src="/js/workspace.js"></script>
 	<script>
 	var projectName = "To be fixed here";
 	var projectId = "<%- projectId %>" ;
 	console.log("Project Id is " + projectId);
 	var myMap = new Map();
+	var undoDataMap = new Map();
+	var redoDataMap = new Map();
 	</script>
+
+	<script src="/dependencies/sails.io.js"></script>
+	<script src="/bower_components/requirejs/require.js"></script>
+	<script src="/js/workspace.js"></script>
+
 
 </body>
 </html>

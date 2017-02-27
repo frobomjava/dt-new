@@ -4,6 +4,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     getInitialState: function () {
       return ({
         myMap: myMap,
+        undoDataMap: undoDataMap,
+        redoDataMap: redoDataMap,
         data: {
           name: projectName,
           resourceType: 'project',
@@ -108,16 +110,21 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
       if (self.state.myMap.has(fileId)) {
         var dtData = self.state.myMap.get(fileId);
-        console.log("---map has key-value--- " + JSON.stringify(dtData));
-        PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData });
+        var undoStack = self.state.undoDataMap.get(fileId);
+        var redoStack = self.state.redoDataMap.get(fileId);
+        PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
       } else {
         console.log("---no key---");
-        url = "/project/in/" + projName + "/file/data/" + fileId;
+        url = "/project/in/" + projectName + "/resource/data/" + nodeID;
         $.getJSON(url, function (data) {
           console.log('ok, got data');
           self.state.myMap.set(fileId, data);
+          self.state.undoDataMap.set(fileId, []);
+          self.state.redoDataMap.set(fileId, []);
+          var undoStack = self.state.undoDataMap.get(fileId);
+          var redoStack = self.state.redoDataMap.get(fileId);
           var dtData = self.state.myMap.get(fileId);
-          PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData });
+          PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
         });
       }
 
@@ -170,7 +177,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           return self.findParentResource(parentId, resource.children, callback);
         }
       });
-
     },
 
     onSelect: function (event, node, trigger, nodeID) {
@@ -182,7 +188,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
       //  this.setState({trigger: trigger});
       this.setState({ nodeID: nodeID });
-
 
       if (this.state.selected && this.state.selected.isMounted()) {
         this.state.selected.setState({ selected: false });
@@ -201,16 +206,21 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
         if (self.state.myMap.has(nodeID)) {
           var dtData = self.state.myMap.get(nodeID);
-          console.log("---map has key-value--- " + JSON.stringify(dtData));
-          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData });
+          var undoStack = self.state.undoDataMap.get(nodeID);
+          var redoStack = self.state.redoDataMap.get(nodeID);
+          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
         } else {
           console.log("---no key---");
           url = "/project/in/" + projectName + "/resource/data/" + nodeID;
           $.getJSON(url, function (data) {
             console.log('ok, got data');
             self.state.myMap.set(nodeID, data);
+            self.state.undoDataMap.set(nodeID, []);
+            self.state.redoDataMap.set(nodeID, []);
+            var undoStack = self.state.undoDataMap.get(nodeID);
+            var redoStack = self.state.redoDataMap.get(nodeID);
             var dtData = self.state.myMap.get(nodeID);
-            PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData });
+            PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
           });
         }
 
@@ -376,7 +386,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       if (this.props.data.resourceType == "file") {
-
         resourceIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
       } else if (this.props.data.resourceType == "folder") {
         resourceIcon = <i className="fa fa-folder-o" aria-hidden="true"></i>;
