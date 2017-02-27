@@ -196,15 +196,16 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         if(undoCount > 0) {
           popedDtData = self.state.undoStack.pop();
           undoCount--;
-        }
-        var updateRedoStack = self.state.redoStack;
-        updateRedoStack.push(updatedDtData);
-        self.setState({redoStack: updateRedoStack});
-        redoCount = self.state.redoStack.length;
 
-        updatedDtData = popedDtData;
-        self.setState({dtData: updatedDtData});
-        myMap.set(self.state.fileId, updatedDtData);
+          var updateRedoStack = self.state.redoStack;
+          updateRedoStack.push(updatedDtData);
+          self.setState({redoStack: updateRedoStack});
+          redoCount = self.state.redoStack.length;
+
+          updatedDtData = popedDtData;
+          self.setState({dtData: updatedDtData});
+          myMap.set(self.state.fileId, updatedDtData);
+        }
       });
 
       $('#redoID').on('click', function (event){
@@ -214,15 +215,16 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         if(redoCount > 0 ) {
           popedDtData = self.state.redoStack.pop();
           redoCount--;
-        }
-        var updateUndoStack = self.state.undoStack;
-        updateUndoStack.push(updatedDtData);
-        self.setState({undoStack: updateUndoStack});
-        undoCount = self.state.undoStack.length;
 
-        updatedDtData = popedDtData;
-        self.setState({dtData: updatedDtData});
-        myMap.set(self.state.fileId, updatedDtData);
+          var updateUndoStack = self.state.undoStack;
+          updateUndoStack.push(updatedDtData);
+          self.setState({undoStack: updateUndoStack});
+          undoCount = self.state.undoStack.length;
+
+          updatedDtData = popedDtData;
+          self.setState({dtData: updatedDtData});
+          myMap.set(self.state.fileId, updatedDtData);
+        }
       });
 
       $(function ($) {
@@ -271,8 +273,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     addColumnRightToActiveCell() {
       var activeRuleIndex = this.state.activeRuleIndex;
       var dtData = this.state.dtData;
-      var historyDtData = JSON.parse(JSON.stringify(dtData));
-      this.createHistory(historyDtData);
+      var dtDatas = JSON.parse(JSON.stringify(dtData));
+      this.createUndoStack(dtDatas);
       dtData.rules.splice(++activeRuleIndex, 0, this.createNewRule());
       this.setState({ dtData: dtData });
     }
@@ -284,8 +286,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         return;
       }
       var dtData = this.state.dtData;
-      var historyDtData = JSON.parse(JSON.stringify(dtData));
-      this.createHistory(historyDtData);
+      var dtDatas = JSON.parse(JSON.stringify(dtData));
+      this.createUndoStack(dtDatas);
       dtData.rules.splice(this.state.activeRuleIndex, 0, this.createNewRule());
       this.setState({ dtData: dtData });
     }
@@ -305,8 +307,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       var dtData = this.state.dtData;
       var numberOfRules = this.state.dtData.rules.length;
       var activeCellType = this.state.activeCellInfo.cellType;
-      var historyDtData = JSON.parse(JSON.stringify(dtData));
-      this.createHistory(historyDtData);
+      var dtDatas = JSON.parse(JSON.stringify(dtData));
+      this.createUndoStack(dtDatas);
       if (activeCellType === 'condition' || activeCellType === 'ruleCondition') {
         dtData.names.conditions.splice(index, 0, "");
         for (var i = 0; i < numberOfRules; i++) {
@@ -326,8 +328,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       console.log("delete column");
       var activeRuleIndex = this.state.activeRuleIndex;
       var dtData = this.state.dtData;
-      var historyDtData = JSON.parse(JSON.stringify(dtData));
-      this.createHistory(historyDtData);
+      var dtDatas = JSON.parse(JSON.stringify(dtData));
+      this.createUndoStack(dtDatas);
       var numberOfRules = this.state.dtData.rules.length;
       if (numberOfRules > 1) {
         dtData.rules.splice(activeRuleIndex, 1);
@@ -342,8 +344,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       var numberOfConditions = this.state.dtData.names.conditions.length;
       var numberOfActions = this.state.dtData.names.actions.length;
       var dtData = this.state.dtData;
-      var historyDtData = JSON.parse(JSON.stringify(dtData));
-      this.createHistory(historyDtData);
+      var dtDatas = JSON.parse(JSON.stringify(dtData));
+      this.createUndoStack(dtDatas);
       if (numberOfConditions > 1 && (activeCellType === 'condition' || activeCellType === 'ruleCondition')) {
         dtData.names.conditions.splice(index, 1);
         for (var i = 0; i < numberOfRules; i++) {
