@@ -26,7 +26,16 @@ module.exports.policies = {
   },
 
   'ProjectController': {
-    '*': 'isAuthenticated'
+    '*': 'isAuthenticated',
+    'resourceTree': ['isAuthenticated', 'projectAuth'],
+    'delete': ['isAuthenticated', 'projectAuth'],
+    'update': ['isAuthenticated', 'projectAuth'],
+    'enter': ['isAuthenticated', 'projectAuth'],
+    'setting': ['isAuthenticated', 'projectAuth'],
+    'addMember': ['isAuthenticated', 'projectAuth'],
+    'getMembers': ['isAuthenticated', 'projectAuth'],
+    'removeMember': ['isAuthenticated', 'projectAuth']
+
   },
 
   'DtFileController': {

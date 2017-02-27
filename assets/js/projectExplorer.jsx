@@ -10,82 +10,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           name: projectName,
           resourceType: 'project',
           level: 0,
-          children: [
-            {
-              id: 1,
-              name: 'folder1',
-              resourceType: 'folder',
-              level: 1,
-              children: [
-                {
-                  id: 1,
-                  name: 'file11',
-                  resourceType: 'file',
-                  level: 2
-                },
-                {
-                  id: 2,
-                  name: 'file12',
-                  resourceType: 'file',
-                  level: 2
-                }
-              ]
-            },
-            {
-              id: 2,
-              name: 'folder2',
-              resourceType: 'folder',
-              level: 1,
-              children: [
-                {
-                  id: 3,
-                  name: 'file21',
-                  resourceType: 'file',
-                  level: 2
-                },
-                {
-                  id: 4,
-                  name: 'file22',
-                  resourceType: 'file',
-                  level: 2
-                }
-              ]
-            },
-            {
-              id: 3,
-              name: 'folder3',
-              resourceType: 'folder',
-              level: 1,
-              children: [
-                {
-                  id: 4,
-                  name: 'subFolder4',
-                  resourceType: 'folder',
-                  level: 2,
-                  children: [
-                    {
-                      id: 7,
-                      name: 'subFile41',
-                      resourceType: 'file',
-                      level: 4
-                    }
-                  ]
-                },
-                {
-                  id: 5,
-                  name: 'file31',
-                  resourceType: 'file',
-                  level: 2
-                },
-                {
-                  id: 6,
-                  name: 'file32',
-                  resourceType: 'file',
-                  level: 2
-                }
-              ]
-            }
-          ]
+          children: []
         },
         resourceType: "",
         trigger: "",
@@ -165,7 +90,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         //console.log(JSON.stringify(projectData));
         console.log("state has been set");
       });
-      console.log("new componet will mount");
+      console.log("new component will mount");
     },
 
     findParentResource: function (parentId, resources, callback) {
