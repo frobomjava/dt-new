@@ -150,7 +150,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           $.contextMenu({
             selector: '.file-context-menu-one',
             callback: function (key, options) {
-              console.log("key ==== " + key);
               self.setState({ resourceType: trigger });
               var resourceId = self.state.nodeID;
               if( key == "delete" ){
@@ -211,9 +210,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
               // if found the parent node, push to the received data to is children,
               // update react component state
               var updatedData = self.state.data;
-              console.log(" *** updatedData from add function *** " + JSON.stringify(updatedData));
               self.findParentResource(data.parent, updatedData.children, function (resource) {
-                console.log(" resource callback data from add function " + JSON.stringify(resource));
                 resource.children.push(newChildData);
                 self.setState({ data: updatedData });
                 console.log("data updated 222*****");
@@ -269,9 +266,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       function deleteFile(resourceId){
         var datasUpdated = self.state.data;
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
-        console.log("delete url = " + url);
-        console.log("============");
-        console.log("resourceId = " + resourceId);
         var getting = $.get(url);
         getting.done(function () {
           findAndDeleteChildFile(datasUpdated.children, resourceId);
@@ -291,10 +285,10 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           }
           if (childData.children) {
             if (findAndDeleteChildFile(childData.children, resourceId)) {
-                if (childData.children.length === 0) {
-                    delete childData.children;
-                    childrenArray.splice(i, 1);
-                }
+                // if (childData.children.length === 0) {
+                //     //delete childData.children;
+                //     childrenArray.children.splice(i, 1);
+                //   }
                 return true;
             }
           }
