@@ -49,6 +49,8 @@ module.exports = {
           if (err) {
             return res.serverError(err);
           }
+          console.log('##### '+ resource.name + ' Resource is created #####');
+          console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
           return res.json(resource);
         });
     } else {
@@ -78,6 +80,8 @@ module.exports = {
           if (err) {
             return res.serverError(err);
           }
+          console.log('##### Resource is created #####');
+          console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
           return res.json(resource);
         });
     }
@@ -149,6 +153,134 @@ module.exports = {
         }
         res.ok();
       });
+  },
+
+  download: function(req, res) {
+    var id = req.param('resourceId');
+    async.waterfall([
+      function (callback) {
+        var criteria = {
+          id: id,
+          resourceType: 'file'
+        };
+        Resource.findOne(criteria).exec(function (err, resource) {
+          if (err) {
+            return callback(err);
+          }
+          if (!resource) {
+            return callback({message: 'No resource'});
+          }
+          return callback(null, resource);
+        })
+      },
+      function (resource, callback) {
+        console.log('resource.url : ' + resource.url);
+        var fs = require('fs');
+        var resourceJSON = JSON.parse(fs.readFileSync(resource.url, 'utf8'));
+        return res.json(resourceJSON);
+      }
+    ],
+    function (err) {
+      if (err) {
+        return res.serverError(err);
+      }
+    });
+  },
+
+  delete : function(req, res) {
+    console.log();
+    console.log('##### ResourceController delete action #####');
+    var resourceId = req.param('resourceId');
+    var projectId = req.param('projectId');
+    var resourceUrl;
+    async.waterfall([
+      function (callback) {
+        var criteria = {
+          id: resourceId,
+          resourceType: 'file'
+        };
+        Resource.findOne(criteria).exec(function (err, resource) {
+          if (err) {
+            return callback(err);
+          }
+          if (!resource) {
+            return callback({
+              message: 'No resource'
+            });
+          }
+          resourceUrl = resource.url;
+          console.log('resourceUrl : ' + resourceUrl);
+          return callback(null, resource);
+        })
+      },
+      function (resource, callback) {
+        console.log('parentResource : ' + JSON.stringify(resource.parent));
+        if (resource.parent) {
+          ResourceUtil.findResourceByIdByPopulatingChildren(resource.parent, function (err, parentResource) {
+            if (err) {
+              return callback(err);
+            }
+            ResourceUtil.removeChildResource(resource, parentResource, function (err) {
+              if (err) {
+                return callback(err);
+              }
+            });
+          });
+        }
+        else {
+          ProjectUtil.findProjectByPopulatingResources(projectId, function (err, project) {
+            if (err) {
+              return callback(err);
+            }
+            if (project) {
+              ProjectUtil.removeResource(resourceId, project, function (err) {
+                if (err) {
+                  return callback(err);
+                }
+                // return res.ok({message : 'resource is deleted..'});
+              })
+            }
+          });
+        }
+        ResourceUtil.deleteResource(resource.id, function (err, result) {
+          if (err) {
+            return callback(err);
+          }
+          return callback(null, result);
+        })
+    },
+    function (isResourceDeleted, callback) {
+      if (isResourceDeleted) {
+        const fs = require('fs-extra')
+
+        fs.remove(resourceUrl, function (err) {
+          if (err) {
+            return callback(err);
+          }
+          console.log(resourceUrl + ' is deleted...');
+          return res.ok({message : 'resource is deleted..'});
+        });
+
+        // fs.stat('./server/upload/my.csv', function (err, stats) {
+      //    console.log(stats);//here we got all information of file in stats variable
+      //
+      //    if (err) {
+      //        return console.error(err);
+      //    }
+      //
+      //    fs.unlink('./server/upload/my.csv',function(err){
+      //         if(err) return console.log(err);
+      //         console.log('file deleted successfully');
+      //    });
+      // });
+      }
+    }
+    ],
+    function (err) {
+      if (err) {
+        return res.serverError(err);
+      }
+    });
   }
 
 };
