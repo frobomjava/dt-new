@@ -18,64 +18,64 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
     },
 
-    handleClick: function (event) {
-      event.preventDefault();
-      var self = this;
-      projName = this.state.projectName;
-      filesUpdated = this.state.files.slice();
-      fileName = event.target.getAttribute('name');
-      fileId = event.target.getAttribute('value');
-      index = event.target.getAttribute('id');
-
-      if (preDiv) {
-        preDiv.style.backgroundColor = "#f1f1f1";
-      }
-      event.target.style.backgroundColor = "#D1D0CE";
-      preDiv = event.target;
-
-      if (self.state.myMap.has(fileId)) {
-        var dtData = self.state.myMap.get(fileId);
-        var undoStack = self.state.undoDataMap.get(fileId);
-        var redoStack = self.state.redoDataMap.get(fileId);
-        PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-      } else {
-        console.log("---no key---");
-        url = "/project/in/" + projectName + "/resource/data/" + nodeID;
-        $.getJSON(url, function (data) {
-          console.log('ok, got data');
-          self.state.myMap.set(fileId, data);
-          self.state.undoDataMap.set(fileId, []);
-          self.state.redoDataMap.set(fileId, []);
-          var undoStack = self.state.undoDataMap.get(fileId);
-          var redoStack = self.state.redoDataMap.get(fileId);
-          var dtData = self.state.myMap.get(fileId);
-          PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-        });
-      }
-
-      $(function ($) {
-        $.contextMenu({
-          selector: '.file-context-menu-one',
-          callback: function (key, options) {
-            deleteHandler();
-          },
-          items: {
-            "Delete": { name: "delete", icon: "delete" }
-          }
-        });
-
-        function deleteHandler() {
-          var url = '/project/in/' + projName + '/file/delete/' + fileId;
-          console.log('===delete url=== ' + url);
-          var getting = $.get(url);
-          getting.done(function () {
-            filesUpdated.splice(index, 1);
-            self.setState({ files: filesUpdated });
-            PubSub.publish('DeleteFileEvent');
-          });
-        }
-      });
-    },
+    // handleClick: function (event) {
+    //   event.preventDefault();
+    //   var self = this;
+    //   projName = this.state.projectName;
+    //   filesUpdated = this.state.files.slice();
+    //   fileName = event.target.getAttribute('name');
+    //   fileId = event.target.getAttribute('value');
+    //   index = event.target.getAttribute('id');
+    //
+    //   if (preDiv) {
+    //     preDiv.style.backgroundColor = "#f1f1f1";
+    //   }
+    //   event.target.style.backgroundColor = "#D1D0CE";
+    //   preDiv = event.target;
+    //
+    //   if (self.state.myMap.has(fileId)) {
+    //     var dtData = self.state.myMap.get(fileId);
+    //     var undoStack = self.state.undoDataMap.get(fileId);
+    //     var redoStack = self.state.redoDataMap.get(fileId);
+    //     PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+    //   } else {
+    //     console.log("---no key---");
+    //     url = "/project/in/" + projectName + "/resource/data/" + nodeID;
+    //     $.getJSON(url, function (data) {
+    //       console.log('ok, got data');
+    //       self.state.myMap.set(fileId, data);
+    //       self.state.undoDataMap.set(fileId, []);
+    //       self.state.redoDataMap.set(fileId, []);
+    //       var undoStack = self.state.undoDataMap.get(fileId);
+    //       var redoStack = self.state.redoDataMap.get(fileId);
+    //       var dtData = self.state.myMap.get(fileId);
+    //       PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+    //     });
+    //   }
+    //
+    //   $(function ($) {
+    //     $.contextMenu({
+    //       selector: '.file-context-menu-one',
+    //       callback: function (key, options) {
+    //         deleteHandler();
+    //       },
+    //       items: {
+    //         "Delete": { name: "delete", icon: "delete" }
+    //       }
+    //     });
+    //
+    //     function deleteHandler() {
+    //       var url = '/project/in/' + projName + '/file/delete/' + fileId;
+    //       console.log('===delete url=== ' + url);
+    //       var getting = $.get(url);
+    //       getting.done(function () {
+    //         filesUpdated.splice(index, 1);
+    //         self.setState({ files: filesUpdated });
+    //         PubSub.publish('DeleteFileEvent');
+    //       });
+    //     }
+    //   });
+    // },
 
     componentWillMount: function () {
       var self = this;
@@ -84,10 +84,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       $.getJSON(url, function (project) {
         console.log("Resource Tree");
         console.log(JSON.stringify(project));
-        //var projectData = JSON.parse(project);
         project.children = project.resources;
         self.setState({ data: project, resourceType: "", trigger: "", nodeID: "" });
-        //console.log(JSON.stringify(projectData));
         console.log("state has been set");
       });
       console.log("new component will mount");
@@ -104,23 +102,21 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
     },
 
-    onSelect: function (event, node, trigger, nodeID) {
+    onSelect: function (event, node, trigger, nodeID, resourceName) {
       var self = this;
       var projectName = this.state.data.name;
       $.contextMenu('destroy', '.file-context-menu-one');
 
       console.log("trigger = " + trigger);
 
-      //  this.setState({trigger: trigger});
       this.setState({ nodeID: nodeID });
 
       if (this.state.selected && this.state.selected.isMounted()) {
         this.state.selected.setState({ selected: false });
       }
+
       this.setState({ selected: node });
       node.setState({ selected: true });
-
-      //console.log("state.trigger = " + this.state.trigger);
 
       if (trigger == "file") {
         if (preDiv) {
@@ -154,11 +150,17 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           $.contextMenu({
             selector: '.file-context-menu-one',
             callback: function (key, options) {
-              self.setState({ resourceType: key });
-              addFunction();
+              self.setState({ resourceType: trigger });
+              var resourceId = self.state.nodeID;
+              if( key == "delete" ){
+                deleteFile(resourceId);
+              } else if ( key == "download" ){
+                downloadFile(resourceId);
+              }
             },
             items: {
               "delete": { name: "Delete", icon: "delete" },
+              "download": { name: "Download", icon: "fa-download" },
               "sep1": "---------",
               "quit": { name: "Quit", icon: function ($element, key, item) { return 'context-menu-icon context-menu-icon-quit'; } }
             }
@@ -171,7 +173,12 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             selector: '.file-context-menu-one',
             callback: function (key, options) {
               self.setState({ resourceType: key });
-              addFunction();
+              var resourceId = self.state.nodeID;
+              if( key == "file" || key == "folder"){
+                addFunction();
+              } else if (key == "delete"){
+                deleteFile(resourceId);
+              }
             },
             items: {
               "folder": { name: "Create Folder", icon: "add" },
@@ -186,11 +193,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
       function add() {
         var resourceName = $('#resourceID').val();
-
         if (resourceName) {
           var resourceType = self.state.resourceType;
           var nodeID = self.state.nodeID;
-
           var url = '/project/in/' + projectId + '/resource/new';
           var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
           posting.done(function (data) {
@@ -218,15 +223,12 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
                 var datasUpdated = self.state.data;
                 datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType });
                 self.setState({ data: datasUpdated });
-                console.log("==updated data=== " + JSON.stringify(self.state.data));
               } else {
                 console.log("Parent is not exist.");
                 var datasUpdated = self.state.data;
                 datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType, 'children': [] });
                 self.setState({ data: datasUpdated });
-                console.log("==updated data=== " + JSON.stringify(self.state.data));
               }
-
             }
           });
           dialog.dialog("close");
@@ -260,7 +262,53 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       function addFunction(nodeID, trigger, esourceType) {
         dialog.dialog("open");
       }
+
+      function deleteFile(resourceId){
+        var datasUpdated = self.state.data;
+        var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
+        var getting = $.get(url);
+        getting.done(function () {
+          findAndDeleteChildFile(datasUpdated.children, resourceId);
+          if(true){
+            self.setState({ data: datasUpdated });
+            PubSub.publish('DeleteFileEvent');
+          }
+        });
+      }
+
+      function findAndDeleteChildFile(childrenArray, resourceId) {
+        for (var i = 0; i < childrenArray.length; ++i) {
+          var childData = childrenArray[i];
+          if (childData.id == resourceId) {
+            childrenArray.splice(i, 1);
+            return true;
+          }
+          if (childData.children) {
+            if (findAndDeleteChildFile(childData.children, resourceId)) {
+                // if (childData.children.length === 0) {
+                //     //delete childData.children;
+                //     childrenArray.children.splice(i, 1);
+                //   }
+                return true;
+            }
+          }
+        }
+      }
+
+      function downloadFile(resourceId){
+        var url = '/project/in/'+ projectId + '/resource/download/' + resourceId;
+        var getting = $.get(url);
+        getting.done(function(data) {
+          $("<a />", {
+            "download": resourceName + ".json",
+            "href" : "data:application/json," + encodeURIComponent(JSON.stringify(data))
+          }).appendTo("body")
+          .click(function() {
+          })[0].click()
+        });
+      }
     },
+
     render: function () {
       return (
         <div>
@@ -280,7 +328,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       if (this.props.onCategorySelect) {
         trigger = event.target.getAttribute('value');
         nodeID = event.target.getAttribute('id');
-        this.props.onCategorySelect(event, this, trigger, nodeID);
+        resourceName = this.props.data.name;
+        this.props.onCategorySelect(event, this, trigger, nodeID, resourceName);
       }
       event.preventDefault();
       event.stopPropagation();

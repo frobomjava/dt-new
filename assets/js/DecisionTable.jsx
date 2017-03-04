@@ -159,6 +159,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       this.setState({ fileId: data.fileId });
       this.setState({ undoStack: data.undoStack });
       this.setState({ redoStack: data.redoStack });
+      undoCount = this.state.undoStack.length;
+      redoCount = this.state.redoStack.length;
     };
 
     handleFileDelete(msg, data) {
@@ -358,9 +360,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
           dtData.rules[i].actions.splice(index, 1);
         }
       }
-
       this.setState({ dtData: dtData });
-
     }
 
     createNewRule() {
@@ -406,15 +406,13 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       this.setState({ dtData: dtDatas });
       myMap.set(this.state.fileId, dtDatas);
       this.forceUpdate();
-
     }
 
     createUndoStack(dtData) {
-      var self = this;
-      var updateUndoStack = self.state.undoStack;
+      var updateUndoStack = this.state.undoStack;
       updateUndoStack.push(dtData);
-      self.setState({undoStack: updateUndoStack});
-      undoCount = self.state.undoStack.length;
+      this.setState({undoStack: updateUndoStack});
+      undoCount = this.state.undoStack.length;
     }
 
     render() {
