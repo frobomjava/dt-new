@@ -84,6 +84,10 @@ module.exports.routes = {
 
   'get /project/in/:projectId/resource/data/:resourceId':'ResourceController.getData',
 
-  'post /project/in/:projectId/resource/save/:resourceId':'ResourceController.saveData'
+  'post /project/in/:projectId/resource/save/:resourceId':'ResourceController.saveData',
+
+  'get /project/in/:projectId/resource/download/:resourceId':'ResourceController.download',
+
+  'get /project/in/:projectId/resource/delete/:resourceId':'ResourceController.delete'
 
 };

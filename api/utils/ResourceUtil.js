@@ -70,6 +70,18 @@ module.exports = {
     });
   },
 
+  removeChildResource: function (childResource, parentResource, callback) {
+    console.log('parentResource.children : ' + JSON.stringify(parentResource.children));
+    parentResource.children.remove(childResource.id);
+    parentResource.save(function (err) {
+      if (err) {
+        return callback(err);
+      }
+      console.log('<><><> childResource is removed <><><>');
+      callback();
+    });
+  },
+
   createAndAddToProject: function (resourceData, project, mainCallback) {
     var self = this;
     async.waterfall([
@@ -182,6 +194,18 @@ module.exports = {
       }
       return callback();
     });
+  },
 
+  deleteResource: function (resourceId, callback) {
+    Resource.destroy({
+      id: resourceId
+    }).exec(function (err) {
+      if (err) {
+        console.log(JSON.stringify(err));
+        return res.json(err);
+      }
+      console.log('##### Resource is destroyed #####');
+      return callback(null, true);
+    });
   }
 }

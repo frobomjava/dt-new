@@ -272,5 +272,20 @@ module.exports = {
       }
       callback();
     });
+  },
+
+  removeResource: function (resourceId, project, callback) {
+    project.resources.remove(resourceId);
+    project.save(function (err) {
+      if (err) {
+        return callback(err);
+      }
+      console.log();
+      console.log('==== removeResource from Project ====');
+      console.log(project.resources);
+      console.log('==== xxxxxxxxxxxxxx ====');
+      console.log();
+      callback();
+    });
   }
 }
