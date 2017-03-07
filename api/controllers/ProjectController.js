@@ -200,25 +200,25 @@ module.exports = {
         },
 
         function success(callback) {
-          console.log("Printing data ***********");
+          //console.log("Printing data ***********");
           data.project.resources.forEach(function (resource) {
-            console.log("Printing each resource");
+            //console.log("Printing each resource");
             console.log(JSON.stringify(resource, ['name', 'children']));
-            console.log("Now will print children");
-            console.log(JSON.stringify(resource.children));
+            //console.log("Now will print children");
+            //console.log(JSON.stringify(resource.children));
             resource.children.forEach(function (child) {
-              console.log(child.name);
+              //console.log(child.name);
             });
           });
 
-          console.log("Printing json data *********************");
+          //console.log("Printing json data *********************");
           delete data.project.updatedAt;
           delete data.project.createdAt;
           delete data.project.id;
           delete data.project.createdBy;
           data.project.name = data.project.projectName;
           data.project.resourceType = 'project';
-          console.log(JSON.stringify(data.project));
+         // console.log(JSON.stringify(data.project));
           res.json(data.project);
         },
 
@@ -228,6 +228,21 @@ module.exports = {
       ]
     );
 
+  },
+
+
+  joinSocket: function (req, res) {
+    console.log("join socket entered");
+    if (!req.isSocket) {
+      return res.badRequest();
+    }
+
+    sails.sockets.join(req, req.param('projectId'), function (err) {
+      if (err) {
+        return res.serverError(err);
+      }
+    });
+    res.json("join success");
   }
 
 };

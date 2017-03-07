@@ -88,6 +88,8 @@ module.exports.routes = {
 
   'get /project/in/:projectId/resource/download/:resourceId':'ResourceController.download',
 
-  'get /project/in/:projectId/resource/delete/:resourceId':'ResourceController.delete'
+  'get /project/in/:projectId/resource/delete/:resourceId':'ResourceController.delete',
+
+  'get /project/socket/:projectId': 'ProjectController.joinSocket'
 
 };

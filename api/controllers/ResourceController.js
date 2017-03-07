@@ -51,6 +51,8 @@ module.exports = {
           }
           console.log('##### '+ resource.name + ' Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+          console.log("broadcasted!");
           return res.json(resource);
         });
     } else {
@@ -82,7 +84,10 @@ module.exports = {
           }
           console.log('##### Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+          console.log("broadcasted!");
           return res.json(resource);
+          
         });
     }
   },

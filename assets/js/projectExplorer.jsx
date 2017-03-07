@@ -89,6 +89,51 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log("state has been set");
       });
       console.log("new component will mount");
+
+      //socket join
+    },
+
+
+    componentDidMount: function () {
+      var self = this;
+      var socketUrl = '/project/socket/' + projectId;
+      io.socket.get(socketUrl, function (responseData) {
+        console.log(responseData);
+      });
+
+      io.socket.on('new-resource', function (data) {
+        if (data.parent) {
+          var newChildData = {
+            id: data.id,
+            name: data.name,
+            resourceType: data.resourceType,
+            children: []
+          };
+          // recursively tracing tree nodes to find the parent node
+          // if found the parent node, push to the received data to is children,
+          // update react component state
+          var updatedData = self.state.data;
+          self.findParentResource(data.parent, updatedData.children, function (resource) {
+            resource.children.push(newChildData);
+            self.setState({ data: updatedData });
+            console.log("data updated 222*****");
+            self.forceUpdate();
+          });
+
+        } else {
+          if (data.resourceType == 'file') {
+            console.log("Parent is not exist. file create");
+            var datasUpdated = self.state.data;
+            datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType });
+            self.setState({ data: datasUpdated });
+          } else {
+            console.log("Parent is not exist.");
+            var datasUpdated = self.state.data;
+            datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType, 'children': [] });
+            self.setState({ data: datasUpdated });
+          }
+        }
+      });
     },
 
     findParentResource: function (parentId, resources, callback) {
@@ -152,9 +197,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             callback: function (key, options) {
               self.setState({ resourceType: trigger });
               var resourceId = self.state.nodeID;
-              if( key == "delete" ){
+              if (key == "delete") {
                 deleteFile(resourceId);
-              } else if ( key == "download" ){
+              } else if (key == "download") {
                 downloadFile(resourceId);
               }
             },
@@ -174,9 +219,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             callback: function (key, options) {
               self.setState({ resourceType: key });
               var resourceId = self.state.nodeID;
-              if( key == "file" || key == "folder"){
+              if (key == "file" || key == "folder") {
                 addFunction();
-              } else if (key == "delete"){
+              } else if (key == "delete") {
                 deleteFile(resourceId);
               }
             },
@@ -263,13 +308,13 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         dialog.dialog("open");
       }
 
-      function deleteFile(resourceId){
+      function deleteFile(resourceId) {
         var datasUpdated = self.state.data;
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
         var getting = $.get(url);
         getting.done(function () {
           findAndDeleteChildFile(datasUpdated.children, resourceId);
-          if(true){
+          if (true) {
             self.setState({ data: datasUpdated });
             PubSub.publish('DeleteFileEvent');
           }
@@ -285,26 +330,26 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           }
           if (childData.children) {
             if (findAndDeleteChildFile(childData.children, resourceId)) {
-                // if (childData.children.length === 0) {
-                //     //delete childData.children;
-                //     childrenArray.children.splice(i, 1);
-                //   }
-                return true;
+              // if (childData.children.length === 0) {
+              //     //delete childData.children;
+              //     childrenArray.children.splice(i, 1);
+              //   }
+              return true;
             }
           }
         }
       }
 
-      function downloadFile(resourceId){
-        var url = '/project/in/'+ projectId + '/resource/download/' + resourceId;
+      function downloadFile(resourceId) {
+        var url = '/project/in/' + projectId + '/resource/download/' + resourceId;
         var getting = $.get(url);
-        getting.done(function(data) {
+        getting.done(function (data) {
           $("<a />", {
             "download": resourceName + ".json",
-            "href" : "data:application/json," + encodeURIComponent(JSON.stringify(data))
+            "href": "data:application/json," + encodeURIComponent(JSON.stringify(data))
           }).appendTo("body")
-          .click(function() {
-          })[0].click()
+            .click(function () {
+            })[0].click()
         });
       }
     },
