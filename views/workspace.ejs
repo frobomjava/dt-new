@@ -1,117 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Decision Table WorkSpace </title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Decision Table WorkSpace </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link href="/bower_components/jQuery-contextMenu/dist/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="/styles/importer.css">
 	<link rel="stylesheet" href="/css/workspace.css">
 	<link rel="stylesheet" href="/styles/style.css">
-	<!-- for file input entry dialog -->
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 </head>
 
 <body>
+  <div id="root-container">
+    <div id="workspace-container">
+      <div id="tool-container">
+        <div id="menu-container">
+          <ul>
+            <li>
+                <a href="#">File</a>
+                <div class="dropdown">
+                  <ul>
+                      <li><a href="#">New</a></li>
+                      <li><a href="#">Refersh</a></li>
+                      <li><a href="#">Save</a></li>
+                  </ul>
+                </div>
+            </li>
+            <li><a href="#">Edit</a>
+              <div class="dropdown">
+                <ul>
+                    <li><a href="#">Copy</a></li>
+                    <li><a href="#">Paste</a></li>
+                    <li><a href="#">Redo</a></li>
+                    <li><a href="#">Undo</a></li>
+                </ul>
+              </div>
+            </li>
+            <li><a href="#">Setting</a></li>
+            <li class="logout">
+              <a href="/logout"><%=req.user.userName %> &nbsp; &nbsp;	<span class="glyphicon glyphicon-user"></span></a>
+            </li>
+          </ul>
+        </div>
+        <div id="toolbar-container">
+          <a href="#" class="save" id="saveID"><i class="fa fa-floppy-o"></i></a>
+  				<a href="#"><i class="fa fa-refresh"></i></a>
+  				<a href="#" class="undo" id="undoID"><i class="fa fa-reply"></i></a>
+  				<a href="#" class="redo" id="redoID"><i class="fa fa-share"></i></a>
+        </div>
+      </div>
+      <div id="component-container">
+        <div id="main-area">
+          <div id="main-left-panel">
+            <div id="project-explorer"></div>
+          </div>
+          <div id="main-right-panel">
+            <div id="editor-container">
+              <div id="editor-status-bar">
+                <a href="#">Link</a>
+        				<a href="#">Link</a>
+        				<a href="#">Link</a>
+        				<a href="#">Link</a>
+              </div>
+              <div id="editor"></div>
+            </div>
+          </div>
+        </div>
+        <div id="extended-area"></div>
+      </div>
+      <div id="status-bar"></div>
+			<div id="dialog-form" title="Creating a new one ">
+    		<form>
+    			<fieldset>
+    				<input type="text" name="name" id="resourceID" class="text ui-widget-content ui-corner-all" placeholder="Enter Name" />
+    				<input type="submit" tabindex="-1" style="position:absolute; top:-1000px" />
+    			</fieldset>
+    		</form>
+    	</div>
+    </div>
+  </div>
+  </body>
 
-	<div class="navbar navbar-default navbar-fixed-top">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="#">Brand</a>
-		</div>
+  <script>
+  	var projectName = "To be fixed here";
+  	var projectId = "<%- projectId %>" ;
+  	console.log("Project Id is " + projectId);
+  	var myMap = new Map();
+  	var undoDataMap = new Map();
+  	var redoDataMap = new Map();
+  </script>
 
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li class="active"><a href="#">File <span class="sr-only">(current)</span></a></li>
-				<li><a href="#">Edit</a></li>
-				<li><a href="#">View</a></li>
-				<li><a href="#">Selection</a></li>
-				<li><a href="#">Find</a></li>
-			</ul>
-			<div class="navbar-form navbar-right">
-				<a href="/logout" class="btn btn-info btn-md">
-					<%=req.user.userName %> &nbsp; &nbsp;	<span class="glyphicon glyphicon-user"></span>
-				</a>
-			</div>
-		</div>
-	</div>
+  <script src="/dependencies/sails.io.js"></script>
+  <script src="/bower_components/requirejs/require.js"></script>
+  <script src="/js/workspace.js"></script>
 
-	<div class="navbar navbar-inverse navbar-static-top">
-		<div class="navbar-header">
-			<ul class="nav navbar-nav">
-				<li><a href="#" class="save" id="saveID"><i class="fa fa-floppy-o"></i></a></li>
-				<li><a href="#"><i class="fa fa-refresh"></i></a></li>
-				<li><a href="#" class="undo" id="undoID"><i class="fa fa-reply"></i></a></li>
-				<li><a href="#" class="redo" id="redoID"><i class="fa fa-share"></i></a></li>
-			</ul>
-		</div>
-	</div>
-
-	<div class="left-div col-sm-2" id='file-list-container'>
-		<!-- <div class='fileListDiv col-sm-12' id='file-list-container'></div> -->
-	</div>
-
-	<div class="center-div col-sm-8">
-		<div class="row navbar navbar-default navbar-static-top col-sm-12">
-			<ul class="nav navbar-nav">
-				<li><a href="#">Link</a></li>
-				<li><a href="#">Link</a></li>
-				<li><a href="#">Link</a></li>
-				<li><a href="#">Link</a></li>
-			</ul>
-		</div>
-		<div class="row col-sm-12">
-			<div class="dtTable" id="decTableID"></div>
-		</div>
-	</div>
-
-	<div class="right-div col-sm-2">
-		<div class="logDiv col-sm-12">
-			<span class="col-sm-9 logTitle"></span>
-			<span class="col-sm-3 restoreIcon glyphicon">&#x2212;</span>
-		</div>
-		<div class="logContent col-sm-12">
-		</div>
-	</div>
-
-	<div id="dialog-form" title="Creating a new one ">
-		<form>
-			<fieldset>
-				<input type="text" name="name" id="resourceID" class="text ui-widget-content ui-corner-all" placeholder="Enter Name" />
-				<input type="submit" tabindex="-1" style="position:absolute; top:-1000px" />
-			</fieldset>
-		</form>
-	</div>
-
-	<footer class="footer-div col-sm-12">
-		<p align="center"><i class="fa fa-copyright"></i> &nbsp;CopyRight ...... </p>
-	</footer>
-
-	<script>
-	var projectName = "To be fixed here";
-	var projectId = "<%- projectId %>" ;
-	console.log("Project Id is " + projectId);
-	var myMap = new Map();
-	var undoDataMap = new Map();
-	var redoDataMap = new Map();
-	</script>
-
-	<script src="/dependencies/sails.io.js"></script>
-	<script src="/bower_components/requirejs/require.js"></script>
-	<script src="/js/workspace.js"></script>
-
-
-</body>
 </html>

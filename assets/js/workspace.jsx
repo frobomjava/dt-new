@@ -23,10 +23,10 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
 
   function render() {
     ReactDOM.render( <ProjectExplorer />,
-      document.getElementById('file-list-container')
+      document.getElementById('project-explorer')
     );
     ReactDOM.render( <DecisionTable / >,
-      document.getElementById('decTableID')
+      document.getElementById('editor')
     );
   }
   render();

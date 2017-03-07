@@ -118,13 +118,13 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       this.setState({ selected: node });
       node.setState({ selected: true });
 
-      if (trigger == "file") {
-        if (preDiv) {
-          preDiv.style.backgroundColor = "#f1f1f1";
-        }
-        event.target.style.backgroundColor = "#D1D0CE";
-        preDiv = event.target;
+      if (preDiv) {
+        preDiv.style.backgroundColor = "#D1D0CE";
+      }
+      event.target.style.backgroundColor = "#A9A9A9";
+      preDiv = event.target;
 
+      if (trigger == "file") {
         if (self.state.myMap.has(nodeID)) {
           var dtData = self.state.myMap.get(nodeID);
           var undoStack = self.state.undoDataMap.get(nodeID);
