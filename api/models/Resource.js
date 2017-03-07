@@ -54,26 +54,28 @@ module.exports = {
     },
 
     toJSON: function () {
-    var resource = this.toObject();
-    if (this.children && this.children.length > 0) {
-      var newChildren = this.children.map(function (child) {
-        delete child.createdAt;
-        delete child.createdBy;
-        delete child.updatedAt;
-        return child;
-      });
-      resource.children = newChildren;
+      var resource = this.toObject();
+      if (this.children && this.children.length > 0) {
+        var newChildren = this.children.map(function (child) {
+          delete child.createdAt;
+          delete child.createdBy;
+          delete child.updatedAt;
+          return child;
+        });
+        resource.children = newChildren;
+      }
+      delete resource.createdAt;
+      delete resource.createdBy;
+      delete resource.updatedAt;
+      return resource;
     }
-    delete resource.createdAt;
-    delete resource.createdBy;
-    delete resource.updatedAt;
-    return resource;
-  }
 
   },
 
   fillChildResourcesRecursively: function (resource) {
-    Resource.find({ parent: resource.id }).exec(function (err, resources) {
+    Resource.find({
+      parent: resource.id
+    }).exec(function (err, resources) {
       if (err) {
         console.log("Error occured");
       } else if (resources) {
@@ -89,24 +91,32 @@ module.exports = {
 
   fillChildResourcesRecursively2: function (remainingCount, resources, callback) {
     console.log("recursive calling");
-    if (remainingCount == 0) {
-      callback();
+    if (remainingCount === 0) {
+      return callback();
     }
 
     if (resources && resources.length > 0) {
       resources.forEach(function (resource) {
         console.log(resource.name);
         remainingCount--;
-        Resource.find({ parent: resource.id }).exec(function (err, resources) {
-          if (err) {
-            console.log("Error occured");
-          } else if (resources) {
-            resource['children'] = resources;
-            remainingCount = remainingCount + resources.length;
-            Resource.fillChildResourcesRecursively2(remainingCount, resources, callback);
-          }
+        if (remainingCount === 0) {
+          return callback();
+        }
+        if (resource.type === 'folder') {
+          Resource.find({
+            parent: resource.id
+          }).exec(function (err, resources) {
+            if (err) {
+              console.log("Error occured");
+            } else if (resources) {
+              resource['children'] = resources;
+              remainingCount = remainingCount + resources.length;
+              Resource.fillChildResourcesRecursively2(remainingCount, resources, callback);
+            }
 
-        });
+          });
+        }
+
       });
     }
 
@@ -129,4 +139,3 @@ module.exports = {
     return resource;
   }
 };
-
