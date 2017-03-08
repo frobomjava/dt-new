@@ -207,5 +207,111 @@ module.exports = {
       console.log('##### Resource is destroyed #####');
       return callback(null, true);
     });
+  },
+
+  readResourceFile: function(path, callback) {
+    console.log('*** ResourceUtil.readResourceFile ***');
+    console.log('path : ' + path);
+    var fs = require('fs');
+    fs.readFile(path, function read(err, data) {
+        if (err) {
+            return callback(err);
+        }
+        var resourceJSON = JSON.parse(data);
+        console.log('resourceJSON : ' + JSON.stringify(resourceJSON));
+        console.log('****************************************');
+        return callback(null, resourceJSON);          // Or put the next step in a function and invoke it
+    });
+  },
+
+  createJSFile: function (path, data, callback) {
+    var fs = require('fs');
+    fs.writeFile(path, data, function (err) {
+      if (err) {
+        return callback(err);
+      }
+      return callback(null, true);
+    });
+  },
+
+  createJSFileAndAddToProject: function (resourceData, project, data, mainCallback) {
+    console.log('*** ResourceUtil.createJSFileAndAddToProject ***');
+    var self = this;
+    async.waterfall([
+        function createFile(callback) {
+
+          if (resourceData.resourceType == 'file') {
+            self.createJSFile(resourceData.url, data, function (err, success) {
+              if (err) {
+                return callback(err);
+              }
+              return callback(null, success);
+            });
+          }
+        },
+        function (success, callback) {
+          self.createResource(resourceData, function (err, resource) {
+            if (err) {
+              return callback(err);
+            }
+            callback(null, resource);
+          });
+        },
+        function (resource, callback) {
+          ProjectUtil.addResource(resource, project, function (err) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, resource);
+          })
+        }
+      ],
+      function (err, resource) {
+        if (err) {
+          return mainCallback(err);
+        }
+        return mainCallback(null, resource);
+      });
+  },
+
+  createJSFileAndAddToParentResource: function (resourceData, parentResource, data, mainCallback) {
+    console.log('*** ResourceUtil.createJSFileAndAddToParentResource ***');
+    var self = this;
+    async.waterfall([
+
+        function createFile(callback) {
+
+          if (resourceData.resourceType == 'file') {
+            self.createJSFile(resourceData.url, data, function (err, success) {
+              if (err) {
+                return callback(err);
+              }
+              return callback(null, success);
+            });
+          }
+        },
+        function (success, callback) {
+          self.createResource(resourceData, function (err, resource) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, resource);
+          });
+        },
+        function (resource, callback) {
+          self.addChildResource(resource, parentResource, function (err) {
+            if (err) {
+              return callback(err);
+            }
+            return callback(null, resource);
+          })
+        }
+      ],
+      function (err, resource) {
+        if (err) {
+          return mainCallback(err);
+        }
+        return mainCallback(null, resource);
+      });
   }
 }

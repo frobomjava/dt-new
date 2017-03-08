@@ -87,7 +87,7 @@ module.exports = {
           sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
-          
+
         });
     }
   },
@@ -280,6 +280,165 @@ module.exports = {
       // });
       }
     }
+    ],
+    function (err) {
+      if (err) {
+        return res.serverError(err);
+      }
+    });
+  },
+  generateCode: function(req, res) {
+    var resourceId = req.param('resourceId');
+    var projectId = req.param('projectId');
+    var resourceData;
+
+    async.waterfall([
+      function (callback) {
+        var criteria = {
+          id: resourceId,
+          resourceType: 'file'
+        };
+        Resource.findOne(criteria).exec(function (err, resource) {
+          if (err) {
+            return callback(err);
+          }
+          if (!resource) {
+            return callback({message: 'No resource'});
+          }
+          resourceData = resource;
+          console.log("parentResource : " + resourceData.parent);
+          delete resourceData.id;
+          console.log();
+          console.log('#  resourceData : ' + JSON.stringify(resourceData));
+          console.log();
+          return callback(null, resource);
+        })
+      },
+      function (resource, callback) {
+        console.log('resource.url : ' + resource.url);
+        ResourceUtil.readResourceFile(resource.url, function (err, resourceJSON) {
+          if (err) {
+            return callback(err);
+          }
+          console.log('==== readResourceFile finished ====');
+          return callback(null, resourceJSON);
+        });
+      },
+      function (resourceJSON, callback) {
+        var data = "function (" + resourceData.name + ") {\n" ;
+        var firstRule = true;
+
+        resourceJSON.rules.map(function (rule) {
+          var count = 0;
+          if (firstRule) {
+            data += "\tif( ";
+            firstRule = false;
+          }
+          else {
+              data += "\n\telse if( ";
+          }
+
+          async.series([
+            function(done) {
+              console.log('first thing')
+              rule.conditions.map(function (condition) {
+                ++count;
+                if (count != rule.conditions.length) {
+                  data += condition + ' && ' ;
+                }
+                else {
+                  data += condition + ') {\n';
+                }
+              });
+              done()
+            },
+            function(done) {
+              console.log('second thing')
+              rule.actions.map(function (action) {
+                console.log('action : ' + action);
+                data += '\t\t' + action + '\n';
+              });
+              data += '\t}';
+            },
+          ], function(err) {
+            if (err) {
+              console.log(err.message);
+            }
+          });
+
+        });//end of rule map
+
+        data += '\n}\n';
+        console.log('data : ' + data);
+        return callback(null, data);
+      },
+      function (data, callback) {
+
+        if (!resourceData.parent) {
+          console.log("Parent id does not exist");
+          async.waterfall([
+              function findParentProject(callback) {
+                ProjectUtil.findProjectByPopulatingResources(projectId, function (err, project) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  return callback(null, project);
+                });
+              },
+              function (project, callback) {
+                resourceData.url = project.url + '/' + resourceData.name + '.js';
+                ResourceUtil.createJSFileAndAddToProject(resourceData, project, data, function (err, resource) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  return callback(null, resource);
+                });
+              }
+            ],
+            function (err, resource) {
+              if (err) {
+                return res.serverError(err);
+              }
+              console.log('##### '+ resource.name + ' Resource is created #####');
+              console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+              return res.json(resource);
+            });
+        }
+        else {
+          console.log();
+          console.log("Parent is exist.<new>");
+          async.waterfall([
+              function findParentResource(callback) {
+                ResourceUtil.findResourceByIdByPopulatingChildren(resourceData.parent, function (err, parentResource) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  return callback(null, parentResource);
+                });
+              },
+              function (parentResource, callback) {
+                resourceData.url = parentResource.url + '/' + resourceData.name + '.js';
+                resourceData.parent = parentResource.id;
+                ResourceUtil.createJSFileAndAddToParentResource(resourceData, parentResource, data, function (err, resource) {
+                  if (err) {
+                    return callback(err);
+                  }
+                  return callback(null, resource);
+                });
+              }
+            ],
+            function (err, resource) {
+              if (err) {
+                return res.serverError(err);
+              }
+              console.log('##### Resource is created #####');
+              console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+              return res.json(resource);
+            });
+        }//end of else
+
+        //return res.json(resourceJSON);
+      }
     ],
     function (err) {
       if (err) {
