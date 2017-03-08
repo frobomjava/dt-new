@@ -122,6 +122,7 @@ module.exports = {
   },
 
   saveData: function (req, res) {
+    var projectId = req.param('projectId');
     var id = req.param('resourceId');
     var data = req.param('data');
     async.waterfall([
@@ -156,7 +157,10 @@ module.exports = {
         if (err) {
           return res.serverError(err);
         }
-        sails.sockets.broadcast(projectId, 'changed-resource', id, req);
+        if(req.isSocket === true) {
+          sails.sockets.broadcast(projectId, 'changed-resource', id, req);
+           console.log("broadcast for saveData successful");
+        }
         res.ok();
       });
   },

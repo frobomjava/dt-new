@@ -113,7 +113,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           // if found the parent node, push to the received data to is children,
           // update react component state
           var updatedData = self.state.data;
-          self.findParentResource(data.parent, updatedData.children, function (resource) {          
+          self.findParentResource(data.parent, updatedData.children, function (resource) {
             resource.children.push(newChildData);
             self.setState({ data: updatedData });
             console.log("data updated 222*****");
@@ -147,8 +147,36 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       io.socket.on('changed-resource', function(data) {
-
+        var resourceId = data;
+        var links = document.getElementsByTagName("a");
+        for(var i=0; i<links.length; i++)
+        {
+            if(links[i].id == resourceId)
+            {
+              links[i].style.backgroundColor = "#FFBF00";
+            }
+        }
       });
+
+      $('#refreshID').on('click', function (event) {
+        event.preventDefault();
+        var updatedDtData = self.state.dtData;
+        var fileId = self.state.fileId;
+        url = "/project/in/" + projectName + "/resource/data/" + nodeID;
+        console.log("refresh url = " + url);
+        console.log("*** nodeID *** " + nodeID);
+        $('#'+ nodeID).css("background-color","#A9A9A9");
+        $.getJSON(url, function (data) {
+          console.log('ok, got data from refreshID');
+          self.state.myMap.set(nodeID, data);
+          self.state.undoDataMap.set(nodeID, []);
+          self.state.redoDataMap.set(nodeID, []);
+          var undoStack = self.state.undoDataMap.get(nodeID);
+          var redoStack = self.state.redoDataMap.get(nodeID);
+          var dtData = self.state.myMap.get(nodeID);
+          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+      });
+    });
     },
 
     findParentResource: function (parentId, resources, callback) {
@@ -178,14 +206,16 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       this.setState({ selected: node });
       node.setState({ selected: true });
 
-      if (preDiv) {
-        preDiv.style.backgroundColor = "#D1D0CE";
+      if (preDiv && preDiv.style.backgroundColor!= "#FFBF00") {
+        preDiv.style.backgroundColor = "#D1D0CE"; //backgroundColor
+        event.target.style.backgroundColor = "#A9A9A9"; //selectedColor
       }
-      event.target.style.backgroundColor = "#A9A9A9";
       preDiv = event.target;
 
       if (trigger == "file") {
         if (self.state.myMap.has(nodeID)) {
+          console.log("Key is exists");
+
           var dtData = self.state.myMap.get(nodeID);
           var undoStack = self.state.undoDataMap.get(nodeID);
           var redoStack = self.state.redoDataMap.get(nodeID);
