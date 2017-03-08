@@ -90,6 +90,8 @@ module.exports.routes = {
 
   'get /project/in/:projectId/resource/delete/:resourceId':'ResourceController.delete',
 
+  'get /project/in/:projectId/resource/code/generate/:resourceId':'ResourceController.generateCode',
+
   'get /project/socket/:projectId': 'ProjectController.joinSocket'
 
 };
