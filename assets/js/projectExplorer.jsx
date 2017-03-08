@@ -98,7 +98,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       var self = this;
       var socketUrl = '/project/socket/' + projectId;
       io.socket.get(socketUrl, function (responseData) {
-        console.log(responseData);
+        console.log("**** respondData ****" + responseData);
       });
 
       io.socket.on('new-resource', function (data) {
@@ -113,7 +113,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           // if found the parent node, push to the received data to is children,
           // update react component state
           var updatedData = self.state.data;
-          self.findParentResource(data.parent, updatedData.children, function (resource) {
+          self.findParentResource(data.parent, updatedData.children, function (resource) {          
             resource.children.push(newChildData);
             self.setState({ data: updatedData });
             console.log("data updated 222*****");
@@ -133,6 +133,21 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             self.setState({ data: datasUpdated });
           }
         }
+      });
+
+      io.socket.on('delete-resource', function(data) {
+        var datasUpdated = self.state.data;
+        var resourceId = data;
+        self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
+            resource.splice(i, 1);
+            self.setState({ data: datasUpdated });
+            self.forceUpdate();
+            PubSub.publish('DeleteFileEvent');
+        });
+      });
+
+      io.socket.on('changed-resource', function(data) {
+
       });
     },
 
@@ -313,31 +328,13 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
         var getting = $.get(url);
         getting.done(function () {
-          findAndDeleteChildFile(datasUpdated.children, resourceId);
-          if (true) {
-            self.setState({ data: datasUpdated });
-            PubSub.publish('DeleteFileEvent');
-          }
+          self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
+              resource.splice(i, 1);
+              self.setState({ data: datasUpdated });
+              self.forceUpdate();
+              PubSub.publish('DeleteFileEvent');
+          });
         });
-      }
-
-      function findAndDeleteChildFile(childrenArray, resourceId) {
-        for (var i = 0; i < childrenArray.length; ++i) {
-          var childData = childrenArray[i];
-          if (childData.id == resourceId) {
-            childrenArray.splice(i, 1);
-            return true;
-          }
-          if (childData.children) {
-            if (findAndDeleteChildFile(childData.children, resourceId)) {
-              // if (childData.children.length === 0) {
-              //     //delete childData.children;
-              //     childrenArray.children.splice(i, 1);
-              //   }
-              return true;
-            }
-          }
-        }
       }
 
       function downloadFile(resourceId) {
@@ -351,6 +348,18 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             .click(function () {
             })[0].click()
         });
+      }
+    },
+
+    findAndDeleteChildFile: function (resources, resourceId, callback) {
+      var self = this;
+      for (var i = 0; i < resources.length; ++i) {
+        var resource = resources[i];
+        if (resource.id == resourceId) {
+          return callback(resources, i);
+        } else if (resource.children && resource.children.length > 0) {
+            return self.findAndDeleteChildFile(resource.children, resourceId,  callback);
+        }
       }
     },
 
@@ -412,7 +421,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
           {resourceIcon}&nbsp;
-
         <a onClick={this.onCategorySelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one">{this.props.data.name}</a>
           <ul>
             {this.state.children.map(function (child, index) {
