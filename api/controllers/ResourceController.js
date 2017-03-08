@@ -87,7 +87,7 @@ module.exports = {
           sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
-          
+
         });
     }
   },
@@ -156,6 +156,7 @@ module.exports = {
         if (err) {
           return res.serverError(err);
         }
+        sails.sockets.broadcast(projectId, 'changed-resource', id, req);
         res.ok();
       });
   },
@@ -263,6 +264,8 @@ module.exports = {
             return callback(err);
           }
           console.log(resourceUrl + ' is deleted...');
+          sails.sockets.broadcast(projectId, 'delete-resource', resourceId, req);
+          console.log("*** delete broadcast successful *** ");
           return res.ok({message : 'resource is deleted..'});
         });
 
