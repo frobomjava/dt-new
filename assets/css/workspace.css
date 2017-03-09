@@ -219,39 +219,40 @@ input.text { margin-bottom:12px; width:95%; padding: .4em; }
 
 fieldset { padding:0; border:0; margin-top:25px; }
 
-.category-tree {
+.resource-tree {
   margin: 0;
   padding: 0;
 }
 
-.category-tree ul {
+.resource-tree ul {
   margin: 0;
   padding: 0 0 0 14px;
 }
 
-.category-tree li {
+.resource-tree li {
   list-style-type: none;
   font-size: 18px;
 }
 
-.category-tree a {
+.resource-tree a {
   cursor: pointer;
   color: #000;
 }
 
-.category-tree a:hover {
+.resource-tree a:hover {
   padding: 5px;
   /*background-color: #DCDCDC;*/
   color: #fff;
   background: #939393;
+  text-decoration: none;
 }
 
-.category-tree li.selected > a {
+.resource-tree li.selected > a {
   padding: 2px 10px 2px 3px;
   background-color: #A9A9A9;
 }
 
-.category-tree li:before {
+.resource-tree li:before {
   content: "";
   display: inline-block;
   font-size: 16px;
@@ -262,17 +263,17 @@ fieldset { padding:0; border:0; margin-top:25px; }
   width: 11px;
 }
 
-.category-tree .has-children:before {
+.resource-tree .has-children:before {
   content: "▶";
   cursor: pointer;
 }
 
-.category-tree .has-children.open:before {
+.resource-tree .has-children.open:before {
   content: "▼";
   cursor: pointer;
 }
 
-.category-tree .has-children.always-open:before {
+.resource-tree .has-children.always-open:before {
   content: "";
   cursor: default;
 }

@@ -138,7 +138,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       io.socket.on('delete-resource', function(data) {
         var datasUpdated = self.state.data;
         var resourceId = data;
-        self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
+        self.findParentResourceForDelete(datasUpdated.children, resourceId,function (resource,i) {
             resource.splice(i, 1);
             self.setState({ data: datasUpdated });
             self.forceUpdate();
@@ -148,14 +148,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
       io.socket.on('changed-resource', function(data) {
         var resourceId = data;
-        var links = document.getElementsByTagName("a");
-        for(var i=0; i<links.length; i++)
-        {
-            if(links[i].id == resourceId)
-            {
-              links[i].style.backgroundColor = "#FFBF00";
-            }
-        }
+        $('#'+ resourceId).css("color","#FFBF00");
       });
 
       $('#refreshID').on('click', function (event) {
@@ -165,9 +158,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         url = "/project/in/" + projectName + "/resource/data/" + nodeID;
         console.log("refresh url = " + url);
         console.log("*** nodeID *** " + nodeID);
-        $('#'+ nodeID).css("background-color","#A9A9A9");
+
         $.getJSON(url, function (data) {
-          console.log('ok, got data from refreshID');
+          console.log('ok, got data from refresh');
           self.state.myMap.set(nodeID, data);
           self.state.undoDataMap.set(nodeID, []);
           self.state.redoDataMap.set(nodeID, []);
@@ -175,6 +168,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var redoStack = self.state.redoDataMap.get(nodeID);
           var dtData = self.state.myMap.get(nodeID);
           PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+          $('#'+ nodeID).css("color","#000");
       });
     });
     },
@@ -206,7 +200,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       this.setState({ selected: node });
       node.setState({ selected: true });
 
-      if (preDiv && preDiv.style.backgroundColor!= "#FFBF00") {
+      if (preDiv) {
         preDiv.style.backgroundColor = "#D1D0CE"; //backgroundColor
         event.target.style.backgroundColor = "#A9A9A9"; //selectedColor
       }
@@ -215,7 +209,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       if (trigger == "file") {
         if (self.state.myMap.has(nodeID)) {
           console.log("Key is exists");
-
           var dtData = self.state.myMap.get(nodeID);
           var undoStack = self.state.undoDataMap.get(nodeID);
           var redoStack = self.state.redoDataMap.get(nodeID);
@@ -232,6 +225,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             var redoStack = self.state.redoDataMap.get(nodeID);
             var dtData = self.state.myMap.get(nodeID);
             PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+            preDiv.style.color = "#000";
           });
         }
 
@@ -358,7 +352,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
         var getting = $.get(url);
         getting.done(function () {
-          self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
+          self.findParentResourceForDelete(datasUpdated.children, resourceId,function (resource,i) {
               resource.splice(i, 1);
               self.setState({ data: datasUpdated });
               self.forceUpdate();
@@ -381,14 +375,14 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
     },
 
-    findAndDeleteChildFile: function (resources, resourceId, callback) {
+    findParentResourceForDelete: function (resources, resourceId, callback) {
       var self = this;
       for (var i = 0; i < resources.length; ++i) {
         var resource = resources[i];
         if (resource.id == resourceId) {
           return callback(resources, i);
         } else if (resource.children && resource.children.length > 0) {
-            return self.findAndDeleteChildFile(resource.children, resourceId,  callback);
+            return self.findParentResourceForDelete(resource.children, resourceId,  callback);
         }
       }
     },
@@ -396,8 +390,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     render: function () {
       return (
         <div>
-          <ul className="category-tree">
-            <TreeNode key={this.state.data.id} data={this.state.data} onCategorySelect={this.onSelect} />
+          <ul className="resource-tree">
+            <TreeNode key={this.state.data.id} data={this.state.data} onResourceSelect={this.onSelect} />
           </ul>
         </div>
       );
@@ -408,12 +402,12 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     getInitialState: function () {
       return { children: [] };
     },
-    onCategorySelect: function (event) {
-      if (this.props.onCategorySelect) {
+    onResourceSelect: function (event) {
+      if (this.props.onResourceSelect) {
         trigger = event.target.getAttribute('value');
         nodeID = event.target.getAttribute('id');
         resourceName = this.props.data.name;
-        this.props.onCategorySelect(event, this, trigger, nodeID, resourceName);
+        this.props.onResourceSelect(event, this, trigger, nodeID, resourceName);
       }
       event.preventDefault();
       event.stopPropagation();
@@ -450,11 +444,10 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-          {resourceIcon}&nbsp;
-        <a onClick={this.onCategorySelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one">{this.props.data.name}</a>
+        <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one"> {resourceIcon}&nbsp; {this.props.data.name}</a>
           <ul>
             {this.state.children.map(function (child, index) {
-              return (<TreeNode key={child.id} data={child} onCategorySelect={self.props.onCategorySelect} />)
+              return (<TreeNode key={child.id} data={child} onResourceSelect={self.props.onResourceSelect} />)
             })}
           </ul>
         </li>
