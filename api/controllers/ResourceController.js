@@ -332,13 +332,13 @@ module.exports = {
         });
       },
       function (resourceJSON, callback) {
-        var data = "function (" + resourceData.name + ") {\n" ;
+        var data = "function dt () {\n" ;
         var firstRule = true;
 
         resourceJSON.rules.map(function (rule) {
           var count = 0;
           if (firstRule) {
-            data += "\tif( ";
+            data += "\tif(";
             firstRule = false;
           }
           else {
@@ -393,7 +393,8 @@ module.exports = {
                 });
               },
               function (project, callback) {
-                resourceData.url = project.url + '/' + resourceData.name + '.js';
+                resourceData.name = resourceData.name + '.js';
+                resourceData.url = project.url + '/' + resourceData.name;
                 ResourceUtil.createJSFileAndAddToProject(resourceData, project, data, function (err, resource) {
                   if (err) {
                     return callback(err);
@@ -408,6 +409,8 @@ module.exports = {
               }
               console.log('##### '+ resource.name + ' Resource is created #####');
               console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+              sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+              console.log("new-resource broadcasted!");
               return res.json(resource);
             });
         }
@@ -424,7 +427,8 @@ module.exports = {
                 });
               },
               function (parentResource, callback) {
-                resourceData.url = parentResource.url + '/' + resourceData.name + '.js';
+                resourceData.name = resourceData.name + '.js';
+                resourceData.url = parentResource.url + '/' + resourceData.name;
                 resourceData.parent = parentResource.id;
                 ResourceUtil.createJSFileAndAddToParentResource(resourceData, parentResource, data, function (err, resource) {
                   if (err) {
@@ -440,6 +444,8 @@ module.exports = {
               }
               console.log('##### Resource is created #####');
               console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
+              sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+              console.log("new-resource broadcasted!");
               return res.json(resource);
             });
         }//end of else
