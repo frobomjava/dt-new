@@ -89,6 +89,8 @@
   <script>
   	var projectName = "To be fixed here";
   	var projectId = "<%- projectId %>" ;
+    var user = {id : "<%=req.user.id %>", userName : "<%=req.user.userName %>"};
+    console.log("user : " + user);
   	console.log("Project Id is " + projectId);
   	var myMap = new Map();
   	var undoDataMap = new Map();

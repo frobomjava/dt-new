@@ -189,8 +189,8 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         var fileId = self.state.fileId;
         var url = '/project/in/' + projectId + '/resource/save/' + fileId;
         //var posting = $.post(url, { data: updatedDtData });
-        io.socket.post(url, { data: updatedDtData }, function (resData, jwres){});
-      });      
+        io.socket.post(url, { data: updatedDtData, user: user }, function (resData, jwres){});
+      });
 
       $('#undoID').on('click', function (event){
         event.preventDefault();

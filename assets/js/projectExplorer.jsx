@@ -133,16 +133,20 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             self.setState({ data: datasUpdated });
           }
         }
+        var time = new Date(new Date().getTime()).toLocaleTimeString();
+        PubSub.publish('LogEvent', { time: time, text:'created', resource: data });
       });
 
       io.socket.on('delete-resource', function(data) {
         var datasUpdated = self.state.data;
-        var resourceId = data;
+        var resourceId = data.id;
         self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
             resource.splice(i, 1);
             self.setState({ data: datasUpdated });
             self.forceUpdate();
             PubSub.publish('DeleteFileEvent');
+            var time = new Date(new Date().getTime()).toLocaleTimeString();
+            PubSub.publish('LogEvent', { time: time, text:'deleted ', resource: data });
         });
       });
 
@@ -156,6 +160,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
               links[i].style.backgroundColor = "#FFBF00";
             }
         }
+        var time = new Date(new Date().getTime()).toLocaleTimeString();
+        PubSub.publish('LogEvent', { time: time, text:'updated ', resource: data });
       });
 
       $('#refreshID').on('click', function (event) {
@@ -326,10 +332,14 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var resourceType = self.state.resourceType;
           var nodeID = self.state.nodeID;
           var url = '/project/in/' + projectId + '/resource/new';
-          var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
-          posting.done(function (data) {
+          // var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
+          // posting.done(function (data) {
+          //   self.updateProjectExplorer(data);
+          // });
+          var posting = io.socket.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID, user: user }, function (data, jwres){
             self.updateProjectExplorer(data);
           });
+
           dialog.dialog("close");
         } else {
           dialog.dialog("close");
@@ -365,14 +375,18 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       function deleteFile(resourceId) {
         var datasUpdated = self.state.data;
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
-        var getting = $.get(url);
-        getting.done(function () {
-          self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
-              resource.splice(i, 1);
-              self.setState({ data: datasUpdated });
-              self.forceUpdate();
-              PubSub.publish('DeleteFileEvent');
-          });
+        // var getting = $.get(url);
+        // getting.done(function () {
+        //   self.findAndDeleteChildFile(datasUpdated.children, resourceId,function (resource,i) {
+        //       resource.splice(i, 1);
+        //       self.setState({ data: datasUpdated });
+        //       self.forceUpdate();
+        //       PubSub.publish('DeleteFileEvent');
+        //   });
+        //
+
+        io.socket.get(url, { user: user }, function (data, jwres){
+            self.updateProjectExplorer(data);
         });
       }
 
@@ -416,7 +430,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     },
 
     render: function () {
-      
+
       return (
         <div>
           <ul className="category-tree">
