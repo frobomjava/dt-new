@@ -203,6 +203,7 @@ module.exports = {
     var resourceId = req.param('resourceId');
     var projectId = req.param('projectId');
     var resourceUrl;
+    var deletedResource = null;
     async.waterfall([
       function (callback) {
         var criteria = {
@@ -220,6 +221,7 @@ module.exports = {
           }
           resourceUrl = resource.url;
           console.log('resourceUrl : ' + resourceUrl);
+          deletedResource = resource;
           return callback(null, resource);
         })
       },
@@ -248,6 +250,7 @@ module.exports = {
                   return callback(err);
                 }
                 // return res.ok({message : 'resource is deleted..'});
+                //return callback();
               })
             }
           });
@@ -257,7 +260,7 @@ module.exports = {
             return callback(err);
           }
           return callback(null, result);
-        })
+        });
     },
     function (isResourceDeleted, callback) {
       if (isResourceDeleted) {
@@ -268,9 +271,10 @@ module.exports = {
             return callback(err);
           }
           console.log(resourceUrl + ' is deleted...');
-          sails.sockets.broadcast(projectId, 'delete-resource', resourceId, req);
+          sails.sockets.broadcast(projectId, 'delete-resource', deletedResource, req);
           console.log("*** delete broadcast successful *** ");
-          return res.ok({message : 'resource is deleted..'});
+          //return res.ok({message : 'resource is deleted..'});
+          return res.json(deletedResource);
         });
 
         // fs.stat('./server/upload/my.csv', function (err, stats) {
@@ -458,6 +462,18 @@ module.exports = {
         return res.serverError(err);
       }
     });
+  },
+
+  getChildren: function(req, res) {
+    console.log("************getChildren****************");
+    var resourceId = req.param('resourceId');
+    console.log("resource id is " + resourceId);
+    Resource.findOne({id: resourceId}).populate('children').exec(function(err, resource) {
+      if (err) {
+        res.serverError(err);
+      }
+      res.json(resource.children);
+    })
   }
 
 };

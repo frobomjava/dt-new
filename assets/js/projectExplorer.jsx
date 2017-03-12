@@ -10,72 +10,14 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           name: projectName,
           resourceType: 'project',
           level: 0,
-          children: []
+          children: [],
+          treeNodeExpanded: false
         },
         resourceType: "",
         trigger: "",
         nodeID: ""
       });
     },
-
-    // handleClick: function (event) {
-    //   event.preventDefault();
-    //   var self = this;
-    //   projName = this.state.projectName;
-    //   filesUpdated = this.state.files.slice();
-    //   fileName = event.target.getAttribute('name');
-    //   fileId = event.target.getAttribute('value');
-    //   index = event.target.getAttribute('id');
-    //
-    //   if (preDiv) {
-    //     preDiv.style.backgroundColor = "#f1f1f1";
-    //   }
-    //   event.target.style.backgroundColor = "#D1D0CE";
-    //   preDiv = event.target;
-    //
-    //   if (self.state.myMap.has(fileId)) {
-    //     var dtData = self.state.myMap.get(fileId);
-    //     var undoStack = self.state.undoDataMap.get(fileId);
-    //     var redoStack = self.state.redoDataMap.get(fileId);
-    //     PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-    //   } else {
-    //     console.log("---no key---");
-    //     url = "/project/in/" + projectName + "/resource/data/" + nodeID;
-    //     $.getJSON(url, function (data) {
-    //       console.log('ok, got data');
-    //       self.state.myMap.set(fileId, data);
-    //       self.state.undoDataMap.set(fileId, []);
-    //       self.state.redoDataMap.set(fileId, []);
-    //       var undoStack = self.state.undoDataMap.get(fileId);
-    //       var redoStack = self.state.redoDataMap.get(fileId);
-    //       var dtData = self.state.myMap.get(fileId);
-    //       PubSub.publish('ClickFileEvent', { fileId: fileId, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-    //     });
-    //   }
-    //
-    //   $(function ($) {
-    //     $.contextMenu({
-    //       selector: '.file-context-menu-one',
-    //       callback: function (key, options) {
-    //         deleteHandler();
-    //       },
-    //       items: {
-    //         "Delete": { name: "delete", icon: "delete" }
-    //       }
-    //     });
-    //
-    //     function deleteHandler() {
-    //       var url = '/project/in/' + projName + '/file/delete/' + fileId;
-    //       console.log('===delete url=== ' + url);
-    //       var getting = $.get(url);
-    //       getting.done(function () {
-    //         filesUpdated.splice(index, 1);
-    //         self.setState({ files: filesUpdated });
-    //         PubSub.publish('DeleteFileEvent');
-    //       });
-    //     }
-    //   });
-    // },
 
     componentWillMount: function () {
       var self = this;
@@ -85,14 +27,11 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log("Resource Tree");
         console.log(JSON.stringify(project));
         project.children = project.resources;
-        self.setState({ data: project, resourceType: "", trigger: "", nodeID: "" });
+        self.setState({ data: project, resourceType: "", trigger: "", nodeID: "", resourceFetched: true });
         console.log("state has been set");
       });
       console.log("new component will mount");
-
-      //socket join
     },
-
 
     componentDidMount: function () {
       var self = this;
@@ -102,53 +41,19 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       io.socket.on('new-resource', function (data) {
-        if (data.parent) {
-          var newChildData = {
-            id: data.id,
-            name: data.name,
-            resourceType: data.resourceType,
-            children: []
-          };
-          // recursively tracing tree nodes to find the parent node
-          // if found the parent node, push to the received data to is children,
-          // update react component state
-          var updatedData = self.state.data;
-          self.findParentResource(data.parent, updatedData.children, function (resource) {
-            resource.children.push(newChildData);
-            self.setState({ data: updatedData });
-            console.log("data updated 222*****");
-            self.forceUpdate();
-          });
-
-        } else {
-          if (data.resourceType == 'file') {
-            console.log("Parent is not exist. file create");
-            var datasUpdated = self.state.data;
-            datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType });
-            self.setState({ data: datasUpdated });
-          } else {
-            console.log("Parent is not exist.");
-            var datasUpdated = self.state.data;
-            datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType, 'children': [] });
-            self.setState({ data: datasUpdated });
-          }
-        }
+        PubSub.publish("AddFile", data);
       });
 
-      io.socket.on('delete-resource', function(data) {
-        var datasUpdated = self.state.data;
-        var resourceId = data;
-        self.findParentResourceForDelete(datasUpdated.children, resourceId,function (resource,i) {
-            resource.splice(i, 1);
-            self.setState({ data: datasUpdated });
-            self.forceUpdate();
-            PubSub.publish('DeleteFileEvent');
-        });
+      io.socket.on('delete-resource', function (data) {
+        console.log("DeleteSocketBroadCast");
+        console.log(JSON.stringify(data));
+        PubSub.publish('DeleteFileEvent');
+        PubSub.publish("DeleteResource", data);
       });
 
-      io.socket.on('changed-resource', function(data) {
+      io.socket.on('changed-resource', function (data) {
         var resourceId = data;
-        $('#'+ resourceId).css("color","#FFBF00");
+        $('#' + resourceId).css("color", "#FFBF00");
       });
 
       $('#refreshID').on('click', function (event) {
@@ -168,56 +73,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var redoStack = self.state.redoDataMap.get(nodeID);
           var dtData = self.state.myMap.get(nodeID);
           PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-          $('#'+ nodeID).css("color","#000");
-      });
-    });
-    },
-
-    findParentResource: function (parentId, resources, callback) {
-      var self = this;
-      resources.forEach(function (resource) {
-        if (resource.id == parentId) {
-          return callback(resource);
-        } else if (resource.children && resource.children.length > 0) {
-          return self.findParentResource(parentId, resource.children, callback);
-        }
-      });
-    },
-
-    updateProjectExplorer: function (data) {
-      console.log('@@@ updateProjectExplorer @@@');
-      var self = this;
-      if (data.parent) {
-        var newChildData = {
-          id: data.id,
-          name: data.name,
-          resourceType: data.resourceType,
-          children: []
-        };
-        // recursively tracing tree nodes to find the parent node
-        // if found the parent node, push to the received data to is children,
-        // update react component state
-        var updatedData = self.state.data;
-        self.findParentResource(data.parent, updatedData.children, function (resource) {
-          resource.children.push(newChildData);
-          self.setState({ data: updatedData });
-          console.log("data updated 222*****");
-          self.forceUpdate();
+          $('#' + nodeID).css("color", "#000");
         });
-
-      } else {
-        if (data.resourceType == 'file') {
-          console.log("Parent is not exist. file create");
-          var datasUpdated = self.state.data;
-          datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType });
-          self.setState({ data: datasUpdated });
-        } else {
-          console.log("Parent is not exist.");
-          var datasUpdated = self.state.data;
-          datasUpdated.children.push({ 'id': data.id, 'name': data.name, 'resourceType': data.resourceType, 'children': [] });
-          self.setState({ data: datasUpdated });
-        }
-      }
+      });
     },
 
     onSelect: function (event, node, trigger, nodeID, resourceName) {
@@ -322,7 +180,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var url = '/project/in/' + projectId + '/resource/new';
           var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
           posting.done(function (data) {
-            self.updateProjectExplorer(data);
+            PubSub.publish("AddFile", data);
           });
           dialog.dialog("close");
         } else {
@@ -360,13 +218,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var datasUpdated = self.state.data;
         var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
         var getting = $.get(url);
-        getting.done(function () {
-          self.findParentResourceForDelete(datasUpdated.children, resourceId,function (resource,i) {
-              resource.splice(i, 1);
-              self.setState({ data: datasUpdated });
-              self.forceUpdate();
-              PubSub.publish('DeleteFileEvent');
-          });
+        getting.done(function (data) {
+          console.log("DeleteResource publishing");
+          PubSub.publish("DeleteResource", data);
         });
       }
 
@@ -388,29 +242,17 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var getting = $.get(url);
         getting.done(function (data) {
           if (data) {
-            console.log('xxx got data after code generate xxx');
+            console.log('*** got data after code generate ***');
             console.log('data : ' + JSON.stringify(data));
-            self.updateProjectExplorer(data);
+            PubSub.publish("AddFile", data);
           }
 
         });
       }
     },
 
-    findParentResourceForDelete: function (resources, resourceId, callback) {
-      var self = this;
-      for (var i = 0; i < resources.length; ++i) {
-        var resource = resources[i];
-        if (resource.id == resourceId) {
-          return callback(resources, i);
-        } else if (resource.children && resource.children.length > 0) {
-            return self.findParentResourceForDelete(resource.children, resourceId,  callback);
-        }
-      }
-    },
-
     render: function () {
-      
+
       return (
         <div>
           <ul className="resource-tree">
@@ -423,7 +265,12 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
   var TreeNode = React.createClass({
     getInitialState: function () {
-      return { children: [] };
+      return {
+        children: [],
+        displayingChildren: [],
+        treeNodeExpanded: false,
+        resourceFetched: false
+      };
     },
     onResourceSelect: function (event) {
       if (this.props.onResourceSelect) {
@@ -437,26 +284,138 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     },
 
     onChildDisplayToggle: function (event) {
-      if (this.props.data.children) {
-        if (this.state.children && this.state.children.length) {
-          this.setState({ children: null });
-        } else {
-          this.setState({ children: this.props.data.children });
-        }
+      var children = [];
+      var self = this;
+      if (this.props.data.resourceType == 'project') {
+        children = this.props.data.children;
+      } else {
+        children = this.state.children;
       }
+      var displayingChildren = this.state.displayingChildren;
+      var resourceFetched = this.state.resourceFetched;
+      var treeNodeExpanded = this.state.treeNodeExpanded;
+      if (this.props.data.resourceType != 'project' && !resourceFetched) {
+        //fetch data
+        var url = '/project/in/' + projectId + '/resource/children/' + this.props.data.id;
+        $.getJSON(url, function (data) {
+          children = data;
+          resourceFetched = true;
+          console.log("resource fetched");
+          console.log(JSON.stringify(children));
+          treeNodeExpanded = !treeNodeExpanded;
+          if (treeNodeExpanded) {
+            console.log("tree node expanded");
+            displayingChildren = children;
+            console.log(JSON.stringify(displayingChildren));
+          }
+          else {
+            console.log("tree node not expanded");
+            displayingChildren = [];
+          }
+
+          console.log('resource fetched: ' + resourceFetched);
+          self.setState({
+            children: children,
+            displayingChildren: displayingChildren,
+            resourceFetched: resourceFetched,
+            treeNodeExpanded: treeNodeExpanded
+          });
+        });
+      } else {
+        treeNodeExpanded = !treeNodeExpanded;
+        if (treeNodeExpanded) {
+          console.log("tree node expanded");
+          displayingChildren = children;
+          console.log(JSON.stringify(displayingChildren));
+        }
+        else {
+          console.log("tree node not expanded");
+          displayingChildren = [];
+        }
+
+        console.log('resource fetched: ' + resourceFetched);
+        this.setState({
+          children: children,
+          displayingChildren: displayingChildren,
+          resourceFetched: resourceFetched,
+          treeNodeExpanded: treeNodeExpanded
+        });
+      }
+
       event.preventDefault();
       event.stopPropagation();
+    },
+
+    removeChildFile: function (msg, file) {
+      console.log("remove child file");
+      if (this.props.data.resourceType == 'file') {
+        return;
+      }
+
+      if (file.parent != this.props.data.id) {
+        return;
+      }
+
+      var children = this.state.children.slice();
+
+      for (var i = 0; i < children.length; i++) {
+        console.log("children id is " + children[i].id);
+        console.log("file id is " + file.id);
+        if (children[i].id == file.id) {
+          children.splice(i, 1);
+        }
+      }
+
+      var displayingChildren = this.state.displayingChildren.slice();
+      if (this.state.treeNodeExpanded) {
+        var displayingChildren = children;
+      }
+      this.setState({
+        children: children,
+        displayingChildren: displayingChildren
+      });
+      console.log("End of Deleted Resource");
+      this.forceUpdate();
+    },
+
+    addChildFile: function (msg, file) {
+      console.log("Add Child File");
+      console.log("file parent is " + file.parent);
+      console.log("this.props.data.id is " + this.props.data.id);
+      if (this.props.data.resource == 'file') {
+        return;
+      }
+      if (file.parent != this.props.data.id) {
+        return;
+      }
+      var children = this.state.children.slice();
+      var displayingChildren = this.state.displayingChildren.slice();
+      children.push(file);
+      if (this.state.treeNodeExpanded) {
+        displayingChildren = children;
+      }
+      this.setState({
+        children: children,
+        displayingChildren: displayingChildren
+      });
+      console.log("End of Add Child File");
+    },
+
+    componentDidMount: function() {
+     PubSub.subscribe("AddFile", this.addChildFile);
+     PubSub.subscribe("DeleteResource", this.removeChildFile);
     },
 
     render: function () {
       var self = this;
       var resourceIcon;
       if (!this.state.children) this.state.children = [];
+      if (!this.state.displayingChildren) this.state.displayingChildren = [];
 
       var classes = classnames({
-        'has-children': (this.props.data.children ? true : false),
-        'open': (this.state.children.length ? true : false),
-        'closed': (this.state.children ? false : true),
+        'has-children': (this.props.data.resourceType != 'file' ? true : false),
+        'open': (this.state.displayingChildren.length ? true : false),
+        'closed': (this.state.displayingChildren ? false : true),
         'selected': (this.state.selected ? true : false)
       });
 
@@ -467,9 +426,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-        <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one"> {resourceIcon}&nbsp; {this.props.data.name}</a>
+          <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one"> {resourceIcon}&nbsp; {this.props.data.name}</a>
           <ul>
-            {this.state.children.map(function (child, index) {
+            {this.state.displayingChildren.map(function (child, index) {
               return (<TreeNode key={child.id} data={child} onResourceSelect={self.props.onResourceSelect} />)
             })}
           </ul>
