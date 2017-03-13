@@ -1,5 +1,62 @@
 define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (classnames, React, $) {
   var preDiv = null;
+
+  var dialog = $("#dialog-form").dialog({
+    autoOpen: false,
+    height: 250,
+    width: 300,
+    modal: true,
+    buttons: {
+      "Create": function (){},
+      Cancel: function () {
+        dialog.dialog("close");
+      }
+    },
+    close: function () {
+      form[0].reset();
+    }
+  });
+
+  var form = dialog.find("form").on("submit", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    PubSub.publish("ResourceNewFormSubmit");
+  });
+
+  function requestDeleteFile(resourceId) {
+    var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
+    var getting = $.get(url);
+    getting.done(function (data) {
+      console.log("DeleteResource publishing");
+      PubSub.publish("DeleteResource", data);
+    });
+  }
+
+  function requestDownloadFile(resourceId) {
+    var url = '/project/in/' + projectId + '/resource/download/' + resourceId;
+    var getting = $.get(url);
+    getting.done(function (data) {
+      $("<a />", {
+        "download": resourceName + ".json",
+        "href": "data:application/json," + encodeURIComponent(JSON.stringify(data))
+      }).appendTo("body")
+        .click(function () {
+        })[0].click()
+    });
+  }
+
+  function requestGenerateCode(resourceId) {
+    var url = '/project/in/' + projectId + '/resource/code/generate/' + resourceId;
+    var getting = $.get(url);
+    getting.done(function (data) {
+      if (data) {
+        console.log('*** got data after code generate ***');
+        console.log('data : ' + JSON.stringify(data));
+        PubSub.publish("AddFile", data);
+      }
+    });
+  }
+
   var ProjectExplorer = React.createClass({
     getInitialState: function () {
       return ({
@@ -76,12 +133,57 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           $('#' + nodeID).css("color", "#000");
         });
       });
+
+      $.contextMenu({
+        selector: '.context-menu-file',
+        callback: function (key, options) {
+          self.setState({ resourceType: trigger });
+          var resourceId = self.state.nodeID;
+          if (key == "delete") {
+            requestDeleteFile(resourceId);
+          } else if (key == "download") {
+            requestDownloadFile(resourceId);
+          } else if (key == "generate-code") {
+            requestGenerateCode(resourceId);
+          }
+        },
+        items: {
+          "delete": { name: "Delete", icon: "delete" },
+          "download": { name: "Download", icon: "fa-download" },
+          "generate-code": { name: "Generate Code", icon: "fa-file-code-o" },
+          "sep1": "---------",
+          "quit": { name: "Quit", icon: function ($element, key, item) { return 'context-menu-icon context-menu-icon-quit'; } }
+        }
+      });
+
+      $.contextMenu({
+        selector: '.context-menu-parent',
+        callback: function (key, options) {
+          self.setState({ resourceType: key });
+          var resourceId = self.state.nodeID;
+          if (key == "file" || key == "folder") {
+            dialog.dialog("open");
+          } else if (key == "delete") {
+            requestDeleteFile(resourceId);
+          }
+        },
+        items: {
+          "folder": { name: "Create Folder", icon: "add" },
+          "file": { name: "Create File", icon: "add" },
+          "delete": { name: "Delete", icon: "delete" },
+          "sep1": "---------",
+          "quit": { name: "Quit", icon: function ($element, key, item) { return 'context-menu-icon context-menu-icon-quit'; } }
+        }
+      });
+
+      PubSub.subscribe("ResourceNewFormSubmit", function() {
+       self.submitResourceAddForm();
+      });
     },
 
     onSelect: function (event, node, trigger, nodeID, resourceName) {
       var self = this;
       var projectName = this.state.data.name;
-      $.contextMenu('destroy', '.file-context-menu-one');
 
       console.log("trigger = " + trigger);
 
@@ -122,133 +224,22 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             preDiv.style.color = "#000";
           });
         }
-
         console.log("===file clicked=== ");
-        $(function ($) {
-          $.contextMenu({
-            selector: '.file-context-menu-one',
-            callback: function (key, options) {
-              self.setState({ resourceType: trigger });
-              var resourceId = self.state.nodeID;
-              if (key == "delete") {
-                deleteFile(resourceId);
-              } else if (key == "download") {
-                downloadFile(resourceId);
-              } else if (key == "generate-code") {
-                generateCode(resourceId);
-              }
-            },
-            items: {
-              "delete": { name: "Delete", icon: "delete" },
-              "download": { name: "Download", icon: "fa-download" },
-              "generate-code": { name: "Generate Code", icon: "fa-file-code-o" },
-              "sep1": "---------",
-              "quit": { name: "Quit", icon: function ($element, key, item) { return 'context-menu-icon context-menu-icon-quit'; } }
-            }
-          });
-        });
-      } else {
-        console.log("===project or folder clicked=== ");
-        $(function ($) {
-          $.contextMenu({
-            selector: '.file-context-menu-one',
-            callback: function (key, options) {
-              self.setState({ resourceType: key });
-              var resourceId = self.state.nodeID;
-              if (key == "file" || key == "folder") {
-                addFunction();
-              } else if (key == "delete") {
-                deleteFile(resourceId);
-              }
-            },
-            items: {
-              "folder": { name: "Create Folder", icon: "add" },
-              "file": { name: "Create File", icon: "add" },
-              "delete": { name: "Delete", icon: "delete" },
-              "sep1": "---------",
-              "quit": { name: "Quit", icon: function ($element, key, item) { return 'context-menu-icon context-menu-icon-quit'; } }
-            }
-          });
+      }
+    },
+
+    submitResourceAddForm: function () {
+      var resourceName = $('#resourceID').val();
+      if (resourceName) {
+        var resourceType = this.state.resourceType;
+        var nodeID = this.state.nodeID;
+        var url = '/project/in/' + projectId + '/resource/new';
+        var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
+        posting.done(function (data) {
+          PubSub.publish("AddFile", data);
         });
       }
-
-      function add() {
-        var resourceName = $('#resourceID').val();
-        if (resourceName) {
-          var resourceType = self.state.resourceType;
-          var nodeID = self.state.nodeID;
-          var url = '/project/in/' + projectId + '/resource/new';
-          var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
-          posting.done(function (data) {
-            PubSub.publish("AddFile", data);
-          });
-          dialog.dialog("close");
-        } else {
-          dialog.dialog("close");
-        }
-      }
-
-      var dialog = $("#dialog-form").dialog({
-        autoOpen: false,
-        height: 250,
-        width: 300,
-        modal: true,
-        buttons: {
-          "Create": add,
-          Cancel: function () {
-            dialog.dialog("close");
-          }
-        },
-        close: function () {
-          form[0].reset();
-        }
-      });
-
-      var form = dialog.find("form").on("submit", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        add();
-      });
-
-      function addFunction(nodeID, trigger, esourceType) {
-        dialog.dialog("open");
-      }
-
-      function deleteFile(resourceId) {
-        var datasUpdated = self.state.data;
-        var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
-        var getting = $.get(url);
-        getting.done(function (data) {
-          console.log("DeleteResource publishing");
-          PubSub.publish("DeleteResource", data);
-        });
-      }
-
-      function downloadFile(resourceId) {
-        var url = '/project/in/' + projectId + '/resource/download/' + resourceId;
-        var getting = $.get(url);
-        getting.done(function (data) {
-          $("<a />", {
-            "download": resourceName + ".json",
-            "href": "data:application/json," + encodeURIComponent(JSON.stringify(data))
-          }).appendTo("body")
-            .click(function () {
-            })[0].click()
-        });
-      }
-
-      function generateCode(resourceId) {
-        var url = '/project/in/' + projectId + '/resource/code/generate/' + resourceId;
-        var getting = $.get(url);
-        getting.done(function (data) {
-          if (data) {
-            console.log('*** got data after code generate ***');
-            console.log('data : ' + JSON.stringify(data));
-            PubSub.publish("AddFile", data);
-          }
-
-        });
-      }
+      dialog.dialog("close");
     },
 
     render: function () {
@@ -401,9 +392,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       console.log("End of Add Child File");
     },
 
-    componentDidMount: function() {
-     PubSub.subscribe("AddFile", this.addChildFile);
-     PubSub.subscribe("DeleteResource", this.removeChildFile);
+    componentDidMount: function () {
+      PubSub.subscribe("AddFile", this.addChildFile);
+      PubSub.subscribe("DeleteResource", this.removeChildFile);
     },
 
     render: function () {
@@ -419,6 +410,14 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         'selected': (this.state.selected ? true : false)
       });
 
+      var contextMenuClassName;
+      if (this.props.data.resourceType == 'file') {
+        contextMenuClassName = "context-menu-file";
+      }
+      else {
+        contextMenuClassName = "context-menu-parent";
+      }
+
       if (this.props.data.resourceType == "file") {
         resourceIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
       } else if (this.props.data.resourceType == "folder") {
@@ -426,7 +425,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-          <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className="file-context-menu-one"> {resourceIcon}&nbsp; {this.props.data.name}</a>
+          <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className={contextMenuClassName}> {resourceIcon}&nbsp; {this.props.data.name}</a>
           <ul>
             {this.state.displayingChildren.map(function (child, index) {
               return (<TreeNode key={child.id} data={child} onResourceSelect={self.props.onResourceSelect} />)
