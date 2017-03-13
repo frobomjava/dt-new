@@ -186,14 +186,7 @@ module.exports = {
             }
             data.project = project;
             if (project) {
-              //project.resources.forEach(function(resource) {
-              console.log("Printing each resource");
-              //console.log(resource.name);
-              Resource.fillChildResourcesRecursively2(project.resources.length, project.resources, function () {
-                console.log("Now callback");
-                callback();
-              });
-              //});
+              callback();
               console.log(JSON.stringify(project));
             }
           });
