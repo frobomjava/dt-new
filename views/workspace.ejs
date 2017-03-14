@@ -88,8 +88,10 @@
 
   <script>
   	var projectName = "To be fixed here";
-  	var projectId = "<%- projectId %>" ;
+  	var projectId = "<%- projectId %>";
   	console.log("Project Id is " + projectId);
+    var userName = "<%=req.user.userName %>";
+    console.log("userName in workspace.ejs : " + userName);
   	var myMap = new Map();
   	var undoDataMap = new Map();
   	var redoDataMap = new Map();

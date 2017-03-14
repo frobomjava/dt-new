@@ -7,7 +7,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     width: 300,
     modal: true,
     buttons: {
-      "Create": function (){},
+      "Create": function (){form.submit()},
       Cancel: function () {
         dialog.dialog("close");
       }
@@ -98,6 +98,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       io.socket.on('new-resource', function (data) {
+        console.log('>>>>> projectExplorer new-resource socket.on >>>>>');
         PubSub.publish("AddFile", data);
       });
 
@@ -109,7 +110,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
 
       io.socket.on('changed-resource', function (data) {
-        var resourceId = data;
+        var resourceId = data.id;
         $('#' + resourceId).css("color", "#FFBF00");
       });
 
@@ -236,6 +237,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var url = '/project/in/' + projectId + '/resource/new';
         var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
         posting.done(function (data) {
+          console.log('##### in projectExplorer post resource/new #####');
           PubSub.publish("AddFile", data);
         });
       }

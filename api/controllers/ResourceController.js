@@ -49,9 +49,12 @@ module.exports = {
           if (err) {
             return res.serverError(err);
           }
+          resourceData = resource;
+          resourceData.userName = req.user.userName;
           console.log('##### '+ resource.name + ' Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+          console.log('resourceData : ' + JSON.stringify(resourceData));
+          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
           console.log("broadcasted!");
           return res.json(resource);
         });
@@ -84,7 +87,9 @@ module.exports = {
           }
           console.log('##### Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
+          resourceData = resource;
+          resourceData.userName = req.user.userName;
+          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
           console.log("broadcasted!");
           return res.json(resource);
 
@@ -149,16 +154,18 @@ module.exports = {
             if (err) {
               return callback(err);
             }
-            return callback();
+            return callback(null, resource);
           });
         }
       ],
-      function (err) {
+      function (err, resource) {
         if (err) {
           return res.serverError(err);
         }
+
         if(req.isSocket === true) {
-          sails.sockets.broadcast(projectId, 'changed-resource', id, req);
+          resource.userName = req.param('userName');
+          sails.sockets.broadcast(projectId, 'changed-resource', resource, req);
            console.log("broadcast for saveData successful");
         }
         res.ok();
@@ -207,8 +214,7 @@ module.exports = {
     async.waterfall([
       function (callback) {
         var criteria = {
-          id: resourceId,
-          resourceType: 'file'
+          id: resourceId
         };
         Resource.findOne(criteria).exec(function (err, resource) {
           if (err) {
@@ -271,6 +277,7 @@ module.exports = {
             return callback(err);
           }
           console.log(resourceUrl + ' is deleted...');
+          deletedResource.userName = req.user.userName;
           sails.sockets.broadcast(projectId, 'delete-resource', deletedResource, req);
           console.log("*** delete broadcast successful *** ");
           //return res.ok({message : 'resource is deleted..'});
