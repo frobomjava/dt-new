@@ -18,8 +18,8 @@ requirejs.config({
 
 });
 
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/projectExplorer', 'app/DecisionTable'],
-function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable) {
+require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/projectExplorer', 'app/DecisionTable', 'app/ProjectLog'],
+function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable, ProjectLog) {
 
   function render() {
     ReactDOM.render( <ProjectExplorer />,
@@ -27,6 +27,9 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
     );
     ReactDOM.render( <DecisionTable / >,
       document.getElementById('editor')
+    );
+    ReactDOM.render( <ProjectLog />,
+      document.getElementById('extended-area')
     );
   }
   render();

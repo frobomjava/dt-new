@@ -1,6 +1,7 @@
 define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
   var undoCount = 0;
   var redoCount = 0;
+
   class CellInfo {
     constructor(cellType, modelIndex, value) {
       this.cellType = cellType;
@@ -183,14 +184,16 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
 
     componentDidMount() {
       var self = this;
+      console.log('DecisionTable.jsx userName : ' + userName);
       $('#saveID').on('click', function (event) {
         event.preventDefault();
         var updatedDtData = self.state.dtData;
         var fileId = self.state.fileId;
         var url = '/project/in/' + projectId + '/resource/save/' + fileId;
         //var posting = $.post(url, { data: updatedDtData });
-        io.socket.post(url, { data: updatedDtData }, function (resData, jwres){});
-      });      
+        console.log('userName : ' + userName);
+        io.socket.post(url, { data: updatedDtData, userName: userName }, function (resData, jwres){});
+      });
 
       $('#undoID').on('click', function (event){
         event.preventDefault();
