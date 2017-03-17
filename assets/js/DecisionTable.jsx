@@ -151,6 +151,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       PubSub.subscribe("ClickFileEvent", this.handleFileClick);
       PubSub.subscribe("DeleteFileEvent", this.handleFileDelete);
       PubSub.subscribe("dtCommand", this.handleDtCommand);
+      PubSub.subscribe("ClickTabEvent", this.handleFileClick);
     };
 
     handleFileClick(msg, data) {
