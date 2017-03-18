@@ -94,6 +94,10 @@ module.exports.routes = {
 
   'get /project/socket/:projectId': 'ProjectController.joinSocket',
 
-  'get /project/in/:projectId/resource/children/:resourceId':'ResourceController.getChildren'
+  'get /project/in/:projectId/resource/children/:resourceId':'ResourceController.getChildren',
+
+  'post /project/in/:projectId/activity/new':'ActivityController.create',
+
+  'get /project/in/:projectId/get/activities': 'ActivityController.getData'
 
 };

@@ -22,7 +22,7 @@ module.exports = {
       name: req.param('resourceName'),
       url: "",
       resourceType: req.param('resourceType'),
-      createdBy: req.user.id
+      createdBy: req.param('userId')
     }
     if (!parentID) {
       console.log("Parent id does not exist");
@@ -36,7 +36,7 @@ module.exports = {
             });
           },
           function (project, callback) {
-            resourceData.url = project.url + '/' + req.param('resourceName');
+            resourceData.url = project.url + '/' + req.param('resourceName') + '.dt';
             ResourceUtil.createAndAddToProject(resourceData, project, function (err, resource) {
               if (err) {
                 return callback(err);
@@ -49,12 +49,12 @@ module.exports = {
           if (err) {
             return res.serverError(err);
           }
-          resourceData = resource;
-          resourceData.userName = req.user.userName;
+          //resourceData = resource;
+          //resourceData.userName = req.user.userName;
           console.log('##### '+ resource.name + ' Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          console.log('resourceData : ' + JSON.stringify(resourceData));
-          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
+          console.log('resource : ' + JSON.stringify(resource));
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
         });
@@ -87,9 +87,9 @@ module.exports = {
           }
           console.log('##### Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          resourceData = resource;
-          resourceData.userName = req.user.userName;
-          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
+          // resourceData = resource;
+          // resourceData.userName = req.user.userName;
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
 
@@ -164,11 +164,12 @@ module.exports = {
         }
 
         if(req.isSocket === true) {
-          resource.userName = req.param('userName');
+          //resource.userName = req.param('userName');
           sails.sockets.broadcast(projectId, 'changed-resource', resource, req);
            console.log("broadcast for saveData successful");
+           return res.json(resource);
         }
-        res.ok();
+        // res.ok();
       });
   },
 
@@ -277,7 +278,8 @@ module.exports = {
             return callback(err);
           }
           console.log(resourceUrl + ' is deleted...');
-          deletedResource.userName = req.user.userName;
+          //deletedResource.userName = req.user.userName;
+          console.log('deletedResource :' + JSON.stringify(deletedResource));
           sails.sockets.broadcast(projectId, 'delete-resource', deletedResource, req);
           console.log("*** delete broadcast successful *** ");
           //return res.ok({message : 'resource is deleted..'});

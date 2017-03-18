@@ -47,7 +47,7 @@ module.exports = {
   },
 
   findProject: function (data, callback) {
-    Project.findOne(data).exec(function (err, projet) {
+    Project.findOne(data).exec(function (err, project) {
       if (err) {
         return callback(err);
       }

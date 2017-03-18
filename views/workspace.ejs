@@ -71,7 +71,9 @@
             </div>
           </div>
         </div>
-        <div id="extended-area"></div>
+        <div id="extended-area">
+          <div id="activity-container"></div>
+        </div>
       </div>
       <div id="status-bar"></div>
 			<div id="dialog-form" title="Creating a new one ">
@@ -91,6 +93,7 @@
   	var projectId = "<%- projectId %>";
   	console.log("Project Id is " + projectId);
     var userName = "<%=req.user.userName %>";
+    var userId = "<%=req.user.id %>";
     console.log("userName in workspace.ejs : " + userName);
   	var myMap = new Map();
   	var undoDataMap = new Map();

@@ -25,10 +25,16 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
   function requestDeleteFile(resourceId) {
     var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
-    var getting = $.get(url);
-    getting.done(function (data) {
+    // var getting = $.get(url);
+    // getting.done(function (data) {
+    //   console.log("DeleteResource publishing");
+    //   PubSub.publish("DeleteResource", data);
+    // });
+    io.socket.get(url, function (resData, jwres){
       console.log("DeleteResource publishing");
-      PubSub.publish("DeleteResource", data);
+      PubSub.publish("DeleteResource", resData);
+      var data = {resource: resData, action: 'deleted'};
+      PubSub.publish("addNewActivity", data);
     });
   }
 
@@ -54,6 +60,23 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log('data : ' + JSON.stringify(data));
         PubSub.publish("AddFile", data);
       }
+    });
+  }
+
+  function requestCreateActivity(msg, data) {
+    var url = '/project/in/' + projectId + '/activity/new';
+    console.log('==== requestCreateActivity ====');
+    console.log('data.action : ' + JSON.stringify(data.action));
+    var activityData = {
+      project: projectId,
+      user: userId,
+      action: data.action,
+      resource: data.resource,
+      date: new Date()
+    };
+
+    io.socket.post(url, { data: activityData }, function (resData, jwres){
+      console.log('##### in ProjectExplorer new activity created #####');
     });
   }
 
@@ -180,6 +203,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       PubSub.subscribe("ResourceNewFormSubmit", function() {
        self.submitResourceAddForm();
       });
+
+      PubSub.subscribe("addNewActivity", requestCreateActivity);
     },
 
     onSelect: function (event, node, trigger, nodeID, resourceName) {
@@ -235,10 +260,18 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var resourceType = this.state.resourceType;
         var nodeID = this.state.nodeID;
         var url = '/project/in/' + projectId + '/resource/new';
-        var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
-        posting.done(function (data) {
+        // var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
+        // posting.done(function (data) {
+        //   console.log('##### in projectExplorer post resource/new #####');
+        //   PubSub.publish("AddFile", data);
+        // });
+        var data = { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID, userId: userId };
+        io.socket.post(url, data, function (resData, jwres){
           console.log('##### in projectExplorer post resource/new #####');
-          PubSub.publish("AddFile", data);
+          console.log('data : ' + JSON.stringify(resData));
+          PubSub.publish("AddFile", resData);
+          var data = {resource: resData, action: 'created'};
+          PubSub.publish("addNewActivity", data);
         });
       }
       dialog.dialog("close");
