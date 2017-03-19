@@ -1,6 +1,5 @@
 define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (classnames, React, $) {
   var preDiv = null;
-
   var dialog = $("#dialog-form").dialog({
     autoOpen: false,
     height: 250,
@@ -63,6 +62,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         myMap: myMap,
         undoDataMap: undoDataMap,
         redoDataMap: redoDataMap,
+        tabTitleMap: tabTitleMap,
         data: {
           name: projectName,
           resourceType: 'project',
@@ -72,7 +72,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         },
         resourceType: "",
         trigger: "",
-        nodeID: ""
+        resourceID: ""
       });
     },
 
@@ -84,7 +84,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log("Resource Tree");
         console.log(JSON.stringify(project));
         project.children = project.resources;
-        self.setState({ data: project, resourceType: "", trigger: "", nodeID: "", resourceFetched: true });
+        self.setState({ data: project, resourceType: "", trigger: "", resourceID: "", resourceFetched: true });
         console.log("state has been set");
       });
       console.log("new component will mount");
@@ -118,20 +118,20 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         event.preventDefault();
         var updatedDtData = self.state.dtData;
         var fileId = self.state.fileId;
-        url = "/project/in/" + projectName + "/resource/data/" + nodeID;
+        url = "/project/in/" + projectName + "/resource/data/" + resourceID;
         console.log("refresh url = " + url);
-        console.log("*** nodeID *** " + nodeID);
+        console.log("*** resourceID *** " + resourceID);
 
         $.getJSON(url, function (data) {
           console.log('ok, got data from refresh');
-          self.state.myMap.set(nodeID, data);
-          self.state.undoDataMap.set(nodeID, []);
-          self.state.redoDataMap.set(nodeID, []);
-          var undoStack = self.state.undoDataMap.get(nodeID);
-          var redoStack = self.state.redoDataMap.get(nodeID);
-          var dtData = self.state.myMap.get(nodeID);
-          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-          $('#' + nodeID).css("color", "#000");
+          self.state.myMap.set(resourceID, data);
+          self.state.undoDataMap.set(resourceID, []);
+          self.state.redoDataMap.set(resourceID, []);
+          var undoStack = self.state.undoDataMap.get(resourceID);
+          var redoStack = self.state.redoDataMap.get(resourceID);
+          var dtData = self.state.myMap.get(resourceID);
+          PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+          $('#' + resourceID).css("color", "#000");
         });
       });
 
@@ -139,7 +139,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         selector: '.context-menu-file',
         callback: function (key, options) {
           self.setState({ resourceType: trigger });
-          var resourceId = self.state.nodeID;
+          var resourceId = self.state.resourceID;
           if (key == "delete") {
             requestDeleteFile(resourceId);
           } else if (key == "download") {
@@ -161,7 +161,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         selector: '.context-menu-parent',
         callback: function (key, options) {
           self.setState({ resourceType: key });
-          var resourceId = self.state.nodeID;
+          var resourceId = self.state.resourceID;
           if (key == "file" || key == "folder") {
             dialog.dialog("open");
           } else if (key == "delete") {
@@ -182,13 +182,11 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       });
     },
 
-    onSelect: function (event, node, trigger, nodeID, resourceName) {
+    onSelect: function (node, resourceID, resourceName, event) {
       var self = this;
       var projectName = this.state.data.name;
 
-      console.log("trigger = " + trigger);
-
-      this.setState({ nodeID: nodeID });
+      this.setState({ resourceID: resourceID });
 
       if (this.state.selected && this.state.selected.isMounted()) {
         this.state.selected.setState({ selected: false });
@@ -200,42 +198,46 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       if (preDiv) {
         preDiv.style.backgroundColor = "#D1D0CE"; //backgroundColor
         event.target.style.backgroundColor = "#A9A9A9"; //selectedColor
-      }
+        }
       preDiv = event.target;
 
-      if (trigger == "file") {
-        if (self.state.myMap.has(nodeID)) {
+      if (self.state.myMap.has(resourceID)) {
           console.log("Key is exists");
-          var dtData = self.state.myMap.get(nodeID);
-          var undoStack = self.state.undoDataMap.get(nodeID);
-          var redoStack = self.state.redoDataMap.get(nodeID);
-          PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+          var dtData = self.state.myMap.get(resourceID);
+          var undoStack = self.state.undoDataMap.get(resourceID);
+          var redoStack = self.state.redoDataMap.get(resourceID);
+          var tabTitle = self.state.tabTitleMap.get(resourceID);
+          PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID, content: dtData, undoStack: undoStack, redoStack: redoStack});
+          PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
         } else {
           console.log("---no key---");
-          url = "/project/in/" + projectName + "/resource/data/" + nodeID;
+          url = "/project/in/" + projectName + "/resource/data/" + resourceID;
           $.getJSON(url, function (data) {
             console.log('ok, got data');
-            self.state.myMap.set(nodeID, data);
-            self.state.undoDataMap.set(nodeID, []);
-            self.state.redoDataMap.set(nodeID, []);
-            var undoStack = self.state.undoDataMap.get(nodeID);
-            var redoStack = self.state.redoDataMap.get(nodeID);
-            var dtData = self.state.myMap.get(nodeID);
-            PubSub.publish('ClickFileEvent', { fileId: nodeID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+            self.state.myMap.set(resourceID, data);
+            self.state.undoDataMap.set(resourceID, []);
+            self.state.redoDataMap.set(resourceID, []);
+            self.state.tabTitleMap.set(resourceID, resourceName);
+            var undoStack = self.state.undoDataMap.get(resourceID);
+            var redoStack = self.state.redoDataMap.get(resourceID);
+            var dtData = self.state.myMap.get(resourceID);
+            var tabTitle = self.state.tabTitleMap.get(resourceID);
+            PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID, content: dtData, undoStack: undoStack, redoStack: redoStack});
+            PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
             preDiv.style.color = "#000";
           });
         }
         console.log("===file clicked=== ");
-      }
     },
 
     submitResourceAddForm: function () {
       var resourceName = $('#resourceID').val();
       if (resourceName) {
         var resourceType = this.state.resourceType;
-        var nodeID = this.state.nodeID;
+        var resourceID = this.state.resourceID;
+        console.log("submitResourceAddForm resourceID = " + resourceID);
         var url = '/project/in/' + projectId + '/resource/new';
-        var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: nodeID });
+        var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: resourceID });
         posting.done(function (data) {
           console.log('##### in projectExplorer post resource/new #####');
           PubSub.publish("AddFile", data);
@@ -245,7 +247,6 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     },
 
     render: function () {
-
       return (
         <div>
           <ul className="resource-tree">
@@ -267,10 +268,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     },
     onResourceSelect: function (event) {
       if (this.props.onResourceSelect) {
-        trigger = event.target.getAttribute('value');
-        nodeID = event.target.getAttribute('id');
+        resourceID = event.target.getAttribute('id');
         resourceName = this.props.data.name;
-        this.props.onResourceSelect(event, this, trigger, nodeID, resourceName);
+        this.props.onResourceSelect(this, resourceID, resourceName, event);
       }
       event.preventDefault();
       event.stopPropagation();
@@ -375,7 +375,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       console.log("Add Child File");
       console.log("file parent is " + file.parent);
       console.log("this.props.data.id is " + this.props.data.id);
-      if (this.props.data.resource == 'file') {
+      if (this.props.data.resourceType == 'file') {
         return;
       }
       if (file.parent != this.props.data.id) {
@@ -394,9 +394,19 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       console.log("End of Add Child File");
     },
 
+    changeSelectedFile: function(msg, data) {
+      console.log(" changeSelectedFile ");
+      if(data.resourceId == this.props.data.id) {
+        $("#" + this.props.data.id).css("background" , "#A9A9A9");
+      } else {
+        $("#" + this.props.data.id).css("background" , "#D1D0CE");
+      }
+    },
+
     componentDidMount: function () {
       PubSub.subscribe("AddFile", this.addChildFile);
       PubSub.subscribe("DeleteResource", this.removeChildFile);
+      PubSub.subscribe("SelectTabEvent", this.changeSelectedFile);
     },
 
     render: function () {
@@ -427,7 +437,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-          <a onClick={this.onResourceSelect} value={this.props.data.resourceType} id={this.props.data.id} className={contextMenuClassName}> {resourceIcon}&nbsp; {this.props.data.name}</a>
+          <a onClick={this.onResourceSelect} id={this.props.data.id} className={contextMenuClassName}> {resourceIcon}&nbsp; {this.props.data.name}</a>
           <ul>
             {this.state.displayingChildren.map(function (child, index) {
               return (<TreeNode key={child.id} data={child} onResourceSelect={self.props.onResourceSelect} />)

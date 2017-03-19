@@ -18,8 +18,8 @@ requirejs.config({
 
 });
 
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/projectExplorer', 'app/DecisionTable', 'app/ProjectLog'],
-function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable, ProjectLog) {
+require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/ProjectExplorer', 'app/DecisionTable', 'app/ProjectLog', 'app/EditorStatusBar'],
+function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable, ProjectLog, EditorStatusBar) {
 
   function render() {
     ReactDOM.render( <ProjectExplorer />,
@@ -30,6 +30,9 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
     );
     ReactDOM.render( <ProjectLog />,
       document.getElementById('extended-area')
+    );
+    ReactDOM.render( <EditorStatusBar />,
+      document.getElementById('editor-status-bar')
     );
   }
   render();
