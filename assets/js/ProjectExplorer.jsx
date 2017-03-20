@@ -33,6 +33,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     io.socket.get(url, function (resData, jwres){
       console.log("DeleteResource publishing");
       PubSub.publish("DeleteResource", resData);
+      PubSub.publish('DeleteFileEvent');
+      PubSub.publish('DeleteTab', resData.id);
       var data = {resource: resData, action: 'deleted'};
       PubSub.publish("addNewActivity", data);
     });
@@ -67,7 +69,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     var url = '/project/in/' + projectId + '/activity/new';
     console.log('==== requestCreateActivity ====');
     console.log('data.action : ' + JSON.stringify(data.action));
-    
+
     var activityData = {
       project: projectId,
       user: userId,
@@ -135,12 +137,12 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log("DeleteSocketBroadCast");
         console.log(JSON.stringify(data));
         PubSub.publish('DeleteFileEvent');
+        PubSub.publish('DeleteTab', data.id);
         PubSub.publish("DeleteResource", data);
       });
 
       io.socket.on('changed-resource', function (data) {
-        var resourceId = data.id;
-        $('#' + resourceId).css("color", "#FFBF00");
+        PubSub.publish("updatedResource", data.id);
       });
 
       $('#refreshID').on('click', function (event) {
@@ -160,7 +162,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
           var redoStack = self.state.redoDataMap.get(resourceID);
           var dtData = self.state.myMap.get(resourceID);
           PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-          $('#' + resourceID).css("color", "#000");
+          PubSub.publish("refreshedResource", resourceID);
         });
       });
 
@@ -214,7 +216,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
 
     },
 
-    onSelect: function (node, resourceID, resourceName, event) {
+    onSelect: function (node, resourceID, resourceName) {
       var self = this;
       var projectName = this.state.data.name;
 
@@ -227,11 +229,11 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       this.setState({ selected: node });
       node.setState({ selected: true });
 
-      if (preDiv) {
-        preDiv.style.backgroundColor = "#D1D0CE"; //backgroundColor
-        event.target.style.backgroundColor = "#A9A9A9"; //selectedColor
-        }
-      preDiv = event.target;
+      // if (preDiv) {
+      //   preDiv.style.backgroundColor = "#D1D0CE"; //backgroundColor
+      //   event.target.style.backgroundColor = "#A9A9A9"; //selectedColor
+      //   }
+      // preDiv = event.target;
 
       if (self.state.myMap.has(resourceID)) {
           console.log("Key is exists");
@@ -256,7 +258,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
             var tabTitle = self.state.tabTitleMap.get(resourceID);
             PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID, content: dtData, undoStack: undoStack, redoStack: redoStack});
             PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
-            preDiv.style.color = "#000";
+            PubSub.publish("refreshedResource", resourceID);
           });
         }
         console.log("===file clicked=== ");
@@ -303,14 +305,16 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         children: [],
         displayingChildren: [],
         treeNodeExpanded: false,
-        resourceFetched: false
+        resourceFetched: false,
+        updated: false,
+        selected: false
       };
     },
     onResourceSelect: function (event) {
       if (this.props.onResourceSelect) {
         resourceID = event.target.getAttribute('id');
         resourceName = this.props.data.name;
-        this.props.onResourceSelect(this, resourceID, resourceName, event);
+        this.props.onResourceSelect(this, resourceID, resourceName);
       }
       event.preventDefault();
       event.stopPropagation();
@@ -438,9 +442,27 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
     changeSelectedFile: function(msg, data) {
       console.log(" changeSelectedFile ");
       if(data.resourceId == this.props.data.id) {
-        $("#" + this.props.data.id).css("background" , "#A9A9A9");
+      this.setState({selected: true});
       } else {
-        $("#" + this.props.data.id).css("background" , "#D1D0CE");
+      this.setState({selected: false});
+      }
+    },
+
+    changeUpdatedState: function(msg, resourceId) {
+      console.log(" ");
+      console.log("changeUpdatedState");
+      if(resourceId == this.props.data.id){
+        this.setState({updated: true});
+      } else {
+        this.setState({updated: false});
+      }
+    },
+
+    resetUpdatedState: function(msg, resourceId) {
+      console.log(" ");
+      console.log("resetUpdatedState");
+      if(resourceId == this.props.data.id){
+        this.setState({updated: false});
       }
     },
 
@@ -448,6 +470,8 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       PubSub.subscribe("AddFile", this.addChildFile);
       PubSub.subscribe("DeleteResource", this.removeChildFile);
       PubSub.subscribe("SelectTabEvent", this.changeSelectedFile);
+      PubSub.subscribe("refreshedResource", this.resetUpdatedState);
+      PubSub.subscribe("updatedResource", this.changeUpdatedState);
     },
 
     render: function () {
@@ -459,17 +483,23 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       var classes = classnames({
         'has-children': (this.props.data.resourceType != 'file' ? true : false),
         'open': (this.state.displayingChildren.length ? true : false),
-        'closed': (this.state.displayingChildren ? false : true),
-        'selected': (this.state.selected ? true : false)
+        'closed': (this.state.displayingChildren ? false : true)
       });
 
-      var contextMenuClassName;
-      if (this.props.data.resourceType == 'file') {
-        contextMenuClassName = "context-menu-file";
-      }
-      else {
-        contextMenuClassName = "context-menu-parent";
-      }
+      var classes1 = classnames({
+      'selected': (this.state.selected ? true : false),
+      'updated' : (this.state.updated ? true : false),
+      'context-menu-file' : (this.props.data.resourceType == 'file'),
+      'context-menu-parent' : (this.props.data.resourceType !== 'file')
+      })
+      //
+      // var contextMenuClassName;
+      // if (this.props.data.resourceType == 'file') {
+      //   contextMenuClassName = "context-menu-file";
+      // }
+      // else {
+      //   contextMenuClassName = "context-menu-parent";
+      // }
 
       if (this.props.data.resourceType == "file") {
         resourceIcon = <i className="fa fa-file-text-o" aria-hidden="true"></i>;
@@ -478,7 +508,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       }
       return (
         <li ref="node" className={classes} onClick={this.onChildDisplayToggle}>
-          <a onClick={this.onResourceSelect} id={this.props.data.id} className={contextMenuClassName}> {resourceIcon}&nbsp; {this.props.data.name}</a>
+          <a onClick={this.onResourceSelect} id={this.props.data.id} className={classes1}> {resourceIcon}&nbsp; {this.props.data.name}</a>
           <ul>
             {this.state.displayingChildren.map(function (child, index) {
               return (<TreeNode key={child.id} data={child} onResourceSelect={self.props.onResourceSelect} />)

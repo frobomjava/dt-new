@@ -10,6 +10,21 @@ define(['react', 'PubSub'], function (React) {
 
     componentDidMount: function () {
       PubSub.subscribe("ClickFileOpenEvent", this.handleFileClick);
+      PubSub.subscribe("DeleteTab", this.handleTabDelete);
+    },
+
+    handleTabDelete: function(msg, resourceId){
+      console.log(" ");
+      console.log("handleFileDelete editor bar");
+      console.log("resourceId = " + resourceId);
+      var updatedTabList = this.state.tabList.slice();
+      for(var i=0; i<updatedTabList.length; i++){
+        var tabID = updatedTabList[i].id;
+        if(tabID == resourceId){
+          updatedTabList.splice(i, 1);
+          this.setState({ tabList: updatedTabList });
+        }
+      }
     },
 
     handleFileClick(msg, data) {
