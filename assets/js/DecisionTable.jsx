@@ -157,12 +157,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     handleFileClick(msg, data) {
       console.log("handleFileClick....");
       console.log("file id is " + data.fileId);
-      this.setState({ dtData: data.dtData });
       this.setState({ fileId: data.fileId });
-      this.setState({ undoStack: data.undoStack });
-      this.setState({ redoStack: data.redoStack });
-      undoCount = this.state.undoStack.length;
-      redoCount = this.state.redoStack.length;
     };
 
     handleFileDelete(msg, data) {
