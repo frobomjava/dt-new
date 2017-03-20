@@ -193,7 +193,12 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         var url = '/project/in/' + projectId + '/resource/save/' + fileId;
         //var posting = $.post(url, { data: updatedDtData });
         console.log('userName : ' + userName);
-        io.socket.post(url, { data: updatedDtData, userName: userName }, function (resData, jwres){});
+        // io.socket.post(url, { data: updatedDtData, userName: userName }, function (resData, jwres){});
+        io.socket.post(url, { data: updatedDtData, userName: userName }, function (resData, jwres){
+          console.log('=== after send /resource/save/ socket request ===');
+          var data = {resource : resData, action: 'updated'};
+          PubSub.publish("addNewActivity", data);
+        });
       });
 
       $('#undoID').on('click', function (event){

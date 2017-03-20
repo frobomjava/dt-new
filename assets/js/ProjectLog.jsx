@@ -1,18 +1,23 @@
-define(['react', 'jquery', 'jquery.ui'], function (React, $) {
+define(['react', 'jquery', 'jquery.ui', 'PubSub'], function (React, $) {
 
   var LogItems = React.createClass({
     render: function() {
       var logData = this.props.data;
 
       function createLogItems(item) {
-        return <li key={item.key}>{item.time}  {item.userName} {item.text} {item.name} {item.resourceType}</li>
+        return <li key={item.id} >
+                <div className="activity">
+                  <b>{item.user.userName}</b> {item.action} {item.resourceUrl}&nbsp;
+                  {item.resourceType} <br/> <time dateTime={item.date}>{item.date}</time>
+                </div>
+              </li>
       }
 
-      var logItems = logData.map(createLogItems);
+      var activityItems = logData.map(createLogItems);
 
       return (
         <ul className="LogList">
-          {logItems}
+          {activityItems}
         </ul>
       );
     }
@@ -24,12 +29,25 @@ define(['react', 'jquery', 'jquery.ui'], function (React, $) {
         items: []
       };
     },
-    // componentWillMount() {
-    //   PubSub.subscribe("LogEvent", this.addItem);
-    // },
+
+    componentWillMount() {
+      var self = this;
+
+      var url = '/project/in/' + projectId + '/get/activities';
+
+      $.getJSON(url, function (activities) {
+        console.log("Got JSON Data");
+        console.log(JSON.stringify(activities));
+        self.setState({ items: activities });
+        console.log("ProjectLog state has been set");
+      });
+
+      console.log("new component will mount");
+    },
+
     addItem: function(data) {
       console.log('*** ProjectLog addItem ***');
-      data.key = new Date();
+      //data.key = new Date();
       console.log('data : ' + JSON.stringify(data));
 
       var itemArray = this.state.items;
@@ -42,39 +60,24 @@ define(['react', 'jquery', 'jquery.ui'], function (React, $) {
     render: function() {
       return (
         <div className="LogContainer">
-          <ul>
+          <div className="title">
+            <h4>Activity</h4>
+          </div>
+          <div id="LogItemContainer">
             <LogItems data={this.state.items}/>
-          </ul>
+          </div>
         </div>
       );
     },
     componentDidMount: function() {
       var self = this;
-      io.socket.on('new-resource', function (data) {
-        console.log('+++++ ProjectLog new-resource socket.on +++++');
-        var time = new Date(new Date().getTime()).toLocaleTimeString();
-        data.time = time;
-        data.text = 'created ';
+
+      io.socket.on('new-activity', function (data) {
+        console.log('+++++ ProjectLog new-activity socket.on +++++');
+        console.log('data in new-activity : ' + JSON.stringify(data));
         self.addItem(data);
       });
 
-      io.socket.on('delete-resource', function (data) {
-        console.log("DeleteSocketBroadCast");
-        console.log(JSON.stringify(data));
-        var time = new Date(new Date().getTime()).toLocaleTimeString();
-        data.time = time;
-        data.text = 'deleted ';
-        self.addItem(data);
-      });
-
-      io.socket.on('changed-resource', function (data) {
-        console.log('>>>>> ProjectLog changed-resource >>>>>');
-        console.log('got data : ' + JSON.stringify(data));
-        var time = new Date(new Date().getTime()).toLocaleTimeString();
-        data.time = time;
-        data.text = 'updated ';
-        self.addItem(data);
-      });
     }
   });
   return ProjectLog;

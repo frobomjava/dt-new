@@ -1,4 +1,21 @@
 module.exports = {
+  findUserById: function (userId, callback) {
+    User.findOne({
+      id: userId
+    }).exec(function (err, user) {
+      if (err) {
+        return callback(err);
+      }
+      if (user) {
+        return callback(null, user);
+      }
+      var error = {
+        appMessage: 'No user exists with this id.'
+      };
+      return callback(error);
+    });
+  },
+
   findUserByEmail: function (email, callback) {
     User.findOne({
       email: email

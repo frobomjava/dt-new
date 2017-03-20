@@ -23,11 +23,18 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
   });
 
   function requestDeleteFile(resourceId) {
-    var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
-    var getting = $.get(url);
-    getting.done(function (data) {
+    console.log('=== requestDeleteFile ===');
+     var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
+    // var getting = $.get(url);
+    // getting.done(function (data) {
+    //   console.log("DeleteResource publishing");
+    //   PubSub.publish("DeleteResource", data);
+    // });
+    io.socket.get(url, function (resData, jwres){
       console.log("DeleteResource publishing");
-      PubSub.publish("DeleteResource", data);
+      PubSub.publish("DeleteResource", resData);
+      var data = {resource: resData, action: 'deleted'};
+      PubSub.publish("addNewActivity", data);
     });
   }
 
@@ -53,6 +60,28 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         console.log('data : ' + JSON.stringify(data));
         PubSub.publish("AddFile", data);
       }
+    });
+  }
+
+  function requestCreateActivity(msg, data) {
+    var url = '/project/in/' + projectId + '/activity/new';
+    console.log('==== requestCreateActivity ====');
+    console.log('data.action : ' + JSON.stringify(data.action));
+    
+    var activityData = {
+      project: projectId,
+      user: userId,
+      action: data.action,
+      resourceUrl: data.resource.url,
+      resourceType: data.resource.resourceType,
+      date: new Date()
+    };
+    // var posting = $.post(url, { data: activityData });
+    // posting.done(function (data) {
+    //   console.log('##### in ProjectExplorer post activity/new #####');
+    // });
+    io.socket.post(url, { data: activityData }, function (resData, jwres){
+      console.log('##### in ProjectExplorer post activity/new #####');
     });
   }
 
@@ -138,7 +167,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       $.contextMenu({
         selector: '.context-menu-file',
         callback: function (key, options) {
-          self.setState({ resourceType: trigger });
+          //self.setState({ resourceType: trigger });
           var resourceId = self.state.resourceID;
           if (key == "delete") {
             requestDeleteFile(resourceId);
@@ -180,6 +209,9 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       PubSub.subscribe("ResourceNewFormSubmit", function() {
        self.submitResourceAddForm();
       });
+
+      PubSub.subscribe("addNewActivity", requestCreateActivity);
+
     },
 
     onSelect: function (node, resourceID, resourceName, event) {
@@ -237,10 +269,18 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         var resourceID = this.state.resourceID;
         console.log("submitResourceAddForm resourceID = " + resourceID);
         var url = '/project/in/' + projectId + '/resource/new';
-        var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: resourceID });
-        posting.done(function (data) {
+        // var posting = $.post(url, { resourceName: resourceName, resourceType: resourceType, nodeID: resourceID });
+        // posting.done(function (data) {
+        //   console.log('##### in projectExplorer post resource/new #####');
+        //   PubSub.publish("AddFile", data);
+        // });
+        var data = { resourceName: resourceName, resourceType: resourceType, nodeID: resourceID, userId: userId };
+        io.socket.post(url, data, function (resData, jwres){
           console.log('##### in projectExplorer post resource/new #####');
-          PubSub.publish("AddFile", data);
+          console.log('data : ' + JSON.stringify(resData));
+          PubSub.publish("AddFile", resData);
+          var data = {resource: resData, action: 'created'};
+          PubSub.publish("addNewActivity", data);
         });
       }
       dialog.dialog("close");
@@ -391,6 +431,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         children: children,
         displayingChildren: displayingChildren
       });
+      console.log('children : ' + JSON.stringify(children));
       console.log("End of Add Child File");
     },
 
