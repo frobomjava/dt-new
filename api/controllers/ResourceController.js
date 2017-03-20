@@ -8,7 +8,7 @@ var ProjectUtil = require('../utils/ProjectUtil.js');
 var ResourceUtil = require('../utils/ResourceUtil');
 module.exports = {
   create: function (req, res) {
-    console.log("===resource create===");
+    console.log("===resource create ResourceController ===");
 
     var projectData = {
       id: req.param('projectId')
@@ -22,7 +22,7 @@ module.exports = {
       name: req.param('resourceName'),
       url: "",
       resourceType: req.param('resourceType'),
-      createdBy: req.user.id
+      createdBy: req.param('userId')
     }
     if (!parentID) {
       console.log("Parent id does not exist");
@@ -32,6 +32,7 @@ module.exports = {
               if (err) {
                 return callback(err);
               }
+              //resourceData.parent = project;
               return callback(null, project);
             });
           },
@@ -49,12 +50,13 @@ module.exports = {
           if (err) {
             return res.serverError(err);
           }
-          resourceData = resource;
-          resourceData.userName = req.user.userName;
+
           console.log('##### '+ resource.name + ' Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          console.log('resourceData : ' + JSON.stringify(resourceData));
-          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
+
+          console.log('created resource : ' + JSON.stringify(resource));
+
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
         });
@@ -87,12 +89,9 @@ module.exports = {
           }
           console.log('##### Resource is created #####');
           console.log('ProjectId/resourceId : ' + projectId + '/' + resource.id);
-          resourceData = resource;
-          resourceData.userName = req.user.userName;
-          sails.sockets.broadcast(projectId, 'new-resource', resourceData, req);
+          sails.sockets.broadcast(projectId, 'new-resource', resource, req);
           console.log("broadcasted!");
           return res.json(resource);
-
         });
     }
   },
@@ -128,15 +127,16 @@ module.exports = {
 
   saveData: function (req, res) {
     var projectId = req.param('projectId');
-    var id = req.param('resourceId');
+    var resourceId = req.param('resourceId');
     var data = req.param('data');
+    var resourceData = {
+      id: resourceId,
+      resourceType: 'file'
+    };
     async.waterfall([
         function (callback) {
-          var criteria = {
-            id: id,
-            resourceType: 'file'
-          };
-          Resource.findOne(criteria).exec(function (err, resource) {
+
+          Resource.findOne(resourceData).exec(function (err, resource) {
             if (err) {
               return callback(err);
             }
@@ -145,6 +145,7 @@ module.exports = {
                 message: 'No resource'
               });
             }
+            resourceData = resource;
             return callback(null, resource);
           })
         },
@@ -164,11 +165,12 @@ module.exports = {
         }
 
         if(req.isSocket === true) {
-          resource.userName = req.param('userName');
-          sails.sockets.broadcast(projectId, 'changed-resource', resource, req);
-           console.log("broadcast for saveData successful");
+          console.log('resource before changed-resource broadcast: ' + JSON.stringify(resourceData));
+          sails.sockets.broadcast(projectId, 'changed-resource', resourceData, req);
+          console.log("broadcast for saveData successful");
+          return res.json(resourceData);
         }
-        res.ok();
+
       });
   },
 
@@ -277,7 +279,7 @@ module.exports = {
             return callback(err);
           }
           console.log(resourceUrl + ' is deleted...');
-          deletedResource.userName = req.user.userName;
+          //deletedResource.userName = req.user.userName;
           sails.sockets.broadcast(projectId, 'delete-resource', deletedResource, req);
           console.log("*** delete broadcast successful *** ");
           //return res.ok({message : 'resource is deleted..'});

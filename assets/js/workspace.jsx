@@ -29,7 +29,7 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
       document.getElementById('editor')
     );
     ReactDOM.render( <ProjectLog />,
-      document.getElementById('extended-area')
+      document.getElementById('activity-container')
     );
     ReactDOM.render( <EditorStatusbar />,
       document.getElementById('editor-status-bar')

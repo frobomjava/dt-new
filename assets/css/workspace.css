@@ -190,6 +190,16 @@ body {
     background: #D1D0CE;
 }
 
+#activity-container {
+  position: absolute;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  right: 0;
+  background: #D1D0CE;
+  overflow: auto;
+}
+
 #tabBar {
   position: absolute;
   top: 0;
@@ -294,4 +304,18 @@ fieldset { padding:0; border:0; margin-top:25px; }
 .resource-tree .has-children.always-open:before {
   content: "";
   cursor: default;
+}
+
+div#activity-container > div.LogContainer > div.title > h4 {
+  text-align: center;
+}
+
+ul.LogList {
+  list-style: none;
+}
+
+div.activity {
+  margin: auto;
+  padding: 8px;
+  background-color: #d2e4f9;
 }
