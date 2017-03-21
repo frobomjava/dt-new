@@ -18,17 +18,44 @@ define(['react', 'PubSub'], function (React) {
       console.log("handleFileDelete editor bar");
       console.log("resourceId = " + resourceId);
       var updatedTabList = this.state.tabList.slice();
+      var updatedTabContentList = this.state.tabContentList.slice();
       for(var i=0; i<updatedTabList.length; i++){
         var tabID = updatedTabList[i].id;
         if(tabID == resourceId){
           updatedTabList.splice(i, 1);
+          updatedTabContentList.splice(i, 1);
           this.setState({ tabList: updatedTabList });
+          this.setState({ tabContentList: updatedTabContentList});
+          PubSub.publish('DeleteFileEvent');
+          console.log("End of Tab and Content Delete");
+
+          var tabCount = updatedTabList.length;
+          var tabIndex = i;
+          if(tabCount != 0){
+            this.refreshContentComponent(tabIndex);
+          }
         }
       }
     },
 
+    refreshContentComponent: function(tabIndex){
+      console.log(" ");
+      console.log("refreshContentComponent");
+      var tab = this.state.tabList.slice();
+      var index;
+      var tabID;
+      if (tabIndex > 0) {
+        index = --tabIndex;
+        tabID = tab[index].id;
+        this.handleTabClick(index, tabID);
+      } else {
+        index = tabIndex;
+        tabID = tab[index].id;
+        this.handleTabClick(index, tabID);
+      }
+    },
+
     handleFileClick(msg, data) {
-      var self = this;
       var isExists = false;
       var updatedTabList = this.state.tabList.slice();
       var updatedTabContentList = this.state.tabContentList.slice();
