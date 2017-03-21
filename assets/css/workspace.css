@@ -316,6 +316,8 @@ div#activity-container > div.LogContainer > div.title > h4 {
 
 ul.LogList {
   list-style: none;
+  margin: 0px;
+  padding: 5px;
 }
 
 div.activity {

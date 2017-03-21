@@ -136,7 +136,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       io.socket.on('delete-resource', function (data) {
         console.log("DeleteSocketBroadCast");
         console.log(JSON.stringify(data));
-        PubSub.publish('DeleteFileEvent');
+        // PubSub.publish('DeleteFileEvent');
         PubSub.publish('DeleteTab', data.id);
         PubSub.publish("DeleteResource", data);
       });
@@ -310,6 +310,7 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
         selected: false
       };
     },
+
     onResourceSelect: function (event) {
       if (this.props.onResourceSelect) {
         resourceID = event.target.getAttribute('id');
@@ -453,9 +454,10 @@ define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], fu
       console.log("changeUpdatedState");
       if(resourceId == this.props.data.id){
         this.setState({updated: true});
-      } else {
-        this.setState({updated: false});
       }
+      // else {
+      //   this.setState({updated: false});
+      // }
     },
 
     resetUpdatedState: function(msg, resourceId) {
