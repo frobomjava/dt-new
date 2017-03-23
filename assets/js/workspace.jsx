@@ -18,8 +18,8 @@ requirejs.config({
 
 });
 
-require(['jquery', 'react', 'reactdom','PubSub', 'jquery-contextMenu', 'classnames', 'app/ProjectExplorer', 'app/DecisionTable', 'app/ProjectLog', 'app/EditorStatusbar'],
-function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, DecisionTable, ProjectLog, EditorStatusbar) {
+require(['react','reactdom','app/ProjectExplorer', 'app/DecisionTable', 'app/ProjectLog', 'app/EditorStatusbar'],
+function (React, ReactDOM, ProjectExplorer, DecisionTable, ProjectLog, EditorStatusbar) {
 
   function render() {
     ReactDOM.render( <ProjectExplorer />,
@@ -36,6 +36,6 @@ function ($, React, ReactDOM, PubSub, contextmenu, classnames, ProjectExplorer, 
     );
   }
   render();
-  console.log("updated workspace.js");
+  console.log("updated workspace.js>>>> require order 2");
 
 }); //require

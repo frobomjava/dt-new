@@ -1,4 +1,4 @@
-define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
+define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstrap'], function (PubSub, React, $) {
   var undoCount = 0;
   var redoCount = 0;
 

@@ -1,4 +1,4 @@
-define(['classnames', 'react', 'jquery', 'jquery.ui', 'bootstrap', 'PubSub'], function (classnames, React, $) {
+define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstrap'], function (PubSub, classnames, React, $) {
   var preDiv = null;
   var dialog = $("#dialog-form").dialog({
     autoOpen: false,

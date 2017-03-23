@@ -1,4 +1,4 @@
-define(['react', 'PubSub'], function (React) {
+define(['react', 'PubSub'], function (React, PubSub) {
   var EditorStatusBar = React.createClass({
     getInitialState: function () {
         return ({
