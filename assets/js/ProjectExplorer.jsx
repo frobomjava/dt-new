@@ -90,10 +90,10 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
   var ProjectExplorer = React.createClass({
     getInitialState: function () {
       return ({
-        myMap: myMap,
-        undoDataMap: undoDataMap,
-        redoDataMap: redoDataMap,
-        tabTitleMap: tabTitleMap,
+        //myMap: myMap,
+        //undoDataMap: undoDataMap,
+        //redoDataMap: redoDataMap,
+        //tabTitleMap: tabTitleMap,
         data: {
           name: projectName,
           resourceType: 'project',
@@ -155,13 +155,16 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
 
         $.getJSON(url, function (data) {
           console.log('ok, got data from refresh');
-          self.state.myMap.set(resourceID, data);
-          self.state.undoDataMap.set(resourceID, []);
-          self.state.redoDataMap.set(resourceID, []);
-          var undoStack = self.state.undoDataMap.get(resourceID);
-          var redoStack = self.state.redoDataMap.get(resourceID);
-          var dtData = self.state.myMap.get(resourceID);
-          PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+          //self.state.myMap.set(resourceID, data);
+          //self.state.undoDataMap.set(resourceID, []);
+          //self.state.redoDataMap.set(resourceID, []);
+          //var undoStack = self.state.undoDataMap.get(resourceID);
+          //var redoStack = self.state.redoDataMap.get(resourceID);
+          //var dtData = self.state.myMap.get(resourceID);
+          app.fileDataMap.set(resourceID, data);
+          app.undoDataMap.set(resourceID, []);
+          app.redoDataMap.set(resourceID, []);
+          PubSub.publish('ClickFileEvent', { fileId: resourceID});
           PubSub.publish("refreshedResource", resourceID);
         });
       });
@@ -235,29 +238,26 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
       //   }
       // preDiv = event.target;
 
-      if (self.state.myMap.has(resourceID)) {
+      if (app.fileDataMap.has(resourceID)) {
           console.log("Key is exists");
-          var dtData = self.state.myMap.get(resourceID);
-          var undoStack = self.state.undoDataMap.get(resourceID);
-          var redoStack = self.state.redoDataMap.get(resourceID);
-          var tabTitle = self.state.tabTitleMap.get(resourceID);
-          PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID, content: dtData, undoStack: undoStack, redoStack: redoStack});
-          PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+          //var dtData = self.state.myMap.get(resourceID);
+          //var undoStack = self.state.undoDataMap.get(resourceID);
+          //var redoStack = self.state.redoDataMap.get(resourceID);
+          var tabTitle = app.tabTitleMap.get(resourceID);
+          PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID});
+          PubSub.publish('ClickFileEvent', { fileId: resourceID});
         } else {
           console.log("---no key---");
           url = "/project/in/" + projectName + "/resource/data/" + resourceID;
           $.getJSON(url, function (data) {
             console.log('ok, got data');
-            self.state.myMap.set(resourceID, data);
-            self.state.undoDataMap.set(resourceID, []);
-            self.state.redoDataMap.set(resourceID, []);
-            self.state.tabTitleMap.set(resourceID, resourceName);
-            var undoStack = self.state.undoDataMap.get(resourceID);
-            var redoStack = self.state.redoDataMap.get(resourceID);
-            var dtData = self.state.myMap.get(resourceID);
-            var tabTitle = self.state.tabTitleMap.get(resourceID);
-            PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID, content: dtData, undoStack: undoStack, redoStack: redoStack});
-            PubSub.publish('ClickFileEvent', { fileId: resourceID, dtData: dtData, undoStack: undoStack, redoStack: redoStack });
+            app.fileDataMap.set(resourceID, data);
+            app.undoDataMap.set(resourceID, []);
+            app.redoDataMap.set(resourceID, []);
+            app.tabTitleMap.set(resourceID, resourceName);
+            var tabTitle = app.tabTitleMap.get(resourceID);
+            PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID});
+            PubSub.publish('ClickFileEvent', { fileId: resourceID});
             PubSub.publish("refreshedResource", resourceID);
           });
         }
