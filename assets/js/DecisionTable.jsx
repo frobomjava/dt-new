@@ -1,4 +1,4 @@
-define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
+define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstrap'], function (PubSub, React, $) {
   var undoCount = 0;
   var redoCount = 0;
 
@@ -116,28 +116,15 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
 
   class DecisionTable extends React.Component {
     constructor(props) {
+      console.log(JSON.stringify(props));
+      console.log("printed pros");
       super(props);
       this.state = {
-        dtData: {
-          names: {
-            conditions: [],
-            actions: []
-          },
-
-          rules: [
-            {
-              conditions: [],
-              actions: []
-            },
-          ]
-        },
-
+        dtData: app.fileDataMap.get(props.fileId),
         activeRuleIndex: '',
         activeCellInfo: null,
         projectName: projectName,
-        fileId: "",
-        undoStack: [],
-        redoStack: []
+        fileId: props.fileId
       }
       this.handleFileClick = this.handleFileClick.bind(this);
       this.handleFileDelete = this.handleFileDelete.bind(this);
@@ -148,7 +135,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     };
 
     componentWillMount() {
-      PubSub.subscribe("ClickFileEvent", this.handleFileClick);
+      //PubSub.subscribe("ClickFileEvent", this.handleFileClick);
       PubSub.subscribe("DeleteFileEvent", this.handleFileDelete);
       PubSub.subscribe("dtCommand", this.handleDtCommand);
       PubSub.subscribe("ClickTabEvent", this.handleFileClick);
@@ -157,12 +144,12 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
     handleFileClick(msg, data) {
       console.log("handleFileClick....");
       console.log("file id is " + data.fileId);
-      this.setState({ dtData: data.dtData });
+      this.setState({ dtData: app.fileDataMap.get(data.fileId) });
       this.setState({ fileId: data.fileId });
-      this.setState({ undoStack: data.undoStack });
-      this.setState({ redoStack: data.redoStack });
-      undoCount = this.state.undoStack.length;
-      redoCount = this.state.redoStack.length;
+      //this.setState({ undoStack: data.undoStack });
+      //this.setState({ redoStack: data.redoStack });
+      undoCount = app.undoDataMap.get(data.fileId).length;
+      redoCount = app.redoDataMap.get(data.fileId).length;
     };
 
     handleFileDelete(msg, data) {
@@ -205,18 +192,13 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         event.preventDefault();
         var updatedDtData = self.state.dtData;
         var popedDtData;
-        if(undoCount > 0) {
-          popedDtData = self.state.undoStack.pop();
-          undoCount--;
-
-          var updateRedoStack = self.state.redoStack;
-          updateRedoStack.push(updatedDtData);
-          self.setState({redoStack: updateRedoStack});
-          redoCount = self.state.redoStack.length;
+        if(app.undoDataMap.get(self.state.fileId).length > 0) {
+          popedDtData = app.undoDataMap.get(self.state.fileId).pop();
+          app.redoDataMap.get(self.state.fileId).push(updatedDtData);
 
           updatedDtData = popedDtData;
           self.setState({dtData: updatedDtData});
-          myMap.set(self.state.fileId, updatedDtData);
+          app.fileDataMap.set(self.state.fileId, updatedDtData);
         }
       });
 
@@ -224,18 +206,14 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         event.preventDefault();
         var updatedDtData = self.state.dtData;
         var popedDtData;
-        if(redoCount > 0 ) {
-          popedDtData = self.state.redoStack.pop();
-          redoCount--;
-
-          var updateUndoStack = self.state.undoStack;
-          updateUndoStack.push(updatedDtData);
-          self.setState({undoStack: updateUndoStack});
-          undoCount = self.state.undoStack.length;
+        if(app.redoDataMap.get(self.state.fileId).length > 0 ) {
+          popedDtData = app.redoDataMap.get(self.state.fileId).pop();
+          
+          app.undoDataMap.get(self.state.fileId).push(updatedDtData);
 
           updatedDtData = popedDtData;
           self.setState({dtData: updatedDtData});
-          myMap.set(self.state.fileId, updatedDtData);
+          app.fileDataMap.set(self.state.fileId, updatedDtData);
         }
       });
 
@@ -289,6 +267,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       this.createUndoStack(dtDatas);
       dtData.rules.splice(++activeRuleIndex, 0, this.createNewRule());
       this.setState({ dtData: dtData });
+      app.fileDataMap.set(this.state.fileId, dtData);
     }
 
     addColumnLeftToActiveCell() {
@@ -302,6 +281,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
       this.createUndoStack(dtDatas);
       dtData.rules.splice(this.state.activeRuleIndex, 0, this.createNewRule());
       this.setState({ dtData: dtData });
+      app.fileDataMap.set(this.state.fileId, dtData);
     }
 
     addRowAboveActiveCell() {
@@ -334,6 +314,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         }
       }
       this.setState({ dtData: dtData });
+      app.fileDataMap.set(this.state.fileId, dtData);
     }
 
     deleteColumn() {
@@ -347,6 +328,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         dtData.rules.splice(activeRuleIndex, 1);
       }
       this.setState({ dtData: dtData });
+      app.fileDataMap.set(this.state.fileId, dtData);
     }
 
     deleteRow() {
@@ -371,6 +353,7 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
         }
       }
       this.setState({ dtData: dtData });
+      app.fileDataMap.set(this.state.fileId, dtData);
     }
 
     createNewRule() {
@@ -414,15 +397,16 @@ define(['react', 'jquery', 'jquery.ui', 'bootstrap'], function (React, $) {
           break;
       }
       this.setState({ dtData: dtDatas });
-      myMap.set(this.state.fileId, dtDatas);
+      app.fileDataMap.set(this.state.fileId, dtDatas);
       this.forceUpdate();
     }
 
     createUndoStack(dtData) {
-      var updateUndoStack = this.state.undoStack;
+      /*var updateUndoStack = this.state.undoStack;
       updateUndoStack.push(dtData);
       this.setState({undoStack: updateUndoStack});
-      undoCount = this.state.undoStack.length;
+      undoCount = this.state.undoStack.length;*/
+      app.undoDataMap.get(this.state.fileId).push(dtData);
     }
 
     render() {

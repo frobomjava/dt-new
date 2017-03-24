@@ -1,4 +1,4 @@
-define(['react', 'jquery', 'jquery.ui', 'PubSub'], function (React, $) {
+define(['react', 'jquery', 'jquery.ui'], function (React, $) {
 
   var LogItems = React.createClass({
     render: function() {
