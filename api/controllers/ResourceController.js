@@ -109,7 +109,7 @@ module.exports = {
           });
         },
         function readData(resource, callback) {
-          if (resource.name.includes('.js')) {
+          if (resource.name.endsWith('.js')) {
             ResourceUtil.readFile(resource.url, function (error, data) {
               if (error) {
                 return callback(err);
