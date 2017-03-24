@@ -116,26 +116,16 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
 
   class DecisionTable extends React.Component {
     constructor(props) {
+      console.log(JSON.stringify(props));
+      console.log("printed pros");
       super(props);
       this.state = {
-        dtData: {
-          names: {
-            conditions: [],
-            actions: []
-          },
-
-          rules: [
-            {
-              conditions: [],
-              actions: []
-            },
-          ]
-        },
+        dtData: props.data,
 
         activeRuleIndex: '',
         activeCellInfo: null,
         projectName: projectName,
-        fileId: ""
+        fileId: props.fileId
       }
       this.handleFileClick = this.handleFileClick.bind(this);
       this.handleFileDelete = this.handleFileDelete.bind(this);
@@ -146,7 +136,7 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
     };
 
     componentWillMount() {
-      PubSub.subscribe("ClickFileEvent", this.handleFileClick);
+      //PubSub.subscribe("ClickFileEvent", this.handleFileClick);
       PubSub.subscribe("DeleteFileEvent", this.handleFileDelete);
       PubSub.subscribe("dtCommand", this.handleDtCommand);
       PubSub.subscribe("ClickTabEvent", this.handleFileClick);

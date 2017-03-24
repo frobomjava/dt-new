@@ -18,14 +18,14 @@ requirejs.config({
 
 });
 
-require(['react','reactdom','app/ProjectExplorer', 'app/DecisionTable', 'app/ProjectLog', 'app/EditorStatusbar'],
-function (React, ReactDOM, ProjectExplorer, DecisionTable, ProjectLog, EditorStatusbar) {
+require(['react','reactdom','app/ProjectExplorer', 'app/DecisionTable', 'app/ProjectLog', 'app/EditorStatusbar', 'app/EditorArea'],
+function (React, ReactDOM, ProjectExplorer, DecisionTable, ProjectLog, EditorStatusbar, EditorArea) {
 
   function render() {
     ReactDOM.render( <ProjectExplorer />,
       document.getElementById('project-explorer')
     );
-    ReactDOM.render( <DecisionTable / >,
+    ReactDOM.render( <EditorArea />,
       document.getElementById('editor')
     );
     ReactDOM.render( <ProjectLog />,
@@ -36,6 +36,6 @@ function (React, ReactDOM, ProjectExplorer, DecisionTable, ProjectLog, EditorSta
     );
   }
   render();
-  console.log("updated workspace.js>>>> require order 2");
+  console.log("updated workspace.js>>>> require order 8");
 
 }); //require
