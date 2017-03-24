@@ -312,6 +312,12 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
     },
 
     onResourceSelect: function (event) {
+      console.log("onResourceSelect*****");
+      var fileId = this.props.data.id;
+      var fileName = this.props.data.name;
+      console.log(this.props.data.name.endsWith('.js'));
+      app.fileInfoMap.set(parseInt(fileId), fileName);
+      console.log("End of onResourceSelect*****");
       if (this.props.onResourceSelect) {
         resourceID = event.target.getAttribute('id');
         resourceName = this.props.data.name;
