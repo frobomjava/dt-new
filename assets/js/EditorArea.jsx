@@ -1,9 +1,10 @@
 define([
     'PubSub',
     'react',
-    'app/DecisionTable'
+    'app/DecisionTable',
+    'app/MonacoEditor'
 
-], function (PubSub, React, DecisionTable) {
+], function (PubSub, React, DecisionTable, MonacoEditor) {
 
     class EditorArea extends React.Component {
         constructor(props) {
@@ -25,6 +26,7 @@ define([
                 });
                 self.forceUpdate();
             });
+
         }
 
         render() {
@@ -39,9 +41,7 @@ define([
             console.log(fileName.endsWith('.js'));
             if (fileName.endsWith('.js')) {
                 return (
-                    <div key={this.state.fileId}>
-                        This is js file.<br /> Editor for js file has not been implemented yet.
-                    </div>
+                    <MonacoEditor/>
                 );
             }
 

@@ -8,7 +8,8 @@ requirejs.config({
     'bootstrap': '/bower_components/bootstrap/dist/js/bootstrap',
     'PubSub': '/bower_components/PubSubJS/src/pubsub',
     'jquery-contextMenu': '/bower_components/jQuery-contextMenu/src/jquery.contextMenu',
-    'app': '/js'
+    'app': '/js',
+    'vs':'/bower_components/monaco-editor/release/min/vs'
   },
 
   shim: {
