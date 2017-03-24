@@ -98,7 +98,7 @@ module.exports = {
 
   getData: function (req, res) {
     var resourceId = req.param('resourceId');
-    
+
     async.waterfall([
         function findResource(callback) {
           ResourceUtil.findResourceById(resourceId, function (err, resource) {
@@ -112,7 +112,7 @@ module.exports = {
           if (resource.name.endsWith('.js')) {
             ResourceUtil.readFile(resource.url, function (error, data) {
               if (error) {
-                return callback(err);
+                return callback(error);
               } else {
                 return res.send(data);
               }
@@ -126,13 +126,13 @@ module.exports = {
               return res.json(jsonData);
             });
           }
-          
+
         }
       ],
       function (err) {
         if (err) {
           return res.serverError(err);
-        }        
+        }
       });
   },
 
@@ -353,7 +353,7 @@ module.exports = {
             return callback(err);
           }
           return callback(null, resourceJSON);
-        });        
+        });
       },
       function (resourceJSON, callback) {
         var data = "function dt ( ) {\n" ;

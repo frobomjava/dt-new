@@ -126,7 +126,7 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
         projectName: projectName,
         fileId: props.fileId
       }
-      this.handleFileClick = this.handleFileClick.bind(this);
+    //  this.handleFileClick = this.handleFileClick.bind(this);
       this.handleFileDelete = this.handleFileDelete.bind(this);
       this.handleDtCommand = this.handleDtCommand.bind(this);
       this.handleCellValueChange = this.handleCellValueChange.bind(this);
@@ -138,19 +138,19 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
       //PubSub.subscribe("ClickFileEvent", this.handleFileClick);
       PubSub.subscribe("DeleteFileEvent", this.handleFileDelete);
       PubSub.subscribe("dtCommand", this.handleDtCommand);
-      PubSub.subscribe("ClickTabEvent", this.handleFileClick);
+      //PubSub.subscribe("ClickTabEvent", this.handleFileClick);
     };
 
-    handleFileClick(msg, data) {
-      console.log("handleFileClick....");
-      console.log("file id is " + data.fileId);
-      this.setState({ dtData: app.fileDataMap.get(data.fileId) });
-      this.setState({ fileId: data.fileId });
-      //this.setState({ undoStack: data.undoStack });
-      //this.setState({ redoStack: data.redoStack });
-      undoCount = app.undoDataMap.get(data.fileId).length;
-      redoCount = app.redoDataMap.get(data.fileId).length;
-    };
+    // handleFileClick(msg, data) {
+    //   console.log("handleFileClick....");
+    //   console.log("file id is " + data.fileId);
+    //   this.setState({ dtData: app.fileDataMap.get(data.fileId) });
+    //   this.setState({ fileId: data.fileId });
+    //   //this.setState({ undoStack: data.undoStack });
+    //   //this.setState({ redoStack: data.redoStack });
+    //   undoCount = app.undoDataMap.get(data.fileId).length;
+    //   redoCount = app.redoDataMap.get(data.fileId).length;
+    // };
 
     handleFileDelete(msg, data) {
       console.log("===delete file handler msg=== " + msg);
@@ -208,7 +208,7 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
         var popedDtData;
         if(app.redoDataMap.get(self.state.fileId).length > 0 ) {
           popedDtData = app.redoDataMap.get(self.state.fileId).pop();
-          
+
           app.undoDataMap.get(self.state.fileId).push(updatedDtData);
 
           updatedDtData = popedDtData;
@@ -261,7 +261,10 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
     };
 
     addColumnRightToActiveCell() {
+      console.log(" ");
+      console.log("***== addColumnRightToActiveCell ==***");
       var activeRuleIndex = this.state.activeRuleIndex;
+      console.log("activeRuleIndex =  " + activeRuleIndex);
       var dtData = this.state.dtData;
       var dtDatas = JSON.parse(JSON.stringify(dtData));
       this.createUndoStack(dtDatas);

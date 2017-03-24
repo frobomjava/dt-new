@@ -20,13 +20,22 @@ define([
             PubSub.subscribe('ClickFileEvent', function (msg, data) {
                 console.log("<<<<<<ClickFileHandler in EditorArea402>>>>>>>");
                 console.log("File id is " + data.fileId);
-                console.log(JSON.stringify(app.fileInfoMap.get(parseInt(data.fileId))));
+                console.log("app.fileInfoMap is "+ JSON.stringify(app.fileInfoMap.get(parseInt(data.fileId))));
                 self.setState({
                     fileId: data.fileId
                 });
                 self.forceUpdate();
             });
 
+            PubSub.subscribe("ClickTabEvent", function (msg, data) {
+                console.log("<<<<<<ClickTabHandler in EditorArea402>>>>>>>");
+                console.log("File id is " + data.fileId);
+                console.log("app.fileInfoMap is "+ JSON.stringify(app.fileInfoMap.get(parseInt(data.fileId))));
+                self.setState({
+                    fileId: data.fileId
+                });
+                self.forceUpdate();
+            });
         }
 
         render() {
@@ -41,7 +50,9 @@ define([
             console.log(fileName.endsWith('.js'));
             if (fileName.endsWith('.js')) {
                 return (
-                    <MonacoEditor/>
+                  <div key={this.state.fileId}>
+                    <MonacoEditor fileId={this.state.fileId}/>
+                  </div>
                 );
             }
 

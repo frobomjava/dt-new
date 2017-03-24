@@ -25,6 +25,7 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
   function requestDeleteFile(resourceId) {
     console.log('=== requestDeleteFile ===');
      var url = '/project/in/' + projectId + '/resource/delete/' + resourceId;
+     console.log("delete url " + url);
     // var getting = $.get(url);
     // getting.done(function (data) {
     //   console.log("DeleteResource publishing");
@@ -249,8 +250,9 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
         } else {
           console.log("---no key---");
           url = "/project/in/" + projectName + "/resource/data/" + resourceID;
-          $.getJSON(url, function (data) {
+          $.get(url, function (data) {
             console.log('ok, got data');
+            console.log("getData = " + data);
             app.fileDataMap.set(resourceID, data);
             app.undoDataMap.set(resourceID, []);
             app.redoDataMap.set(resourceID, []);
@@ -260,6 +262,17 @@ define(['PubSub','classnames', 'react', 'jquery', 'jquery.ui','jquery-contextMen
             PubSub.publish('ClickFileEvent', { fileId: resourceID});
             PubSub.publish("refreshedResource", resourceID);
           });
+          // $.getJSON(url, function (data) {
+          //   console.log('ok, got data');
+          //   app.fileDataMap.set(resourceID, data);
+          //   app.undoDataMap.set(resourceID, []);
+          //   app.redoDataMap.set(resourceID, []);
+          //   app.tabTitleMap.set(resourceID, resourceName);
+          //   var tabTitle = app.tabTitleMap.get(resourceID);
+          //   PubSub.publish("ClickFileOpenEvent", {title: tabTitle, currentID: resourceID});
+          //   PubSub.publish('ClickFileEvent', { fileId: resourceID});
+          //   PubSub.publish("refreshedResource", resourceID);
+          // });
         }
         console.log("===file clicked=== ");
     },

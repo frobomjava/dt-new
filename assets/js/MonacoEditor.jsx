@@ -5,15 +5,16 @@ define([
     class MonacoEditor extends React.Component {
        constructor(props) {
            super(props);
-       }
+           this.state = {
+             codeData: app.fileDataMap.get(props.fileId),
+             fileId: props.fileId
+           }
+       };
 
        componentDidMount() {
+         console.log("this.state.codeData " + JSON.stringify(this.state.codeData));
            var editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-			value: [
-				'function x() {',
-				'\tconsole.log("Hello world!");',
-				'}'
-			].join('\n'),
+			value: [this.state.codeData].join('\n'),
 			language: 'javascript'
 		});
        }
