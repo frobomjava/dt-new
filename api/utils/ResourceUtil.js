@@ -209,18 +209,18 @@ module.exports = {
     });
   },
 
-  readResourceFile: function(path, callback) {
-    console.log('*** ResourceUtil.readResourceFile ***');
+  readFile: function(path, callback) {
+    console.log('*** ResourceUtil.readFile ***');
     console.log('path : ' + path);
     var fs = require('fs');
-    fs.readFile(path, function read(err, data) {
+    fs.readFile(path, "utf8", function read(err, data) {
         if (err) {
             return callback(err);
         }
-        var resourceJSON = JSON.parse(data);
-        console.log('resourceJSON : ' + JSON.stringify(resourceJSON));
+        
+        console.log('data : ' + data);
         console.log('****************************************');
-        return callback(null, resourceJSON);          // Or put the next step in a function and invoke it
+        return callback(null, data);
     });
   },
 

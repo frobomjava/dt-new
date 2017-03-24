@@ -98,7 +98,7 @@ module.exports = {
 
   getData: function (req, res) {
     var resourceId = req.param('resourceId');
-    var jsonFile = require('jsonfile');
+    
     async.waterfall([
         function findResource(callback) {
           ResourceUtil.findResourceById(resourceId, function (err, resource) {
@@ -109,19 +109,30 @@ module.exports = {
           });
         },
         function readData(resource, callback) {
-          jsonFile.readFile(resource.url, function (err, jsonData) {
+          if (resource.name.endsWith('.js')) {
+            ResourceUtil.readFile(resource.url, function (error, data) {
+              if (error) {
+                return callback(err);
+              } else {
+                return res.send(data);
+              }
+            });
+          } else {
+            var jsonFile = require('jsonfile');
+            jsonFile.readFile(resource.url, function (err, jsonData) {
             if (err) {
               return callback(err);
             }
-            return callback(null, jsonData);
-          });
+              return res.json(jsonData);
+            });
+          }
+          
         }
       ],
-      function (err, jsonData) {
+      function (err) {
         if (err) {
           return res.serverError(err);
-        }
-        return res.json(jsonData);
+        }        
       });
   },
 
@@ -336,16 +347,16 @@ module.exports = {
       },
       function (resource, callback) {
         console.log('resource.url : ' + resource.url);
-        ResourceUtil.readResourceFile(resource.url, function (err, resourceJSON) {
+        var jsonFile = require('jsonfile');
+        jsonFile.readFile(resource.url, function (err, resourceJSON) {
           if (err) {
             return callback(err);
           }
-          console.log('==== readResourceFile finished ====');
           return callback(null, resourceJSON);
-        });
+        });        
       },
       function (resourceJSON, callback) {
-        var data = "function dt () {\n" ;
+        var data = "function dt ( ) {\n" ;
         var firstRule = true;
 
         resourceJSON.rules.map(function (rule) {
@@ -355,7 +366,7 @@ module.exports = {
             firstRule = false;
           }
           else {
-              data += "\n\telse if( ";
+              data += "\n\telse if(";
           }
 
           async.series([
