@@ -120,8 +120,7 @@ define(['PubSub', 'react', 'jquery', 'jquery.ui','jquery-contextMenu', 'bootstra
       console.log("printed pros");
       super(props);
       this.state = {
-        dtData: props.data,
-
+        dtData: app.fileDataMap.get(props.fileId),
         activeRuleIndex: '',
         activeCellInfo: null,
         projectName: projectName,
