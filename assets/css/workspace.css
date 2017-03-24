@@ -325,3 +325,7 @@ div.activity {
   padding: 8px;
   background-color: #d2e4f9;
 }
+
+#monaco-editor {
+  width:800px;height:600px;border:1px solid grey
+}
